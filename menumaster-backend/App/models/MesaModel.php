@@ -1,0 +1,149 @@
+<?php
+namespace App\Models;
+
+use PDO;
+use PDOException;
+
+// CORRECCIÓN: Se renombra la clase a 'MesaModel' para consistencia con los otros modelos.
+class MesaModel
+{
+    // CORRECCIÓN: Se estandarizan las propiedades a '$db' y '$table'.
+    private $db;
+    private $table = "mesas";
+
+    public function __construct(PDO $db)
+    {
+        // CORRECCIÓN: Se usa '$this->db' en lugar de '$this->conn'.
+        $this->db = $db;
+    }
+
+    /**
+     * Obtiene todas las mesas con el nombre de su estado.
+     */
+    public function findAll(): array|false
+    {
+        $sql = "SELECT 
+                    m.id, m.numero, m.capacidad, m.ubicacion,
+                    e.nombre AS estado
+                FROM 
+                    {$this->table} m
+                LEFT JOIN 
+                    estados_generales e ON m.estado_id = e.id
+                ORDER BY 
+                    m.numero ASC";
+        
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::findAll: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene una mesa por su ID.
+     */
+    public function find(int $id): array|false
+    {
+        $sql = "SELECT * FROM {$this->table} WHERE id = :id";
+        
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::find: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Crea una nueva mesa a partir de un array de datos.
+     */
+    public function create(array $data): int|false
+    {
+        $columns = implode(', ', array_keys($data));
+        $placeholders = ':' . implode(', :', array_keys($data));
+        
+        $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            foreach ($data as $key => &$value) {
+                // Se determina el tipo de parámetro para mayor seguridad
+                $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+                $stmt->bindParam(':' . $key, $value, $paramType);
+            }
+            
+            $stmt->execute();
+            return (int)$this->db->lastInsertId();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::create: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza una mesa a partir de un array de datos.
+     */
+    public function update(int $id, array $data): bool
+    {
+        $fields = [];
+        foreach ($data as $key => $value) {
+            $fields[] = "{$key} = :{$key}";
+        }
+        $fieldString = implode(', ', $fields);
+
+        $sql = "UPDATE {$this->table} SET {$fieldString} WHERE id = :id";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            foreach ($data as $key => &$value) {
+                $paramType = is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR;
+                $stmt->bindParam(':' . $key, $value, $paramType);
+            }
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::update: ' . $e->getMessage());
+            return false;
+        }
+    }
+    
+    /**
+     * Elimina una mesa por su ID.
+     */
+    public function delete(int $id): bool
+    {
+        $sql = "DELETE FROM {$this->table} WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::delete: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Resetea el estado de TODAS las mesas a 'disponible'.
+     */
+    public function resetAll(): bool
+    {
+        // Asumimos que el ID del estado 'disponible' es 1.
+        $sql = "UPDATE {$this->table} SET estado_id = 1";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::resetAll: ' . $e->getMessage());
+            return false;
+        }
+    }
+}
