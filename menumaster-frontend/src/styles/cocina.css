@@ -1,0 +1,196 @@
+/* src/features/cocina/pages/Cocina.css */
+
+.cocina-container {
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    margin: 2rem auto;
+    max-width: 1200px; /* Un poco más de espacio para las tarjetas */
+    min-height: 70vh;
+    box-shadow: var(--shadow-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cocina-title {
+    color: var(--color-text-primary);
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.cocina-description {
+    color: var(--color-text-secondary);
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.pedidos-list {
+    width: 100%;
+    display: grid;
+    /* Grid responsivo que se adapta al tamaño de la pantalla */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+/* --- Estilos de las Tarjetas de Pedido --- */
+.pedido-card {
+    background-color: var(--color-background);
+    border-left: 5px solid var(--color-text-secondary); /* Borde de estado por defecto */
+    border-radius: var(--border-radius-small);
+    padding: 1.2rem;
+    box-shadow: var(--shadow-small);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pedido-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+/* --- Estilos específicos para cada estado del pedido --- */
+.pedido-card.pendiente {
+    border-left-color: #ef4444; /* Rojo (Error color for urgency) */
+    background-color: #fee2e2;
+}
+
+.pedido-card.en-preparacion {
+    border-left-color: #f59e0b; /* Ámbar/Naranja */
+    background-color: #fef3c7;
+}
+
+.pedido-card.listo-para-servir {
+    border-left-color: #10b981; /* Verde (Success color) */
+    background-color: #d1fae5;
+}
+
+.pedido-header {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--color-text-primary);
+}
+
+.pedido-items {
+    list-style-position: inside;
+    padding-left: 0.5rem;
+    margin: 0.5rem 0;
+    color: var(--color-text-secondary);
+    flex-grow: 1; /* Empuja el estado y el botón hacia abajo */
+}
+
+.pedido-estado {
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    text-transform: capitalize;
+}
+
+/* El botón ya no necesita estilos propios, usará las clases .btn de components.css */
+.pedido-card .w-full {
+    width: 100%;
+}
+
+.no-pedidos {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 1.1rem;
+    padding: 3rem;
+    grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+}
+
+/* --- Media Queries para Responsividad --- */
+@media (max-width: 600px) {
+    .cocina-container {
+        padding: 1.5rem 1rem;
+        margin: 1rem;
+    }
+    .cocina-title {
+        font-size: 1.8rem;
+    }
+    .pedidos-list {
+        grid-template-columns: 1fr;
+    }
+}
+/* src/features/cocina/pages/MenuDelDia.css */
+
+.menu-dia-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+}
+
+.menu-dia-container h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.menu-dia-container p {
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+/* --- Grupo de Inputs --- */
+.input-group {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.input-group select.form-input {
+    flex-grow: 1; /* Hace que el select ocupe el espacio disponible */
+}
+
+/* --- Lista de Productos del Día --- */
+.lista-productos-dia {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--color-border);
+}
+
+.lista-productos-dia li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.2s ease;
+}
+
+.lista-productos-dia li:hover {
+    background-color: var(--color-background);
+}
+
+.lista-productos-dia span {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+/* Estilo para el mensaje de lista vacía */
+.lista-productos-dia li:only-child {
+    justify-content: center;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    border-bottom: none;
+}
+
+/* Botón de eliminar más pequeño y adaptado para la lista */
+.boton-eliminar {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}

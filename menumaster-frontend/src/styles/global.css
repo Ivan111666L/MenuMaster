@@ -1,0 +1,811 @@
+html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #e4dacb;
+}
+
+/* Home */
+
+/* Componentes Reutulizables */
+/* src/styles/components.css */
+
+/* Botones */
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.2s, transform 0.1s;
+}
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+.btn-primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+.btn-secondary:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+.btn-danger:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+/* Inputs */
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+/* Spinner */
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #007bff;
+  animation: spin 1s ease infinite;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  max-width: 500px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+.modal-title {
+  margin: 0;
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+.modal-body {
+  padding-top: 10px;
+}
+
+/* === Variables de Color y Fuentes === */
+:root {
+    --primary-color: #ff6347; /* Tomate */
+    --primary-color-dark: #e55337;
+    --background-color: #f8f5f0; /* Un beige más claro y suave */
+    --surface-color: #ffffff;
+    --text-color: #333333;
+    --text-secondary-color: #666666;
+    --border-color: #dddddd;
+    --error-bg-color: #f2dede;
+    --error-text-color: #a94442;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+}
+
+/* === Contenedor Principal de la Página === */
+.home-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* === Encabezado (Hero Section) === */
+.home-header {
+    width: 100%;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, var(--secondary-color), #555);
+    color: var(--text-light-color);
+}
+
+.home-title {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.home-tagline {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* === Botones de Llamado a la Acción (CTA) === */
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.cta-button {
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.cta-button.primary {
+    background-color: var(--primary-color);
+    color: var(--text-light-color);
+}
+
+.cta-button.primary:hover {
+    background-color: #e55337;
+    transform: translateY(-2px);
+}
+
+.cta-button.secondary {
+    background-color: transparent;
+    color: var(--text-light-color);
+    border: 2px solid var(--text-light-color);
+}
+
+.cta-button.secondary:hover {
+    background-color: var(--text-light-color);
+    color: var(--secondary-color);
+}
+
+
+/* === Sección de Funcionalidades === */
+.features-section {
+    padding: 60px 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 40px;
+}
+
+.features-grid {
+    display: grid;
+    /* Crea una cuadrícula responsiva */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.feature-card {
+    background-color: var(--surface-color);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+    font-size: 3rem; /* Emojis como iconos */
+    margin-bottom: 15px;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* === Sección CTA Final === */
+.cta-section {
+    width: 100%;
+    background-color: var(--secondary-color);
+    color: var(--text-light-color);
+    padding: 60px 20px;
+}
+
+/* === Pie de Página === */
+.home-footer {
+    width: 100%;
+    padding: 20px;
+    background-color: #222;
+    color: #aaa;
+    font-size: 0.9rem;
+}
+/* Register */
+/* Contenedor general con fondo y centrado */
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+}
+
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho */
+}
+
+/* Estilo para el ícono de mostrar/ocultar contraseña */
+.password-group {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 38px; /* Ajusta según la altura de tu label e input */
+    cursor: pointer;
+    user-select: none; /* Evita que el texto se seleccione */
+}
+
+
+/* Mensajes de validación debajo de cada campo */
+.error-text {
+    color: #d9534f; /* Rojo para errores */
+    font-size: 0.85rem;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Mensajes generales (éxito o error de API) */
+.message {
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.message.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+    border: 1px solid #d6e9c6;
+}
+
+.message.error {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #ebccd1;
+}
+
+
+.register-button:hover {
+    background-color: #e55337;
+}
+
+/* Estilo para el botón deshabilitado */
+.register-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Enlace para cambiar a login */
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 0.9rem;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-header h2 {
+    font-size: 1.8rem;
+    color: #F57C00;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sidebar-menu {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.sidebar-menu li {
+    padding: 12px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.sidebar-menu li:hover {
+    background-color: #F57C00;
+    color: white;
+}
+
+.sidebar-icon {
+    font-size: 1.2rem;
+}
+
+/* Contenido principal */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    background-color: #e4dacb;
+    overflow-y: auto;
+}
+
+.main-content header {
+    background-color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.main-content header h1 {
+    font-size: 2rem;
+    color: #F57C00;
+    margin-bottom: 10px;
+}
+
+.main-content header p {
+    color: #666;
+}
+
+/* Widgets */
+.dashboard-widgets {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.widget {
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.widget:hover {
+    transform: translateY(-5px);
+}
+
+.widget h3 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+}
+
+.widget-value {
+    font-size: 2rem;
+    color: #F57C00;
+    font-weight: bold;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .dashboard-widgets {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .home-container {
+        width: 100%;
+        height: auto;
+        padding: 0.5rem;
+        margin: 0.5rem;
+    }
+    .home-title {
+        font-size: 2rem;
+    }
+    .home-links {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .register-form,
+    .login-form {
+        padding: 1rem;
+        max-width: 100%;
+    }
+    .register-title,
+    .login-title {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-title {
+        font-size: 1.5rem;
+    }
+    .home-description {
+        font-size: 0.9rem;
+    }
+    .home-link {
+        font-size: 0.9rem;
+    }
+    .register-title,
+    .login-title {
+        font-size: 1.1rem;
+    }
+    .form-group input {
+        font-size: 0.9rem;
+    }
+}
+/* Final del Dashboard */
+
+
+
+
+
+
+
+
+
+/* --- Variables de Color y Tipografía --- */
+:root {
+    --color-primary: #4f46e5;
+    --color-primary-dark: #4338ca;
+    --color-white: #ffffff;
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #6b7280;
+    --color-background-card: #ffffff;
+    --color-background-light: #f3f4f6;
+    --color-border: #e5e7eb;
+    --color-success: #10b981;
+    --color-success-dark: #059669;
+
+    --border-radius: 0.75rem;
+    --border-radius-small: 0.5rem;
+    --shadow-small: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+
+
+
+/* facturacion */
+/* --- ESTILOS PARA LA PÁGINA DE FACTURACIÓN --- */
+.facturacion-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.facturacion-title {
+    color: #2c3e50;
+    text-align: center;
+}
+
+.facturacion-description {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 30px;
+}
+
+.facturacion-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* Columna de lista más pequeña que la de detalles */
+    gap: 30px;
+}
+
+/* --- Lista de Pedidos --- */
+.lista-pedidos {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    height: fit-content; /* Para que no ocupe toda la altura */
+}
+
+.lista-pedidos h2 {
+    margin-top: 0;
+    font-size: 1.2em;
+}
+
+.lista-pedidos ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-pedidos li {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.lista-pedidos li:hover {
+    background-color: #f9f9f9;
+    border-color: #3498db;
+}
+
+.lista-pedidos li.seleccionado {
+    background-color: #eaf5fc;
+    border-color: #3498db;
+    font-weight: bold;
+}
+
+
+
+/* usuariolayout */
+/* Contenedor para la barra superior y el contenido principal */
+.content-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barra superior */
+.top-bar {
+  background-color: #ffffff;
+  padding: 10px 30px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: flex-end; /* Alinea el contenido a la derecha */
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Espacio entre los detalles y el botón */
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* Alinea el texto a la derecha */
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.user-role {
+  font-size: 12px;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 24px;
+  color: #d9534f; /* Un color rojo para indicar "salir" */
+  transition: color 0.2s;
+}
+
+.logout-button:hover {
+  color: #c9302c;
+}
+/* pedidos cocina */
+/* Estilos para los estados de los pedidos en cocina */
+.pedido-card.entrando {
+  border-left: 5px solid #ffa500; /* Naranja */
+}
+
+.pedido-card.marchando {
+  border-left: 5px solid #3498db; /* Azul */
+}
+
+.pedido-card.saliendo {
+  border-left: 5px solid #2ecc71; /* Verde */
+  opacity: 0.7; /* El pedido ya salió, lo atenuamos un poco */
+}
+
+.pedido-card.saliendo .pedido-boton {
+  display: none; /* Ocultamos el botón cuando ya salió */
+}
+/* menu dia */
+.menu-dia-container {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+}
+
+.input-group {
+  display: flex;
+  margin-bottom: 1.5rem;
+}
+
+/* .input-group input {
+  flex-grow: 1;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px 0 0 4px;
+} */
+
+.input-group button {
+  padding: 0.8rem 1.2rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+}
+
+.lista-productos-dia {
+  list-style: none;
+  padding: 0;
+}
+
+.lista-productos-dia li {
+  background-color: #f9f9f9;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.boton-eliminar {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+/* tomar pedidos */
+.tomar-pedido-container {
+  display: flex;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.columna {
+  flex: 1;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.menu-disponible-lista button {
+  display: block;
+  width: 100%;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  background-color: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.pedido-actual-lista {
+  list-style: none;
+  padding: 0;
+  min-height: 200px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.boton-enviar {
+  width: 100%;
+  padding: 1rem;
+  background-color: #e67e22;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.boton-enviar:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+

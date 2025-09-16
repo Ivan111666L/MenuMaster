@@ -1,0 +1,100 @@
+/* src/features/home/pages/Home.css */
+
+.home-page {
+    text-align: center;
+    color: var(--color-text-primary);
+}
+
+/* === Encabezado Principal (Hero Section) === */
+.home-header {
+    width: 100%;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, var(--color-primary), #6d28d9); /* Gradiente moderno */
+    color: var(--color-white);
+}
+
+.home-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.home-tagline {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0.9;
+}
+
+.cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* === Sección de Funcionalidades === */
+.features-section {
+    padding: 80px 20px;
+    background-color: var(--color-background);
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: var(--color-text-primary);
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.feature-card {
+    background-color: var(--color-surface);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-small);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.feature-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.feature-card p {
+    color: var(--color-text-secondary);
+}
+
+/* === Sección CTA Final === */
+.cta-section {
+    width: 100%;
+    background-color: var(--color-text-secondary);
+    color: var(--color-white);
+    padding: 60px 20px;
+}
+
+/* === Pie de Página === */
+.home-footer {
+    width: 100%;
+    padding: 20px;
+    background-color: #111827; /* Gris oscuro */
+    color: #9ca3af;
+    font-size: 0.9rem;
+}

@@ -1,0 +1,252 @@
+/*productosNuevos.css*/
+/* --- Contenedor principal de la aplicación --- */
+.app-container {
+    background-color: var(--color-background-light);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+/* --- Contenedor del formulario --- */
+.productos-form-wrapper {
+    background-color: var(--color-background-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+    padding: 2rem 2.5rem;
+    width: 100%;
+    max-width: 32rem;
+}
+
+.productos-title {
+    font-size: 1.875rem;
+    font-weight: bold;
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.productos-description {
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+}
+
+/* --- Formulario y sus elementos --- */
+.productos-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label, .form-group-checkbox label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    display: block;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-small);
+    box-shadow: var(--shadow-small);
+    font-size: 0.875rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.form-group-checkbox {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.form-group-checkbox input {
+    margin-right: 0.5rem;
+    width: 1rem;
+    height: 1rem;
+    color: var(--color-primary);
+    border-color: var(--color-border);
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.btn-crear {
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border: none;
+    border-radius: var(--border-radius-small);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-crear:hover {
+    background-color: var(--color-primary-dark);
+}
+/* productos creados */
+/* --- CONTENEDOR PRINCIPAL --- */
+.app-container {
+    max-width: 900px;
+    margin: auto;
+}
+
+.productos-container {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.productos-title {
+    font-size: 2rem;
+    color: #212529;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.productos-description {
+    font-size: 1rem;
+    color: #6c757d;
+    margin-bottom: 2rem;
+}
+
+/* --- ESTILOS DE LA TABLA --- */
+.productos-table-wrapper {
+    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+}
+
+.productos-table {
+    width: 100%;
+    border-collapse: collapse; /* Une los bordes de las celdas */
+    text-align: left;
+}
+
+.table-header-cell {
+    background-color: #f2f2f2;
+    padding: 1rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #495057;
+}
+
+.table-row {
+    border-bottom: 1px solid #dee2e6; /* Línea separadora entre filas */
+}
+
+.table-row:last-child {
+    border-bottom: none; /* Elimina la última línea */
+}
+
+.table-cell {
+    padding: 1rem;
+    vertical-align: middle; /* Alinea el contenido verticalmente */
+    font-size: 0.95rem;
+    color: #495057;
+}
+
+.font-semibold {
+    font-weight: 600;
+    color: #343a40;
+}
+
+/* --- ESTILOS PARA EL BOTÓN DE ELIMINAR --- */
+.btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+.btn-eliminar:hover {
+    background-color: #c82333;
+    transform: translateY(-1px); /* Efecto sutil al pasar el mouse */
+}
+
+.btn-eliminar:active {
+    transform: translateY(0);
+}
+.productos-container {
+    padding: 2rem;
+}
+
+.productos-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+}
+
+/* Estos estilos de tarjeta son los mismos que usamos en Configuracion.jsx,
+   lo que demuestra la consistencia de tu diseño. Podrían incluso moverse
+   a un archivo de componentes si se usan mucho. */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem 2rem;
+    box-shadow: var(--shadow-small);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+}
+
+.card p {
+    color: var(--color-text-secondary);
+    flex-grow: 1;
+    margin-bottom: 1.5rem;
+}
+
+.card-link {
+    text-decoration: none;
+    margin-top: auto;
+}

@@ -1,0 +1,87 @@
+.gestion-mesas-app {
+    padding: 2rem;
+}
+
+.gestion-mesas-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.header-controles {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-small);
+}
+
+.header-controles h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--color-text-primary);
+}
+
+.mesa-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.mesa-card {
+    background: var(--color-surface);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-medium);
+    cursor: pointer;
+    border-left: 8px solid;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mesa-card:hover {
+    transform: translateY(-5px);
+}
+
+.mesa-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-text-primary);
+    font-size: 1.5rem;
+}
+
+.mesa-card p {
+    color: var(--color-text-secondary);
+    margin: 0.25rem 0;
+}
+
+.mesa-card .estado-badge {
+    font-weight: bold;
+    text-transform: capitalize;
+    margin-top: 1.5rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    display: inline-block;
+    font-size: 0.8rem;
+}
+
+/* Colores de estado */
+.mesa-card.disponible { border-color: var(--color-success); }
+.mesa-card.disponible .estado-badge { color: #059669; background-color: #d1fae5; }
+
+.mesa-card.ocupada { border-color: #f59e0b; }
+.mesa-card.ocupada .estado-badge { color: #b45309; background-color: #fef3c7; }
+
+.mesa-card.reservada { border-color: var(--color-error); }
+.mesa-card.reservada .estado-badge { color: #b91c1c; background-color: #fee2e2; }
+
+.loader-container, .no-mesas {
+    text-align: center;
+    font-size: 1.2rem;
+    color: var(--color-text-secondary);
+    padding: 3rem;
+    grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+}

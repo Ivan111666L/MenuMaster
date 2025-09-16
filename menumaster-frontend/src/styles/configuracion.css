@@ -1,0 +1,163 @@
+.configuracion-container {
+    padding: 2rem;
+}
+
+.configuracion-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 1rem;
+}
+
+.card-container {
+    display: grid;
+    /* Crea una cuadrícula responsiva para las tarjetas */
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    padding: 1.5rem 2rem;
+    box-shadow: var(--shadow-small);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    color: var(--color-primary);
+}
+
+.card p {
+    color: var(--color-text-secondary);
+    flex-grow: 1; /* Empuja el botón hacia abajo */
+    margin-bottom: 1.5rem;
+}
+
+/* El enlace ahora solo actúa como contenedor del botón */
+.card-link {
+    text-decoration: none;
+    margin-top: auto; /* Alinea el botón al final de la tarjeta */
+}
+/* mesas configuracion */
+
+.gestion-mesas-container {
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+}
+
+.gestion-mesas-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+}
+
+.crear-mesa-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    background-color: var(--color-background);
+    border-radius: var(--border-radius-small);
+    margin-bottom: 2rem;
+}
+
+.crear-mesa-form .form-group {
+    flex: 1;
+    min-width: 150px;
+    margin-bottom: 0;
+}
+
+.buscador-mesas {
+    margin-bottom: 2rem;
+    max-width: 400px;
+}
+
+.mesas-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mesas-table th, .mesas-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.mesas-table th {
+    background-color: var(--color-background);
+    font-weight: 600;
+}
+
+.mesas-table td select {
+    padding: 0.5rem;
+    border-radius: var(--border-radius-small);
+    border: 1px solid var(--color-border);
+}
+
+/* gestion usuarios */
+.gestion-usuarios-container {
+    padding: 2rem;
+    background-color: var(--color-surface);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-medium);
+}
+
+.gestion-usuarios-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 2rem;
+}
+
+.buscador-usuarios {
+    margin-bottom: 2rem;
+    max-width: 400px;
+}
+
+.usuarios-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.usuarios-table th, .usuarios-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    vertical-align: middle;
+}
+
+.usuarios-table th {
+    background-color: var(--color-background);
+    font-weight: 600;
+}
+
+.usuarios-table td select {
+    padding: 0.5rem;
+    border-radius: var(--border-radius-small);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+}
+
+.usuarios-table .btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
