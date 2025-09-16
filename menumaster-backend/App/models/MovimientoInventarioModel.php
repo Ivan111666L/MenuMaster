@@ -4,7 +4,7 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class MovimientoInventario
+class MovimientoInventarioModel
 {
     private $conn;
     private $table_name = "movimientos_inventario";

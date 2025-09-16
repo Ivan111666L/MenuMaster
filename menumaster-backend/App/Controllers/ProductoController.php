@@ -1,10 +1,11 @@
 <?php
 namespace App\Controllers;
 
-// Importamos las clases de los modelos que vamos a necesitar
-use App\Models\Producto;
-use App\Models\Categoria;
-use App\Models\EstadoProducto;
+// --- Dependencias ---
+use App\Models\ProductoModel;
+use App\Models\CategoriaModel;
+use App\Models\EstadoProductoModel;
+use App\Utils\Validator; // Se importa el Validator
 use PDO;
 use Exception;
 
@@ -21,9 +22,9 @@ class ProductoController
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->productoModel = new Producto($this->db);
-        $this->categoriaModel = new Categoria($this->db);
-        $this->estadoProductoModel = new EstadoProducto($this->db);
+        $this->productoModel = new ProductoModel($this->db);
+        $this->categoriaModel = new CategoriaModel($this->db);
+        $this->estadoProductoModel = new EstadoProductoModel($this->db);
     }
 
     /**
@@ -38,8 +39,6 @@ class ProductoController
         }
         $this->sendResponse(200, $productos);
     }
-
-    
 
     /**
      * Obtiene un único producto por su ID.
@@ -57,14 +56,17 @@ class ProductoController
     /**
      * Crea un nuevo producto.
      * Corresponde a: POST /api/productos
-     * NOTA: La autenticación y autorización (ej. verificar si es admin)
-     * se maneja en el enrutador con AuthMiddleware.
      */
     public function store(array $data): void
     {
-        $this->validarCampos($data, ['nombre', 'precio', 'categoria_nombre', 'estado_nombre']);
+        // CORRECCIÓN: Se usa el Validator centralizado.
+        Validator::validate($data, [
+            'nombre' => 'required',
+            'precio' => 'required',
+            'categoria_nombre' => 'required',
+            'estado_nombre' => 'required'
+        ]);
 
-        // Buscamos los IDs correspondientes a los nombres de categoría y estado
         $categoria = $this->categoriaModel->findByName($data['categoria_nombre']);
         if (!$categoria) {
             throw new Exception("La categoría '{$data['categoria_nombre']}' no es válida.", 400);
@@ -75,48 +77,41 @@ class ProductoController
             throw new Exception("El estado '{$data['estado_nombre']}' no es válido.", 400);
         }
 
-        // Preparamos el array de datos para el modelo, usando los IDs
         $datosParaCrear = [
             'nombre' => $data['nombre'],
             'descripcion' => $data['descripcion'] ?? null,
             'precio' => $data['precio'],
             'categoria_id' => $categoria['id'],
             'estado_id' => $estado['id']
-            // Puedes añadir otros campos opcionales aquí
         ];
 
         $nuevoId = $this->productoModel->create($datosParaCrear);
-
         if (!$nuevoId) {
             throw new Exception("No se pudo crear el producto.", 500);
         }
 
         $nuevoProducto = $this->productoModel->find($nuevoId);
-        $this->sendResponse(201, $nuevoProducto); // 201 Created
+        $this->sendResponse(201, $nuevoProducto);
     }
 
     /**
      * Actualiza un producto existente.
      * Corresponde a: PUT /api/productos/{id}
-     * NOTA: La autenticación y autorización se maneja en el enrutador.
      */
     public function update(int $id, array $data): void
     {
         if (empty($data)) {
             throw new Exception("No se proporcionaron datos para actualizar.", 400);
         }
-
         if (!$this->productoModel->find($id)) {
             throw new Exception("Producto no encontrado.", 404);
         }
         
-        // El frontend puede enviar solo los campos que quiere cambiar.
-        // Convertimos nombres a IDs solo si se proporcionan en la petición.
         if (isset($data['categoria_nombre'])) {
             $categoria = $this->categoriaModel->findByName($data['categoria_nombre']);
             if (!$categoria) throw new Exception("Categoría no válida.", 400);
             $data['categoria_id'] = $categoria['id'];
-            unset($data['categoria_nombre']); // Limpiamos para no confundir al modelo
+            unset($data['categoria_nombre']);
         }
         if (isset($data['estado_nombre'])) {
             $estado = $this->estadoProductoModel->findByName($data['estado_nombre']);
@@ -136,35 +131,19 @@ class ProductoController
     /**
      * Elimina un producto.
      * Corresponde a: DELETE /api/productos/{id}
-     * NOTA: La autenticación y autorización se maneja en el enrutador.
      */
     public function destroy(int $id): void
     {
         if (!$this->productoModel->find($id)) {
             throw new Exception("Producto no encontrado.", 404);
         }
-
         if (!$this->productoModel->delete($id)) {
             throw new Exception("No se pudo eliminar el producto.", 500);
         }
-
-        // 204 No Content es la respuesta estándar para una eliminación exitosa
-        $this->sendResponse(204, []);
+        $this->sendResponse(204, null);
     }
 
-    // --- Métodos de Ayuda (Helpers) ---
-
-    /**
-     * Valida que los campos requeridos existan en el array de datos.
-     */
-    private function validarCampos(array $data, array $camposRequeridos): void
-    {
-        foreach ($camposRequeridos as $campo) {
-            if (empty($data[$campo])) {
-                throw new Exception("El campo '{$campo}' es obligatorio.", 400);
-            }
-        }
-    }
+    // --- Métodos de Ayuda ---
 
     /**
      * Envía la respuesta HTTP en formato JSON y termina la ejecución del script.
@@ -172,9 +151,9 @@ class ProductoController
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);
-        // Para el código 204, no se debe enviar cuerpo en la respuesta.
         if ($statusCode !== 204) {
-            echo json_encode($data);
+            // CORRECCIÓN: Se estandariza la respuesta de éxito.
+            echo json_encode(['success' => true, 'data' => $data]);
         }
         exit;
     }

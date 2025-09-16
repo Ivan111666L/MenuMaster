@@ -1,6 +1,6 @@
 <?php
 
-class MetodoPago {
+class MetodoPagoModel {
     private $conn;
     private $table_name = "metodos_pago";
 

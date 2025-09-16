@@ -3,7 +3,7 @@ namespace App\Models;
 
 use PDO;
 
-class Rol {
+class RolModel {
     private $db;
     private $table = 'roles';
 

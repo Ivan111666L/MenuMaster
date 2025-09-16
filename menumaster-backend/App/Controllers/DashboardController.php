@@ -20,10 +20,10 @@ class DashboardController
      * Obtiene un resumen de todos los datos para el panel de control.
      * Corresponde a: GET /api/dashboard/summary
      */
-    public function getSummary()
+    public function getSummary(): void
     {
         try {
-            // Llamamos a cada método del modelo para construir la respuesta
+            // La lógica para obtener los datos ya era correcta.
             $summaryData = [
                 'pedidosActivos' => $this->dashboardModel->getActiveOrdersCount(),
                 'ventasDia' => $this->dashboardModel->getTodaysSales(),
@@ -34,14 +34,26 @@ class DashboardController
                 'topProductos' => $this->dashboardModel->getTopSellingProducts()
             ];
 
-            // Enviamos la respuesta en el formato esperado por el frontend
-            http_response_code(200);
-            echo json_encode(['success' => true, 'data' => $summaryData]);
+            // CORRECCIÓN: Se usa el método helper 'sendResponse' para consistencia.
+            $this->sendResponse(200, $summaryData);
 
         } catch (Exception $e) {
-            http_response_code(500);
-
-            echo json_encode(['success' => false, 'error' => 'Error interno del servidor al obtener los datos del dashboard.']);
+            // El bloque catch ahora puede lanzar una excepción que será manejada
+            // por el enrutador de forma centralizada.
+            throw new Exception('Error interno del servidor al obtener los datos del dashboard.', 500);
         }
+    }
+
+    /**
+     * Envía la respuesta HTTP en formato JSON y termina la ejecución del script.
+     * (Este es el método helper que hemos usado en otros controladores).
+     */
+    private function sendResponse(int $statusCode, $data): void
+    {
+        http_response_code($statusCode);
+        if ($statusCode !== 204) {
+            echo json_encode(['success' => true, 'data' => $data]);
+        }
+        exit;
     }
 }

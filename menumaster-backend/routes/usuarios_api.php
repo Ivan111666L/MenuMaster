@@ -8,7 +8,7 @@
 // --- Dependencias ---
 require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/App/Controllers/UsuarioController.php';
-require_once BASE_PATH . '/App/Controllers/AuthController.php'; // Necesario para requireAdmin
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
 
 // Usar alias para las clases
 use App\Controllers\UsuarioController;
@@ -38,8 +38,7 @@ try {
     // Todas las rutas de usuarios requieren autenticación
     $authMiddleware->handle();
     
-    // Las acciones de escritura (POST, PUT, DELETE) y ver la lista de todos los usuarios
-    // requieren permisos de administrador.
+    // Las acciones de escritura y ver la lista completa de usuarios requieren ser administrador.
     if (in_array($method, ['POST', 'PUT', 'DELETE']) || ($method === 'GET' && $id === null)) {
         requireAdmin();
     }
@@ -50,11 +49,8 @@ try {
             if ($id === 'perfil') {
                 $controller->getProfile();
             } elseif (is_numeric($id)) {
-                // Un admin puede ver un usuario específico, o un usuario su propio perfil
-                // (esa lógica de autorización iría en el controlador).
                 $controller->show($id);
             } elseif ($id === null) {
-                // Solo los admins pueden ver la lista completa
                 $controller->index();
             } else {
                 throw new Exception("Ruta de usuario no encontrada.", 404);

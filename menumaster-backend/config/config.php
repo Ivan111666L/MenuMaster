@@ -1,25 +1,30 @@
 <?php
-// config/config.php
-namespace App;
+// Ubicación: App/Config/Config.php
 
-class Config {
-    
-    public static function getDbConfig(): array
+// CORRECCIÓN: Se ajusta el namespace a la ubicación del archivo.
+namespace App\Config;
+
+class Config 
+{
+    /**
+     * Devuelve la configuración para la generación de tokens JWT.
+     * Lee la clave secreta desde las variables de entorno para mayor seguridad.
+     * @return array
+     */
+    public static function getJwtConfig(): array
     {
         return [
-            'host'   => $_ENV['DB_HOST'] ?? 'localhost',
-            'dbname' => $_ENV['DB_NAME'] ?? 'menu_master',
-            'user'   => $_ENV['DB_USER'] ?? 'root',
-            'pass'   => $_ENV['DB_PASS'] ?? ''
+            // La clave secreta se lee desde tu archivo .env
+            'secret' => $_ENV['JWT_SECRET_KEY'] ?? 'una_clave_por_defecto_muy_insegura',
+            
+            // Tiempo de expiración del token en segundos (ej. 1 hora = 3600 segundos)
+            'expiration_time' => 3600, 
+            
+            // Algoritmo de encriptación
+            'algorithm' => 'HS256'
         ];
     }
 
-   public static function getJwtConfig(): array
-    {
-        return [
-            'secret'    => $_ENV['JWT_SECRET_KEY'] ?? 'clave_por_defecto_solo_para_desarrollo',
-            'algorithm' => 'HS256',
-            'expiration_time' => 3600 // 1 hora en segundos
-        ];
-    }
+    // CORRECCIÓN: Se eliminaron los métodos getDbConfig(), decodenTokenData() y getJwtToken().
+    // La lógica de esos métodos era incorrecta o pertenecía a otras clases (Database y AuthController).
 }

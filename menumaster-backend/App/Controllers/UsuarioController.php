@@ -2,10 +2,10 @@
 namespace App\Controllers;
 
 // --- Dependencias ---
-use App\Models\EstadoGeneral;
-use App\Models\Usuario;
-use App\Models\Rol;
-// Importamos las clases que vamos a necesitar para obtener los datos del token
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
+use App\Models\EstadoGeneralModel;
+use App\Utils\Validator;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
 use PDO;
@@ -13,20 +13,19 @@ use Exception;
 
 class UsuarioController
 {
-    private $db;
+    // --- Propiedades para los modelos ---
     private $usuarioModel;
     private $rolModel;
     private $estadoGeneralModel;
 
     /**
-     * El constructor recibe la conexión a la DB e instancia los modelos necesarios.
+     * El constructor recibe la conexión a la DB e instancia todos los modelos necesarios.
      */
     public function __construct(PDO $db)
     {
-        $this->db = $db;
-        $this->usuarioModel = new Usuario($this->db);
-        $this->rolModel = new Rol($this->db);
-        $this->estadoGeneralModel = new EstadoGeneral($this->db);
+        $this->usuarioModel = new UsuarioModel($db);
+        $this->rolModel = new RolModel($db);
+        $this->estadoGeneralModel = new EstadoGeneralModel($db);
     }
 
     /**
@@ -36,9 +35,6 @@ class UsuarioController
     public function index(): void
     {
         $usuarios = $this->usuarioModel->findAll();
-        if ($usuarios === false) {
-            throw new Exception("No se pudieron obtener los usuarios.", 500);
-        }
         $this->sendResponse(200, $usuarios);
     }
 
@@ -56,21 +52,26 @@ class UsuarioController
     }
 
     /**
-     * Crea un nuevo usuario (generalmente por un administrador).
+     * Crea un nuevo usuario.
      * Corresponde a: POST /api/usuarios
-     * NOTA: La autenticación y autorización se manejan en el enrutador.
      */
     public function store(array $data): void
     {
-        $this->validarCampos($data, ['nombre', 'email', 'password', 'rol']);
-
+        // Se usa el Validator para una validación limpia y centralizada.
+        Validator::validate($data, [
+            'nombre' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:8',
+            'rol' => 'required' // El frontend envía el nombre del rol
+        ]);
+        
         if ($this->usuarioModel->findByEmail($data['email'])) {
             throw new Exception("El correo electrónico ya está registrado.", 409); // 409 Conflict
         }
         
         $rol = $this->rolModel->findByName($data['rol']);
         if (!$rol) {
-            throw new Exception("El rol especificado no es válido.", 400);
+            throw new Exception("El rol '{$data['rol']}' no es válido.", 400);
         }
 
         $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
@@ -81,17 +82,22 @@ class UsuarioController
         }
         
         $nuevoUsuario = $this->usuarioModel->find($nuevoId);
-        $this->sendResponse(201, $nuevoUsuario); // 201 Created
+        $this->sendResponse(201, $nuevoUsuario);
     }
 
     /**
      * Actualiza un usuario existente.
      * Corresponde a: PUT /api/usuarios/{id}
-     * NOTA: La autenticación y autorización se manejan en el enrutador.
      */
     public function update(int $id, array $data): void
     {
-        $this->validarCampos($data, ['nombre', 'email', 'rol', 'estado']);
+        // El validador se adapta para los campos de actualización
+        Validator::validate($data, [
+            'nombre' => 'required',
+            'email' => 'required|email',
+            'rol' => 'required',
+            'estado' => 'required'
+        ]);
         
         if (!$this->usuarioModel->find($id)) {
             throw new Exception("Usuario no encontrado.", 404);
@@ -114,37 +120,31 @@ class UsuarioController
     /**
      * Elimina un usuario.
      * Corresponde a: DELETE /api/usuarios/{id}
-     * NOTA: La autenticación y autorización se manejan en el enrutador.
      */
     public function destroy(int $id): void
     {
         if (!$this->usuarioModel->find($id)) {
             throw new Exception("Usuario no encontrado.", 404);
         }
-
         if (!$this->usuarioModel->delete($id)) {
             throw new Exception("No se pudo eliminar el usuario.", 500);
         }
-        
-        $this->sendResponse(204, []); // 204 No Content
+        $this->sendResponse(204, null);
     }
 
     /**
      * Obtiene el perfil del usuario autenticado actualmente a través de su token.
      * Corresponde a: GET /api/usuarios/perfil
-     * NOTA: La ruta está protegida por el enrutador, por lo que aquí ya sabemos que el token es válido.
      */
     public function getProfile(): void
     {
-        // CORRECCIÓN: Obtenemos los datos del token de forma segura.
         $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
         if (!$token) {
-            throw new Exception("Token de autorización no encontrado en la cabecera.", 401);
+            throw new Exception("Token de autorización no encontrado.", 401);
         }
 
         $payload = AuthController::decodeTokenData($token);
         $usuarioId = $payload['id'] ?? null;
-
         if (!$usuarioId) {
             throw new Exception("Token inválido: ID de usuario no encontrado.", 401);
         }
@@ -153,14 +153,12 @@ class UsuarioController
         if (!$usuario) {
             throw new Exception("El usuario asociado al token ya no existe.", 404);
         }
-
         $this->sendResponse(200, $usuario);
     }
 
     /**
      * Desactiva la cuenta de un usuario específico.
      * Corresponde a: PUT /api/usuarios/{id}/desactivar
-     * NOTA: La autenticación y autorización se manejan en el enrutador.
      */
     public function deactivate(int $id): void
     {
@@ -176,23 +174,18 @@ class UsuarioController
         $this->sendResponse(200, ["mensaje" => "Usuario desactivado correctamente."]);
     }
 
-    // --- Métodos de Ayuda (Helpers) ---
+    // --- Métodos de Ayuda ---
 
+    /**
+     * Envía la respuesta HTTP en formato JSON y termina la ejecución del script.
+     */
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);
         if ($statusCode !== 204) {
-            echo json_encode($data);
+            // Se estandariza la respuesta de éxito
+            echo json_encode(['success' => true, 'data' => $data]);
         }
         exit;
-    }
-
-    private function validarCampos(array $data, array $camposRequeridos): void
-    {
-        foreach ($camposRequeridos as $campo) {
-            if (empty($data[$campo])) {
-                throw new Exception("El campo '{$campo}' es obligatorio.", 400);
-            }
-        }
     }
 }

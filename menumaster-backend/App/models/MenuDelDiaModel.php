@@ -4,7 +4,7 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class MenuDelDia {
+class MenuDelDiaModel {
     private $db;
     private $table = 'menu_del_dia';
 

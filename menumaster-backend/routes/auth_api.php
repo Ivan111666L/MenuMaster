@@ -1,54 +1,48 @@
 <?php
 // routes/auth.php
 
-/**
- * Sub-enrutador para la autenticación.
- */
+// --- Dependencias ---
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Models/UsuarioModel.php';
+require_once BASE_PATH . '/App/Models/RolModel.php';
 
 use App\Controllers\AuthController;
-
-require_once BASE_PATH . '/App/Controllers/AuthController.php';
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
 
 try {
-    // 1. Instanciamos el controlador
-    $controller = new AuthController($db);
+    // CORRECCIÓN: Instanciamos los modelos primero...
+    $usuarioModel = new UsuarioModel($db);
+    $rolModel = new RolModel($db);
+    
+    // ...y luego los pasamos al constructor del controlador.
+    $controller = new AuthController($db, $usuarioModel, $rolModel);
 
     // 2. Analizamos la petición
     $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
     $uri_segments = explode('/', trim($request_uri, '/'));
     $auth_index = array_search('auth', $uri_segments);
     $action = $uri_segments[$auth_index + 1] ?? null;
-
-    $method = $_SERVER['REQUEST_METHOD'];
     $data = json_decode(file_get_contents("php://input"), true) ?? [];
 
-    // 3. Dirigimos la petición al método correcto
-    if ($method === 'POST') {
+    // 3. Dirigimos la petición al método correcto del controlador
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         switch ($action) {
             case 'register':
-                $result = $controller->register($data);
-                http_response_code(201); // Created
-                // MEJORA: Respuesta JSON consistente
-                echo json_encode(['success' => true, 'data' => $result]);
+                // CORRECCIÓN: El controlador ahora maneja la respuesta. Solo lo llamamos.
+                $controller->register($data);
                 break;
 
             case 'login':
-                $result = $controller->login($data);
-                http_response_code(200); // OK
-                // MEJORA: Respuesta JSON consistente
-                echo json_encode(['success' => true, 'data' => $result]);
+                $controller->login($data);
                 break;
             
             case 'forgot-password':
-                $result = $controller->forgotPassword($data);
-                http_response_code(200); // OK
-                echo json_encode(['success' => true, 'data' => $result]);
+                $controller->forgotPassword($data);
                 break;
 
             case 'reset-password':
-                $result = $controller->resetPassword($data);
-                http_response_code(200); // OK
-                echo json_encode(['success' => true, 'data' => $result]);
+                $controller->resetPassword($data);
                 break;
 
             default:
@@ -60,7 +54,7 @@ try {
 
 } catch (Exception $e) {
     // Capturador de Errores Centralizado
-    $code = $e->getCode() ?: 400; // Por defecto, Bad Request
+    $code = $e->getCode() ?: 400;
     http_response_code($code);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }

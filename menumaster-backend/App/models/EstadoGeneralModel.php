@@ -1,7 +1,7 @@
 <?php
 namespace App\Models;
 
-class EstadoGeneral {
+class EstadoGeneralModel {
     private $conn;
     private $table_name = "estados_generales";
 

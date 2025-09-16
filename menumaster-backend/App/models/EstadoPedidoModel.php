@@ -4,7 +4,7 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class EstadoPedido 
+class EstadoPedidoModel 
 {
     private $conn;
     private $table_name = "estados_pedido";

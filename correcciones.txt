@@ -1,0 +1,64 @@
+## Frontend (menumaster-frontend)
+Tu frontend tiene una arquitectura excelente. Los problemas son principalmente de conexión y estado.
+
+### Qué Corregir corrections
+URL de la API en el Servicio:
+
+Problema: El error más común que has experimentado (404 Not Found con la URL del frontend) se debe a que la baseURL en services/api.js o en los archivos .env apunta a localhost:5173 en lugar de a localhost.
+
+Solución: Asegúrate de que tu archivo .env.local tenga la URL correcta y absoluta de tu backend:
+
+Fragmento de código
+
+VITE_API_BASE_URL=http://localhost/MenuMaster/menumaster-backend/public/api
+Y que tu api.js use esta variable: baseURL: import.meta.env.VITE_API_BASE_URL. Recuerda reiniciar el servidor de Vite después de cambiar el .env.
+
+Conexión de Componentes a la API:
+
+Problema: Varios de tus componentes (ProductosCreados, Mesas, etc.) todavía usan datos simulados o localStorage.
+
+Solución: Debes replicar el patrón que usamos en Cocina.jsx o Facturacion.jsx:
+
+Crea un servicio (...Service.js) para cada "feature".
+
+En el componente de la página, usa useEffect para llamar al servicio y obtener los datos.
+
+Maneja los estados de isLoading y error para mostrar un <Spinner /> o un mensaje de error.
+
+Conecta las acciones (como eliminar o crear) a las funciones correspondientes del servicio.
+
+### Qué Mejorar improvements
+Hooks Personalizados:
+
+Mejora: Ya lo hiciste muy bien con useFacturacion y usePedido. Aplica este mismo patrón a otras páginas complejas como ConfiguracionUsuarios o ConfiguracionMesas. Crear un useMesas o useUsuarios que encapsule la lógica de useState, useEffect y las llamadas a la API hará tus componentes de página increíblemente limpios.
+
+Manejo de Notificaciones:
+
+Mejora: Actualmente usas alert() para los mensajes de error o éxito. Considera usar una librería como react-toastify para mostrar notificaciones "toast" más elegantes y profesionales que no interrumpan el flujo del usuario.
+
+## Para que Funcione Perfectamente (Checklist Final) ✅
+Para pasar de un proyecto casi listo a uno 100% funcional, enfócate en este flujo de trabajo:
+
+Confirma la Conexión Backend-Frontend:
+
+[ ] CORS y .htaccess: Asegúrate de que tu .htaccess en public/ esté configurado correctamente para CORS y reescritura de URLs.
+
+[ ] URL Base: Verifica por última vez que tu .env.local del frontend apunte a la URL correcta del backend y reinicia el servidor de Vite.
+
+[ ] Prueba de Fuego: Haz que el Login funcione. Si puedes iniciar sesión, significa que la conexión base, CORS y la comunicación con la base de datos están funcionando.
+
+Dinamiza Cada "Feature" del Frontend:
+
+[ ] Dashboard: Conecta los widgets a los datos reales del dashboardService.
+
+[ ] Productos: Conecta ProductosCreados.jsx al productoService para mostrar y eliminar productos reales.
+
+[ ] Inventario: Conecta IngredienteCreado.jsx e IngredienteNuevo.jsx a sus servicios de API.
+
+[ ] Configuración: Conecta las páginas de ConfiguracionUsuarios y ConfiguracionMesas a sus respectivos servicios.
+
+Refina la Experiencia de Usuario:
+
+[ ] Carga y Errores: Asegúrate de que TODAS las páginas que cargan datos muestren un <Spinner /> y manejen los errores de la API con un mensaje claro.
+
+[ ] Notificaciones: Reemplaza los alert() con un sistema de notificaciones más amigable.

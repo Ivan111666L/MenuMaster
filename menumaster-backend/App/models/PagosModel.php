@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../config/db.php';
 
-class Pago {
+class PagoModel {
     // Conexión a la base de datos y nombre de la tabla
     private $conn;
     private $table_name = "pagos";

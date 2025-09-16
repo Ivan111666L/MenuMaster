@@ -1,37 +1,31 @@
 <?php
-// Ubicación: /App/Config/Database.php
+// Ubicación: App/Config/Database.php
 
 namespace App\Config;
 
 use PDO;
 use PDOException;
 
-/**
- * Clase Database que implementa el patrón Singleton.
- */
 final class Database {
-
-    // --- Propiedades ---
     private static ?PDO $conn = null;
 
     private function __construct() {}
     private function __clone() {}
 
     /**
-     * Método estático principal para obtener la conexión a la base de datos.
+     * Obtiene la única instancia de la conexión a la base de datos (Patrón Singleton).
      * @return PDO La instancia de la conexión PDO.
      * @throws PDOException Si la conexión falla.
      */
     public static function getConnection(): PDO
     {
-        if (self::$conn !== 'menu_master') {
+        if (self::$conn !== null) {
             return self::$conn;
         }
 
-        // CORRECCIÓN: Se usa $_ENV en lugar de getenv().
-        // Dotenv carga las variables en la superglobal $_ENV, por lo que es más directo usarla.
+        // Lee las credenciales directamente del .env
         $host     = $_ENV['DB_HOST'] ?? 'localhost';
-        $db_name  = $_ENV['DB_NAME'] ?? 'menu_master';
+        $db_name  = $_ENV['DB_NAME'] ?? null;
         $username = $_ENV['DB_USER'] ?? 'root';
         $password = $_ENV['DB_PASS'] ?? '';
         $charset  = $_ENV['DB_CHARSET'] ?? 'utf8mb4';

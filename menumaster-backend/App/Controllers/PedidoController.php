@@ -1,9 +1,10 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Pedido;
+use App\Models\PedidoModel;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
+use App\Utils\Validator;
 use PDO;
 use Exception;
 
@@ -15,7 +16,7 @@ class PedidoController
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->pedidoModel = new Pedido($this->db);
+        $this->pedidoModel = new PedidoModel($this->db);
     }
 
     /**
@@ -49,13 +50,14 @@ class PedidoController
      */
     public function store(array $data): void
     {
-        if (empty($data['mesa_id']) || empty($data['items'])) {
-            throw new Exception("El ID de la mesa y los ítems son requeridos.", 400);
-        }
+        Validator::validate($data, [
+            'mesa_id' => 'required',
+            'items' => 'required'
+        ]);
 
-        // Obtenemos el ID del usuario que está creando el pedido
         $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
         if (!$token) throw new Exception("Token no encontrado.", 401);
+        
         $payload = AuthController::decodeTokenData($token);
         $usuarioId = $payload['id'] ?? null;
         if (!$usuarioId) throw new Exception("Token inválido.", 401);
@@ -64,7 +66,7 @@ class PedidoController
         
         $pedidoId = $this->pedidoModel->createPedido($data['mesa_id'], $usuarioId, $data['items'], $notas);
         if (!$pedidoId) {
-            throw new Exception("Error al crear el pedido. Verifique el stock de los productos.", 500);
+            throw new Exception("Error al crear el pedido. Verifique el stock o los datos del producto.", 500);
         }
         
         $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
@@ -76,9 +78,7 @@ class PedidoController
      */
     public function updateStatus(int $id, array $data): void
     {
-        if (empty($data['estado'])) {
-            throw new Exception("El nuevo estado es requerido.", 400);
-        }
+        Validator::validate($data, ['estado' => 'required']);
         
         if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
             throw new Exception("Error al actualizar el estado del pedido.", 500);
@@ -92,10 +92,9 @@ class PedidoController
      */
     public function facturar(int $id, array $data): void
     {
-        // La lógica de facturación real (cálculo de totales, impuestos, etc.)
-        // iría aquí o en un 'FacturaController'. Por ahora, solo cambiamos el estado.
+        // En una implementación real, aquí se validaría $data['metodo_pago'], etc.
         if (!$this->pedidoModel->facturarPedido($id)) {
-            throw new Exception("No se pudo facturar el pedido.", 500);
+            throw new Exception("No se pudo facturar el pedido. Verifique el ID.", 500);
         }
         
         $this->sendResponse(200, ["mensaje" => "Pedido facturado con éxito."]);
@@ -106,6 +105,11 @@ class PedidoController
      */
     public function destroy(int $id): void
     {
+        // MEJORA: Se añade una verificación para asegurar que el pedido existe antes de intentar borrarlo.
+        if (!$this->pedidoModel->getPedidoWithDetails($id)) {
+            throw new Exception("Pedido no encontrado.", 404);
+        }
+
         if (!$this->pedidoModel->eliminarPedido($id)) {
             throw new Exception("Error al eliminar el pedido.", 500);
         }

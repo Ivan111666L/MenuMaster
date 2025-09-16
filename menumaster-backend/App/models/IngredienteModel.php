@@ -3,8 +3,8 @@ namespace App\Models;
 
 use PDO;
 use PDOException;
-
-class Ingrediente
+use Exception;
+class IngredienteModel
 {
     private $conn;
     private $table_name = "ingredientes";
@@ -125,32 +125,62 @@ class Ingrediente
     }
 
     /**
-     * Actualiza el stock de un ingrediente. Crítico para el control de inventario.
-     * @param int $id El ID del ingrediente.
-     * @param float $cantidad La cantidad a añadir (positivo) o restar (negativo).
-     * @return bool
-     */
-    public function actualizarStock(int $id, float $cantidad): bool
-    {
-        // Esta consulta previene que el stock se vuelva negativo directamente en la BD
-        $sql = "UPDATE {$this->table_name} 
-                SET stock_actual = stock_actual + :cantidad 
-                WHERE id = :id AND stock_actual + :cantidad >= 0";
-    
-        try {
-            $stmt = $this->conn->prepare($sql);
-            $stmt->bindParam(':cantidad', $cantidad);
-            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
-            
-            // execute() devuelve true, pero rowCount() nos dice si realmente se hizo el cambio.
-            // Si el stock se iba a volver negativo, rowCount() será 0.
-            return $stmt->rowCount() > 0;
-        } catch (PDOException $e) {
-            error_log('Error en IngredienteModel::actualizarStock: ' . $e->getMessage());
-            return false;
+ * Actualiza el stock de un ingrediente de forma transaccional y segura.
+ * Suma para 'entrada' o 'ajuste', resta para 'salida'.
+ * Previene que el stock quede por debajo de cero.
+ *
+ * @param int $id El ID del ingrediente.
+ * @param float $cantidad La cantidad a sumar o restar.
+ * @param string $tipo El tipo de movimiento ('entrada', 'salida', 'ajuste').
+ * @return void
+ * @throws Exception Si el stock es insuficiente o si ocurre un error en la DB.
+ */
+public function actualizarStock(int $id, float $cantidad, string $tipo): void
+{
+    try {
+        // 1. Iniciar una transacción para asegurar la integridad de los datos.
+        $this->conn->beginTransaction();
+
+        // 2. Obtener el ingrediente y bloquear la fila para evitar concurrencia (race conditions).
+        $stmt = $this->conn->prepare("SELECT cantidad_stock FROM ingredientes WHERE id = :id FOR UPDATE");
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        $ingrediente = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$ingrediente) {
+            throw new Exception("El ingrediente con ID {$id} no existe.", 404);
         }
+
+        $stockActual = (float)$ingrediente['cantidad_stock'];
+        $nuevoStock = $stockActual;
+
+        // 3. Calcular el nuevo stock según el tipo de movimiento.
+        if ($tipo === 'entrada' || $tipo === 'ajuste') {
+            $nuevoStock = $stockActual + $cantidad;
+        } elseif ($tipo === 'salida') {
+            // 4. VALIDACIÓN CRÍTICA: Asegurarse de que hay suficiente stock.
+            if ($stockActual < $cantidad) {
+                throw new Exception("Stock insuficiente para el ingrediente ID {$id}. Stock actual: {$stockActual}, se requiere: {$cantidad}", 409); // 409 Conflict
+            }
+            $nuevoStock = $stockActual - $cantidad;
+        }
+
+        // 5. Actualizar el stock en la base de datos.
+        $updateStmt = $this->conn->prepare("UPDATE ingredientes SET cantidad_stock = :nuevo_stock WHERE id = :id");
+        $updateStmt->bindParam(':nuevo_stock', $nuevoStock);
+        $updateStmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $updateStmt->execute();
+
+        // 6. Si todo fue exitoso, confirmar la transacción.
+        $this->conn->commit();
+
+    } catch (Exception $e) {
+        // 7. Si algo falla, revertir todos los cambios.
+        $this->conn->rollBack();
+        // Re-lanzar la excepción para que el controlador la maneje.
+        throw $e;
     }
+}
 
     /**
      * Elimina un ingrediente por su ID.
@@ -169,4 +199,6 @@ class Ingrediente
             return false;
         }
     }
+
+    
 }

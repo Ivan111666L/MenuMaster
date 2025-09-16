@@ -2,7 +2,7 @@
 namespace App\Controllers;
 
 // CORRECCIÓN: Se importa el nombre correcto del modelo: 'MenuDelDiaModel'.
-use App\Models\MenuDelDia;
+use App\Models\MenuDelDiaModel;
 use PDO;
 use Exception;
 
@@ -14,7 +14,7 @@ class MenuDelDiaController
     public function __construct(PDO $db)
     {
         // CORRECCIÓN: Se instancia la clase 'MenuDelDiaModel', no el controlador mismo.
-        $this->MenuDelDia = new MenuDelDia($db);
+        $this->MenuDelDia = new MenuDelDiaModel($db);
     }
 
     /**

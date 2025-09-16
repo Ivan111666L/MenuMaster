@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Models\Categoria;
+use App\Models\CategoriaModel;
 use PDO;
 use Exception;
 
@@ -11,7 +11,7 @@ class CategoriaController
 
     public function __construct(PDO $db)
     {
-        $this->categoriaModel = new Categoria($db);
+        $this->categoriaModel = new CategoriaModel($db);
     }
 
     /**
@@ -25,9 +25,17 @@ class CategoriaController
             throw new Exception("No se pudieron obtener las categorías.", 500);
         }
         
-        // Se envía la respuesta en el formato estándar
-        http_response_code(200);
-        echo json_encode(['success' => true, 'data' => $categorias]);
+        // CORRECCIÓN: Se usa el método helper 'sendResponse' para consistencia.
+        $this->sendResponse(200, $categorias);
+    }
+
+    /**
+     * Envía la respuesta HTTP en formato JSON y termina la ejecución.
+     */
+    private function sendResponse(int $statusCode, $data): void
+    {
+        http_response_code($statusCode);
+        echo json_encode(['success' => true, 'data' => $data]);
         exit;
     }
 }

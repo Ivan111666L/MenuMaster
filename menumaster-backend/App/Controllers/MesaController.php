@@ -4,7 +4,7 @@ namespace App\Controllers;
 // CORRECCIÓN: Se usan los nombres de clase correctos para los modelos.
 // Asumimos que el modelo para los estados se llama 'EstadoGeneral'.
 use App\Models\MesaModel;
-use App\Models\EstadoGeneral; // Se usa un modelo de estado genérico
+use App\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
 use PDO;
 use Exception;
 
@@ -19,7 +19,7 @@ class MesaController
         $this->db = $db;
         // CORRECCIÓN: Se instancian los modelos con el nombre de clase correcto.
         $this->mesaModel = new MesaModel($this->db);
-        $this->estadoGeneralModel = new EstadoGeneral($this->db);
+        $this->estadoGeneralModel = new EstadoGeneralModel($this->db);
     }
 
     /**

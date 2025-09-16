@@ -15,12 +15,11 @@ try {
     // Protegemos la ruta. Solo usuarios logueados pueden acceder.
     $authMiddleware->handle();
 
-    // Por ahora, solo tenemos una ruta: GET /api/dashboard/summary
-    // Si en el futuro tienes más (ej. /api/dashboard/detailed-report), las añades aquí.
+    // Solo se permite el método GET para este endpoint.
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        $result = $controller->getSummary();
-        // El controlador ya se encarga de imprimir la respuesta,
-        // así que aquí no necesitamos hacer nada con $result.
+        // CORRECCIÓN: Se elimina la asignación a '$result'.
+        // El método 'getSummary' del controlador ya se encarga de enviar la respuesta y terminar el script.
+        $controller->getSummary();
     } else {
         throw new Exception("Método no permitido.", 405);
     }

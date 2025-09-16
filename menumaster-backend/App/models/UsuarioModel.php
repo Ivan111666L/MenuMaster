@@ -4,7 +4,7 @@ namespace App\Models;
 use PDO;
 use PDOException;
 
-class Usuario {
+class UsuarioModel {
     // CORRECCIÓN: Se estandariza el uso de '$db' para la conexión y '$table' para el nombre de la tabla.
     private $db;
     private $table = 'usuarios';

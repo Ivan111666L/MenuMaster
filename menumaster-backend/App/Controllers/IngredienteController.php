@@ -2,9 +2,9 @@
 namespace App\Controllers;
 
 // Importamos los modelos que vamos a necesitar
-use App\Models\Ingrediente;
-use App\Models\Proveedor;
-use App\Models\EstadoGeneral;
+use App\Models\IngredienteModel;
+use App\Models\ProveedorModel;
+use App\Models\EstadoGeneralModel;
 use PDO;
 use Exception;
 
@@ -18,9 +18,9 @@ class IngredienteController
     public function __construct(PDO $db)
     {
         $this->db = $db;
-        $this->ingredienteModel = new Ingrediente($this->db);
-        $this->proveedorModel = new Proveedor($this->db); // Suponiendo que tienes un ProveedorModel
-        $this->estadoGeneralModel = new EstadoGeneral($this->db);
+        $this->ingredienteModel = new IngredienteModel($this->db);
+        $this->proveedorModel = new ProveedorModel($this->db); // Suponiendo que tienes un ProveedorModel
+        $this->estadoGeneralModel = new EstadoGeneralModel($this->db);
     }
 
     /**
