@@ -50,11 +50,17 @@ class AuthController
         }
 
         $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
-        $nuevoUsuarioId = $this->usuarioModel->create($data['nombre'], $data['email'], $password_hash, $rol['id']);
-        
+    
+        $nuevoUsuarioId = $this->usuarioModel->create(
+            $data['nombre'],
+            $data['email'],
+            $password_hash,
+            $rol['id']
+        );
         if (!$nuevoUsuarioId) {
-            throw new Exception("No se pudo registrar el usuario.", 500);
-        }
+        // Si el modelo devuelve 'false', lanzamos un error.
+        throw new Exception("No se pudo registrar el usuario en la base de datos.", 500);
+    }
         
         $nuevoUsuario = $this->usuarioModel->find($nuevoUsuarioId);
         $this->sendResponse(201, [

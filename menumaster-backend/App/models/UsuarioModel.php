@@ -21,35 +21,34 @@ class UsuarioModel {
      * Crea un nuevo usuario en la base de datos.
      * @return int|false El ID del nuevo usuario creado o false si falla.
      */
-    public function create(string $nombre, string $email, string $password_hash, int $rol_id): int|false 
+    public function create(string $nombre, string $email, string $password_hash, int $rol_id): int|false
     {
-        // CORRECCIÓN: Se ha arreglado la sentencia SQL con los nombres de columna y placeholders correctos.
-        $sql = "INSERT INTO {$this->table} (nombre, email, password, rol_id) 
-                VALUES (:nombre, :email, :password, :rol_id)";
+    $sql = "INSERT INTO {$this->table} (nombre, email, password, rol_id, estado_id) 
+            VALUES (:nombre, :email, :password, :rol_id, 1)"; // Se asume estado 'activo' (ID 1)
 
-        // CORRECCIÓN: Se añade un bloque try...catch para un manejo de errores consistente.
-        try {
-            $stmt = $this->db->prepare($sql);
+    try {
+        $stmt = $this->db->prepare($sql);
 
-            // Vincula los valores
-            $stmt->bindParam(':nombre', $nombre);
-            $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':password', $password_hash);
-            $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_INT);
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password_hash);
+        $stmt->bindParam(':rol_id', $rol_id, PDO::PARAM_INT);
 
-            // Si la ejecución falla, devuelve false
-            if (!$stmt->execute()) {
-                return false;
-            }
-            
-            // Devuelve el ID del usuario recién creado.
-            return (int)$this->db->lastInsertId();
-
-        } catch (PDOException $e) {
-            error_log('Error en UsuarioModel::create: ' . $e->getMessage());
+        // --- CORRECCIÓN CLAVE ---
+        // Verificamos si la ejecución fue exitosa. Si no, devolvemos false.
+        if (!$stmt->execute()) {
             return false;
         }
-    }
+        
+        // Si tiene éxito, devolvemos el ID del usuario recién creado.
+        return (int)$this->db->lastInsertId();
+
+    } catch (PDOException $e) {
+        // Si hay una excepción de la base de datos (ej. email duplicado), la registramos y devolvemos false.
+        error_log('Error en UsuarioModel::create: ' . $e->getMessage());
+        return false;
+    }   
+    }   
     
     /**
      * Busca un usuario por su ID y devuelve sus datos junto con el nombre del rol y estado.
