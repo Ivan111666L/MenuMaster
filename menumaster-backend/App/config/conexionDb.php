@@ -1,12 +1,12 @@
 <?php
-// Ubicación: App/Config/Database.php
 
 namespace app\config;
+
 
 use PDO;
 use PDOException;
 
-final class conexionDb {
+final class ConexionDb { // <-- CORREGIDO: ConexionDb con mayúsculas
     private static ?PDO $conn = null;
 
     private function __construct() {}
@@ -14,8 +14,6 @@ final class conexionDb {
 
     /**
      * Obtiene la única instancia de la conexión a la base de datos (Patrón Singleton).
-     * @return PDO La instancia de la conexión PDO.
-     * @throws PDOException Si la conexión falla.
      */
     public static function getConnection(): PDO
     {

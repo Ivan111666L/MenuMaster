@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 use app\Models\CategoriaModel;
 use PDO;

@@ -1,31 +1,13 @@
-# Activar el motor de reescritura de URLs
-RewriteEngine On
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "http://localhost:5173"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>
 
-# --- INICIO DEL BLOQUE DE CABECeras CORS ---
-# Se envían estas cabeceras en cada petición para dar permiso al frontend.
-
-# 1. PERMITIR ORIGEN
-#    Permite el acceso desde el servidor de desarrollo de Vite.
-#    En producción, cambia esta URL por el dominio de tu sitio web.
-Header always set Access-Control-Allow-Origin "http://localhost:5173"
-
-# 2. PERMITIR MÉTODOS
-#    Permite todos los métodos HTTP que tu API necesita.
-Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
-
-# 3. PERMITIR CABECERAS
-#    Permite que el frontend envíe cabeceras como Content-Type y Authorization.
-Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
-
-# --- MANEJO DE LA PETICIÓN PREFLIGHT (OPTIONS) ---
-# Si el método es OPTIONS, Apache responde con "204 No Content" y detiene el procesamiento.
-# Esto responde a la pregunta de permiso del navegador.
-RewriteCond %{REQUEST_METHOD} OPTIONS
-RewriteRule ^(.*)$ $1 [R=204,L]
-
-
-# --- REGLA DEL FRONT CONTROLLER ---
-# Redirige todas las demás peticiones a index.php para que las maneje tu router de PHP.
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.php [QSA,L]
+# Reglas para el Front Controller (ya deberías tenerlas)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>

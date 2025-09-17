@@ -1,3 +1,4 @@
+
 // Se importa únicamente la instancia 'api' que ya está configurada.
 import api from '@/services/api';
 
