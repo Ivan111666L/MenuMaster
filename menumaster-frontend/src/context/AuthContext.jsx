@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import authService from '@/features/auth/services/authService';
@@ -47,7 +48,10 @@ export function AuthProvider({ children }) {
             const sessionData = await authService.login(credentials);
             
             const newSession = {
-                user: sessionData.user,
+                user: sessionData.user, 
+
+
+                
                 token: sessionData.token,
                 expiraEn: sessionData.expiraEn,
             };

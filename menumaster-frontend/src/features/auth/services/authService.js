@@ -6,9 +6,7 @@ import api from '@/services/api';
  * @param {object} userData - Datos del nuevo usuario.
  */
 const register = async (userData) => {
-  // Se usa 'api.post' y una ruta relativa que comienza con '/'.
   const response = await api.post('/auth/register', userData);
-  // Devolvemos la respuesta completa para que el componente maneje el mensaje.
   return response.data;
 };
 
@@ -17,12 +15,18 @@ const register = async (userData) => {
  * @param {object} credentials - Email y password del usuario.
  */
 const login = async (credentials) => {
-  // Se usa 'api.post' y una ruta relativa.
   const response = await api.post('/auth/login', credentials);
   console.log("Respuesta del backend login:", response.data);
-  // El servicio solo se encarga de la comunicación; el AuthContext guardará la sesión.
-  // Devolvemos solo la data útil que el AuthContext necesita.
-  return response.data.data; 
+  // Ajusta esta línea según la estructura real del JSON que devuelve tu backend:
+  // Si tu backend devuelve directamente { user, token, expiraEn }, usa:
+  return {
+  user: response.data.usuario,
+  token: response.data.token,
+  expiraEn: Math.floor(Date.now() / 1000) + 15 * 60 // o el tiempo que uses
+};
+
+  // Si tu backend devuelve { data: { user, token, expiraEn } }, usa:
+  // return response.data.data;
 };
 
 /**
