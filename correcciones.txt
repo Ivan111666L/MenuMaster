@@ -62,3 +62,96 @@ Refina la Experiencia de Usuario:
 [ ] Carga y Errores: Asegúrate de que TODAS las páginas que cargan datos muestren un <Spinner /> y manejen los errores de la API con un mensaje claro.
 
 [ ] Notificaciones: Reemplaza los alert() con un sistema de notificaciones más amigable.
+
+Contraseña en texto plano
+En tus logs tu usuario “juan” tiene contraseña 11223344. Si la guardaste así, no funcionará password_verify. Debes guardar contraseñas hasheadas con password_hash al registrar.
+
+Verificar que rol esté bien definido
+Ya hiciste model con rol_id, unión con tabla roles para traer rol como nombre. Verifica que:
+
+Tabla roles exista y columna nombre esté ahí.
+
+Que en tu base de datos los rol_id de los usuarios correspondan a entradas existentes en la tabla roles.
+
+Secretos correctamente cargados
+Tu .env tiene JWT_SECRET_KEY. Verifica que:
+
+Estés usando $_ENV['JWT_SECRET_KEY'] en el backend.
+
+Que Config::getJwtConfig() lo use correctamente (y haya cargado dotenv).
+
+Si en AuthController usas $_ENV['JWT_SECRET'] en vez de JWT_SECRET_KEY por error, puede dar null.
+
+SendResponse uniforme
+Asegúrate de que todas las rutas relevantes (login, register, errores) usen la versión de sendResponse que devuelve JSON con { success, message, token, usuario }, para que React pueda manejarlo consistentemente.
+
+Respuesta correcta desde backend
+Como el error 401 te lo retornan, React está recibiendo “Unauthorized”. Eso es correcto si credenciales no coinciden, pero debes revisar el mensaje que retorna el backend para asegurarte que es claro y que React lo maneja bien.
+
+Endpoint verifyToken o middleware
+Si tienes rutas protegidas, necesitas un middleware que verifique el token JWT y rechace el request si no es válido.
+
+CORS
+Asegúrate de que el backend responde con cabezeras CORS permitiendo peticiones desde tu frontend (http://localhost:5173 u otro). Si no, podrían bloquearse en producción.
+
+Documentación / SQL
+Tienes el script menu_master.sql lo cual es bueno. Verifica que las tablas coincidan con lo que tus modelos esperan (nombres, columnas, relaciones).
+## Posibles Errores Comunes en tu Código
+Revisa tu proyecto en busca de estos errores típicos:
+
+Falta de manejo de errores: ¿Qué pasa si un usuario introduce texto donde debería ir un número? ¿O si un archivo que intentas leer no existe? Tu código debería anticipar y gestionar estos casos (con bloques try-except en Python, por ejemplo) para no fallar inesperadamente.
+
+Código repetido (No sigues el principio DRY - Don't Repeat Yourself): Si tienes las mismas líneas de código en varios lugares, es mejor crear una función. Esto hace que tu código sea más fácil de mantener y de leer.
+
+Variables con nombres poco descriptivos: Nombres como x, a o data no dicen mucho. Usa nombres que describan claramente qué guarda la variable, como nombre_plato o precio_total.
+
+Funciones que hacen demasiadas cosas: Cada función debería tener una única responsabilidad. Una función que calcula el total de una orden no debería también ser la responsable de imprimir el recibo.
+
+Seguridad básica: Si manejas datos de usuario o contraseñas, asegúrate de no guardarlas como texto plano. Investiga sobre cómo "hashear" contraseñas. Tampoco subas a GitHub claves de APIs o credenciales de bases de datos.
+
+## Archivos y Estructura que Podrían Faltar
+Un buen repositorio de GitHub es más que solo código. Revisa si tienes lo siguiente:
+
+README.md (¡El más importante!)
+Este es el archivo que sirve como portada de tu proyecto. Sin él, nadie sabrá de qué trata, cómo usarlo o para qué sirve. Tu README debería tener:
+
+Un título y una descripción clara: ¿Qué es "MenuMaster"? ¿Un gestor de menús para restaurantes? ¿Una app para planificar comidas?
+
+Instrucciones de instalación: ¿Cómo puede alguien más ejecutar tu proyecto? ¿Necesita instalar librerías específicas? (Ej: pip install -r requirements.txt).
+
+Guía de uso: Un ejemplo rápido de cómo se utiliza tu programa. Puedes incluir capturas de pantalla o fragmentos de código.
+
+.gitignore
+Este archivo es crucial. Le dice a Git qué archivos y carpetas debe ignorar. Sirve para evitar subir a tu repositorio:
+
+Archivos de configuración del entorno (como la carpeta __pycache__ en Python).
+
+Archivos con información sensible (contraseñas, API keys).
+
+Archivos grandes o binarios que no son parte del código fuente.
+
+requirements.txt (o similar)
+Si usas librerías externas (como Flask, Django, Pandas, etc.), necesitas un archivo que las liste. Esto permite que otras personas instalen las mismas versiones de las dependencias que tú usaste para que el proyecto funcione correctamente.
+
+## ¿Qué te Falta por Crear? (Sugerencias para "MenuMaster")
+Basado en el nombre "MenuMaster", aquí tienes algunas ideas de funcionalidades que podrías implementar si aún no lo has hecho:
+
+Persistencia de datos: ¿Los menús se borran cada vez que cierras el programa? Deberías guardar la información en algún lugar.
+
+Opción simple: Usar archivos de texto, JSON o CSV.
+
+Opción avanzada: Integrar una base de datos como SQLite (que es muy sencilla de empezar a usar), PostgreSQL o MySQL.
+
+Interfaz de usuario:
+
+Si es una app de consola: Mejora la experiencia con menús claros y preguntas intuitivas.
+
+Si quieres ir más allá: Crea una interfaz gráfica (GUI) con librerías como Tkinter o PyQt, o una interfaz web con un framework como Flask o Django.
+
+Funcionalidades del menú:
+
+CRUD completo: Asegúrate de que puedes Crear, Leer, Actualizar y Eliminar platos del menú (en inglés: Create, Read, Update, Delete).
+
+Categorías: Poder agrupar platos (entradas, platos fuertes, postres, bebidas).
+
+Cálculos: Calcular precios, calorías o incluso generar un menú aleatorio del día.

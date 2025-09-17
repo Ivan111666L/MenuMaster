@@ -1,11 +1,9 @@
 <?php
 namespace app\Controllers;
 
-// --- Dependencias ---
 use app\Models\UsuarioModel;
 use app\Models\RolModel;
-use app\Utils\Validator;
-use app\config\Config;
+use app\Config\Config;
 use app\Config\conexionDb;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -21,8 +19,8 @@ class AuthController
     public function __construct(PDO $db = null, UsuarioModel $usuarioModel = null, RolModel $rolModel = null)
     {
         $this->db = $db ?? conexionDb::getConnection();
-        $this->usuarioModel = $usuarioModel;
-        $this->rolModel = $rolModel;
+        $this->usuarioModel = $usuarioModel ?? new UsuarioModel($this->db);
+        $this->rolModel = $rolModel ?? new RolModel($this->db);
     }
 
     /**
@@ -55,7 +53,7 @@ class AuthController
                 ":nombre" => $data['nombre'],
                 ":email" => $data['email'],
                 ":password" => $hashedPassword,
-                ":rol_id" => $data['rol_id'] ?? 2, // por defecto usuario normal
+                ":rol_id" => $data['rol_id'] ?? 2, // rol por defecto
                 ":estado_id" => 1
             ]);
 
@@ -71,21 +69,8 @@ class AuthController
             $stmt->execute([":id" => $userId]);
             $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // JWT
-            $issuedAt = time();
-            $expirationTime = $issuedAt + 3600;
-            $payload = [
-                "iat" => $issuedAt,
-                "exp" => $expirationTime,
-                "data" => [
-                    "id" => $usuario['id'],
-                    "email" => $usuario['email'],
-                    "rol" => $usuario['rol']
-                ]
-            ];
-            $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
-
-            $this->sendResponse(201, "Usuario registrado correctamente.", $jwt, $usuario);
+            $token = $this->generateToken($usuario);
+            $this->sendResponse(201, "Usuario registrado correctamente.", $token, $usuario);
 
         } catch (Exception $e) {
             $this->sendResponse(500, "Error en el servidor: " . $e->getMessage());
@@ -104,41 +89,42 @@ class AuthController
                 $this->sendResponse(400, "Email y contraseña son obligatorios.");
             }
 
-            $stmt = $this->db->prepare("
-                SELECT u.id, u.nombre, u.email, u.password, u.rol_id, u.estado_id, r.nombre AS rol
-                FROM usuarios u
-                INNER JOIN roles r ON u.rol_id = r.id
-                WHERE u.email = :email
-                LIMIT 1
-            ");
-            $stmt->execute([":email" => $data['email']]);
-            $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+            $usuario = $this->usuarioModel->findByEmail($data['email']);
 
             if (!$usuario || !password_verify($data['password'], $usuario['password'])) {
                 $this->sendResponse(401, "Credenciales incorrectas.");
             }
 
-            unset($usuario['password']); // no enviar el hash
+            unset($usuario['password']); // nunca enviar el hash
+            $token = $this->generateToken($usuario);
 
-            // JWT
-            $issuedAt = time();
-            $expirationTime = $issuedAt + 3600;
-            $payload = [
-                "iat" => $issuedAt,
-                "exp" => $expirationTime,
-                "data" => [
-                    "id" => $usuario['id'],
-                    "email" => $usuario['email'],
-                    "rol" => $usuario['rol']
-                ]
-            ];
-            $jwt = JWT::encode($payload, $_ENV['JWT_SECRET'], 'HS256');
-
-            $this->sendResponse(200, "Inicio de sesión exitoso.", $jwt, $usuario);
+            $this->sendResponse(200, "Inicio de sesión exitoso.", $token, $usuario);
 
         } catch (Exception $e) {
             $this->sendResponse(500, "Error en el servidor: " . $e->getMessage());
         }
+    }
+
+    /**
+     * Genera token JWT
+     */
+    private function generateToken(array $usuario): string
+    {
+        $jwtConfig = Config::getJwtConfig();
+        $issuedAt = time();
+        $expirationTime = $issuedAt + $jwtConfig['expiration_time'];
+
+        $payload = [
+            "iat" => $issuedAt,
+            "exp" => $expirationTime,
+            "data" => [
+                "id" => $usuario['id'],
+                "email" => $usuario['email'],
+                "rol" => $usuario['rol'] ?? null
+            ]
+        ];
+
+        return JWT::encode($payload, $jwtConfig['secret'], $jwtConfig['algorithm']);
     }
 
     /**
@@ -147,21 +133,8 @@ class AuthController
     public static function decodeTokenData(string $token): array
     {
         $jwtConfig = Config::getJwtConfig();
-        $secret_key = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];
-        $decoded = JWT::decode($token, new Key($secret_key, $jwtConfig['algorithm']));
+        $decoded = JWT::decode($token, new Key($jwtConfig['secret'], $jwtConfig['algorithm']));
         return (array) $decoded;
-    }
-
-    /**
-     * Envía correo de restablecimiento
-     */
-    private function sendPasswordResetEmail(string $email, string $token): void
-    {
-        $resetLink = ($_ENV['FRONTEND_URL'] ?? 'http://localhost:5173') . "/reset-password?token=" . $token;
-        $asunto = "Restablecimiento de Contraseña - MenuMaster";
-        $cuerpo = "<h1>Restablece tu Contraseña</h1><p>Haz clic en el siguiente enlace:</p><a href='{$resetLink}'>Restablecer Contraseña</a>";
-
-        file_put_contents(BASE_PATH . '/logs/emails.log', "--- EMAIL TO: {$email} ---\nLINK: {$resetLink}\n\n", FILE_APPEND);
     }
 
     /**

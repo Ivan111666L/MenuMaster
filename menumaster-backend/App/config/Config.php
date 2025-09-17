@@ -1,30 +1,34 @@
 <?php
-// Ubicación: App/Config/Config.php
-
-// CORRECCIÓN: Se ajusta el namespace a la ubicación del archivo.
 namespace app\config;
 
-class Config 
-{
-    /**
-     * Devuelve la configuración para la generación de tokens JWT.
-     * Lee la clave secreta desde las variables de entorno para mayor seguridad.
-     * @return array
-     */
-    public static function getJwtConfig(): array
-    {
-        return [
-            // La clave secreta se lee desde tu archivo .env
-            'secret' => $_ENV['JWT_SECRET_KEY'] ?? 'una_clave_por_defecto_muy_insegura',
-            
-            // Tiempo de expiración del token en segundos (ej. 1 hora = 3600 segundos)
-            'expiration_time' => 3600, 
-            
-            // Algoritmo de encriptación
-            'algorithm' => 'HS256'
-        ];
+use PDO;
+use PDOException;
+
+class Config {
+    private static $dbHost = "localhost";
+    private static $dbName = "menumaster";
+    private static $dbUser = "root";
+    private static $dbPass = "";
+
+    public static function getConnection() {
+        try {
+            $pdo = new PDO(
+                "mysql:host=" . self::$dbHost . ";dbname=" . self::$dbName . ";charset=utf8",
+                self::$dbUser,
+                self::$dbPass
+            );
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            return $pdo;
+        } catch (PDOException $e) {
+            die("Error de conexión: " . $e->getMessage());
+        }
     }
 
-    // CORRECCIÓN: Se eliminaron los métodos getDbConfig(), decodenTokenData() y getJwtToken().
-    // La lógica de esos métodos era incorrecta o pertenecía a otras clases (Database y AuthController).
+    public static function getJwtConfig() {
+        return [
+            "secret" => "clave_secreta_super_segura", // cámbiala en producción
+            "algorithm" => "HS256",
+            "expiration" => 3600 // 1 hora
+        ];
+    }
 }
