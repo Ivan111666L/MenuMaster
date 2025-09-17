@@ -1,5 +1,5 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // Importamos los modelos que vamos a necesitar
 use app\Models\IngredienteModel;
