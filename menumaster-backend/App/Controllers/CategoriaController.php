@@ -1,7 +1,7 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
-use App\Models\CategoriaModel;
+use app\Models\CategoriaModel;
 use PDO;
 use Exception;
 

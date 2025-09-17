@@ -1,11 +1,11 @@
 <?php
 // routes/categorias_api.php
 
-require_once BASE_PATH . '/App/Controllers/CategoriaController.php';
-require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/app/Controllers/CategoriaController.php';
+require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 
-use App\Controllers\CategoriaController;
-use App\Middleware\AuthMiddleware;
+use app\Controllers\CategoriaController;
+use app\Middleware\AuthMiddleware;
 
 try {
     // 1. Se instancian las clases necesarias

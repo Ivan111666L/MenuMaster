@@ -2,13 +2,13 @@
 // routes/auth.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/App/Controllers/AuthController.php';
-require_once BASE_PATH . '/App/Models/UsuarioModel.php';
-require_once BASE_PATH . '/App/Models/RolModel.php';
+require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/app/Models/UsuarioModel.php';
+require_once BASE_PATH . '/app/Models/RolModel.php';
 
-use App\Controllers\AuthController;
-use App\Models\UsuarioModel;
-use App\Models\RolModel;
+use app\Controllers\AuthController;
+use app\Models\UsuarioModel;
+use app\Models\RolModel;
 
 try {
     // CORRECCIÓN: Instanciamos los modelos primero...

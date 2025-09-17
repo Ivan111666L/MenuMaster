@@ -6,13 +6,13 @@
  */
 
 // --- Dependencias ---
-require_once BASE_PATH . '/App/Controllers/MovimientoInventarioController.php';
-require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/App/Controllers/AuthController.php';
+require_once BASE_PATH . '/app/Controllers/MovimientoInventarioController.php';
+require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
-use App\Controllers\MovimientoInventarioController;
-use App\Middleware\AuthMiddleware;
-use App\Controllers\AuthController;
+use app\Controllers\MovimientoInventarioController;
+use app\Middleware\AuthMiddleware;
+use app\Controllers\AuthController;
 
 // --- Lógica del Enrutador ---
 try {

@@ -85,3 +85,13 @@
     padding: 3rem;
     grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
 }
+
+/* ... (Los estilos que te proporcioné en la respuesta anterior) ... */
+.gestion-mesas-app {
+    padding: 2rem;
+}
+.header-controles {
+    display: flex;
+    justify-content: space-between;
+    /* ... etc ... */
+}

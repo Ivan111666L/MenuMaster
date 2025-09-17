@@ -1,21 +1,19 @@
 <?php
-namespace App\Middleware;
+namespace app\Middleware;
 
+use app\config\Config; // Asegúrate de que el namespace de Config sea correcto
+use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use App\Config;
-use Exception;
-// IMPORTANTE: Importar las excepciones específicas de la librería JWT
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 
 class AuthMiddleware
 {
     /**
-     * CORRECCIÓN: El middleware no debe ser estático. Se crea una instancia por cada petición.
-     * Su trabajo es "vigilar" la ruta. Si la autenticación es correcta, no hace nada
-     * y permite el paso. Si falla, lanza una excepción y detiene la ejecución.
-     * Por eso, el tipo de retorno es 'void'.
+     * Maneja la verificación del token JWT.
+     * Si el token es válido, permite que la petición continúe.
+     * Si no, lanza una excepción para detener la ejecución.
      */
     public function handle(): void
     {
@@ -28,47 +26,43 @@ class AuthMiddleware
             $jwtConfig = Config::getJwtConfig();
             JWT::decode($token, new Key($jwtConfig['secret'], $jwtConfig['algorithm']));
             
-            // Si la decodificación es exitosa, la función termina y el script continúa hacia el controlador.
-            // No es necesario retornar los datos del usuario aquí. El controlador puede decodificar el token de nuevo
-            // si necesita los datos, ya que en este punto se ha verificado que es seguro hacerlo.
+            // Si la decodificación es exitosa, la función termina y el script
+            // continúa hacia el controlador sin problemas.
 
         } catch (ExpiredException $e) {
-            // CORRECCIÓN: Capturar errores específicos para dar mensajes más claros.
+            // Captura el error específico cuando el token ha caducado.
             throw new Exception("El token ha expirado.", 401);
 
         } catch (SignatureInvalidException $e) {
+            // Captura el error específico si la firma del token no es válida.
             throw new Exception("La firma del token no es válida.", 401);
             
         } catch (Exception $e) {
-            // Captura cualquier otro error de la librería JWT o de la configuración.
+            // Captura cualquier otro error de la librería JWT.
             throw new Exception("Token inválido.", 401);
         }
     }
 
     /**
-     * CORRECCIÓN: Se usa $_SERVER en lugar de getallheaders() para mayor portabilidad.
-     * La función getallheaders() no siempre está disponible (ej. en servidores Nginx).
+     * Extrae el token del encabezado 'Authorization' de forma segura.
      * @return string|null
      */
     private function getBearerToken(): ?string
     {
+        // Se usa $_SERVER para máxima compatibilidad con diferentes servidores (Apache, Nginx).
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
 
         if (!empty($authHeader) && preg_match('/Bearer\s(\S+)/i', $authHeader, $matches)) {
-            // El modificador /i hace que 'Bearer' no distinga mayúsculas/minúsculas.
             return $matches[1];
         }
         return null;
     }
+    
     /**
-     * Método público para obtener el token desde otros scripts.
-     * Reutiliza la lógica privada que ya teníamos.
+     * Método público para ser usado internamente por otros scripts (ej. enrutadores).
      */
     public function getBearerTokenForInternalUse(): ?string
     {
-        // Llama al método privado que ya existe en esta misma clase
         return $this->getBearerToken();
     }
-    
-
 }

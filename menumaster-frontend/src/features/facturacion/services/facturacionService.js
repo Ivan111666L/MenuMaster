@@ -1,8 +1,7 @@
 import api from '@/services/api'; // Tu instancia central de Axios
 
 /**
- * Obtiene los pedidos que están listos para ser facturados.
- * En la cocina, estos son los pedidos marcados como 'listo para servir'.
+ * Obtiene los pedidos que están listos para ser facturados (ej. estado 'listo para servir').
  */
 const getPedidosParaFacturar = async () => {
     const response = await api.get('/pedidos?estado=listo para servir');

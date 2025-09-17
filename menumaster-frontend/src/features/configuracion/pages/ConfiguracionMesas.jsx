@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import mesaService from '@/features/mesas/services/mesaService';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import '@/configuracion.css';
+import './ConfiguracionMesas.css'; // Asegúrate de tener este archivo de estilos
 
 const estadoInicialNuevaMesa = {
   numero: '',
   capacidad: '',
   ubicacion: '',
-  estado_nombre: 'disponible', // Usamos el nombre del estado para la creación
+  estado_nombre: 'disponible',
 };
 
 function ConfiguracionMesas() {
@@ -18,10 +18,12 @@ function ConfiguracionMesas() {
   const [nuevaMesa, setNuevaMesa] = useState(estadoInicialNuevaMesa);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Estado para el botón de crear
 
-  const cargarMesas = async () => {
+  // Usamos useCallback para evitar que la función se re-cree innecesariamente
+  const cargarMesas = useCallback(async () => {
     try {
-      setIsLoading(true);
+      // No seteamos isLoading a true aquí para permitir recargas silenciosas
       const data = await mesaService.getMesas();
       setMesas(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -29,11 +31,11 @@ function ConfiguracionMesas() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     cargarMesas();
-  }, []);
+  }, [cargarMesas]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -42,22 +44,28 @@ function ConfiguracionMesas() {
 
   const crearMesa = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
     try {
       await mesaService.createMesa(nuevaMesa);
       setNuevaMesa(estadoInicialNuevaMesa);
-      cargarMesas(); // Recargar la lista
+      await cargarMesas(); // Recargar la lista
     } catch (err) {
-      alert('Error al crear la mesa.');
+      alert('Error al crear la mesa: ' + (err.response?.data?.error || err.message));
+    } finally {
+      setIsSubmitting(false);
     }
   };
   
   const cambiarEstado = async (id, nuevoEstado) => {
+    const mesasOriginales = [...mesas];
+    // Actualización optimista
+    setMesas(prev => prev.map(m => m.id === id ? { ...m, estado: nuevoEstado } : m));
+    
     try {
       await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
-      // Actualizamos el estado local para una respuesta visual instantánea
-      setMesas(prev => prev.map(m => m.id === id ? { ...m, estado: nuevoEstado } : m));
     } catch (err) {
         alert('Error al cambiar el estado.');
+        setMesas(mesasOriginales); // Revertir en caso de error
     }
   };
 
@@ -65,9 +73,10 @@ function ConfiguracionMesas() {
     if (window.confirm('¿Estás seguro de que quieres eliminar esta mesa?')) {
       try {
         await mesaService.deleteMesa(id);
-        cargarMesas(); // Recargar la lista
+        setMesas(prev => prev.filter(m => m.id !== id)); // Actualización optimista
       } catch (err) {
         alert('Error al eliminar la mesa.');
+        cargarMesas(); // Recargar para re-sincronizar
       }
     }
   };
@@ -84,51 +93,57 @@ function ConfiguracionMesas() {
       <h1 className="gestion-mesas-title">Gestión de Mesas</h1>
 
       <form onSubmit={crearMesa} className="crear-mesa-form">
-        <Input name="numero" placeholder="Número (ej: M5)" value={nuevaMesa.numero} onChange={handleInputChange} required />
-        <Input name="capacidad" type="number" placeholder="Capacidad" value={nuevaMesa.capacidad} onChange={handleInputChange} required />
-        <Input name="ubicacion" placeholder="Ubicación" value={nuevaMesa.ubicacion} onChange={handleInputChange} />
-        <Button type="submit" variant="primary">Crear Mesa</Button>
+        {/* CORRECCIÓN: Se usa el 'id' en los Input para vincular con el label implícito */}
+        <Input id="numero" name="numero" placeholder="Número (ej: M5)" value={nuevaMesa.numero} onChange={handleInputChange} required />
+        <Input id="capacidad" name="capacidad" type="number" placeholder="Capacidad" value={nuevaMesa.capacidad} onChange={handleInputChange} required />
+        <Input id="ubicacion" name="ubicacion" placeholder="Ubicación" value={nuevaMesa.ubicacion} onChange={handleInputChange} />
+        <Button type="submit" variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? <Spinner /> : 'Crear Mesa'}
+        </Button>
       </form>
 
       <Input
+        id="busqueda"
         placeholder="Buscar por número o ubicación..."
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}
         className="buscador-mesas"
       />
 
-      <table className="mesas-table">
-        <thead>
-          <tr>
-            <th>Número</th>
-            <th>Capacidad</th>
-            <th>Ubicación</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mesasFiltradas.map((m) => (
-            <tr key={m.id}>
-              <td>{m.numero}</td>
-              <td>{m.capacidad}</td>
-              <td>{m.ubicacion}</td>
-              <td>
-                <select value={m.estado} onChange={(e) => cambiarEstado(m.id, e.target.value)}>
-                  <option value="disponible">Disponible</option>
-                  <option value="ocupada">Ocupada</option>
-                  <option value="reservada">Reservada</option>
-                </select>
-              </td>
-              <td>
-                <Button variant="danger" onClick={() => eliminarMesa(m.id)}>
-                  Eliminar
-                </Button>
-              </td>
+      <div className="table-wrapper">
+        <table className="mesas-table">
+          <thead>
+            <tr>
+              <th>Número</th>
+              <th>Capacidad</th>
+              <th>Ubicación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {mesasFiltradas.map((m) => (
+              <tr key={m.id}>
+                <td>{m.numero}</td>
+                <td>{m.capacidad}</td>
+                <td>{m.ubicacion}</td>
+                <td>
+                  <select className="form-input" value={m.estado} onChange={(e) => cambiarEstado(m.id, e.target.value)}>
+                    <option value="disponible">Disponible</option>
+                    <option value="ocupada">Ocupada</option>
+                    <option value="reservada">Reservada</option>
+                  </select>
+                </td>
+                <td>
+                  <Button variant="danger" onClick={() => eliminarMesa(m.id)}>
+                    Eliminar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

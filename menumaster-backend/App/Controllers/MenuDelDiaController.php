@@ -1,8 +1,8 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // CORRECCIÓN: Se importa el nombre correcto del modelo: 'MenuDelDiaModel'.
-use App\Models\MenuDelDiaModel;
+use app\Models\MenuDelDiaModel;
 use PDO;
 use Exception;
 

@@ -1,13 +1,13 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // --- Dependencias ---
-use App\Models\UsuarioModel;
-use App\Models\RolModel;
-use App\Models\EstadoGeneralModel;
-use App\Utils\Validator;
-use App\Middleware\AuthMiddleware;
-use App\Controllers\AuthController;
+use app\Models\UsuarioModel;
+use app\Models\RolModel;
+use app\Models\EstadoGeneralModel;
+use app\Utils\Validator;
+use app\Middleware\AuthMiddleware;
+use app\Controllers\AuthController;
 use PDO;
 use Exception;
 

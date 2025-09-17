@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import pedidoService from '../services/pedidoService';
+import { toast } from 'react-toastify'; // Importamos la librería de notificaciones
+import pedidoService from '@/features/pedidos/services/pedidoService';
 
-// --- Funciones de Ayuda para la Impresión ---
+// --- Funciones de Ayuda para la Impresión (se mantienen intactas) ---
 const generarTicketCocina = (pedidoCompleto) => {
     let ticket = "================================\n";
     ticket += "      NUEVO PEDIDO PARA COCINA\n";
@@ -25,7 +26,7 @@ const generarTicketCocina = (pedidoCompleto) => {
 
 const imprimirContenido = (contenido) => {
     const ventanaImpresion = window.open('', '_blank');
-    ventanaImpresion.document.write(`<pre>${contenido}</pre>`);
+    ventanaImpresion.document.write(`<pre style="font-family: monospace; font-size: 12px;">${contenido}</pre>`);
     ventanaImpresion.document.close();
     ventanaImpresion.focus();
     ventanaImpresion.print();
@@ -42,20 +43,22 @@ export const usePedido = () => {
     const [error, setError] = useState(null);
 
     // --- Carga de Datos ---
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await pedidoService.getTomaPedidoData();
-                setProductos(data.productos || []);
-                setMesas(data.mesas || []);
-            } catch (err) {
-                setError('No se pudieron cargar los datos para tomar pedidos.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
+    const fetchData = useCallback(async () => {
+        try {
+            const data = await pedidoService.getTomaPedidoData();
+            // Filtramos solo las mesas que están disponibles
+            setProductos(data.productos || []);
+            setMesas(data.mesas.filter(mesa => mesa.estado === 'disponible') || []);
+        } catch (err) {
+            setError('No se pudieron cargar los datos para tomar pedidos.');
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
 
     // --- Acciones ---
     const seleccionarMesa = (mesaId) => {
@@ -88,18 +91,23 @@ export const usePedido = () => {
 
     const enviarPedido = async () => {
         if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
-            alert('Por favor, selecciona una mesa y agrega al menos un producto.');
+            // CORRECCIÓN: Se usa toast en lugar de alert
+            toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
             return;
         }
         try {
             setLoading(true);
             const pedidoCreado = await pedidoService.createPedido(pedidoActual);
-            // ¡AQUÍ SE CONSERVA LA LÓGICA DE IMPRESIÓN!
+            
+            // Se conserva la lógica de impresión
             generarTicketCocina(pedidoCreado);
-            alert('Pedido enviado a cocina exitosamente.');
+            
+            // CORRECCIÓN: Se usa toast en lugar de alert
+            toast.success('¡Pedido enviado a cocina exitosamente!');
             limpiarPedido();
         } catch (err) {
-            alert('Error al enviar el pedido.');
+            // CORRECCIÓN: Se usa toast en lugar de alert, mostrando el error de la API
+            toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
         } finally {
             setLoading(false);
         }

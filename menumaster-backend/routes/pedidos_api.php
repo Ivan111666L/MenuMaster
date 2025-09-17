@@ -2,13 +2,13 @@
 // routes/pedidos_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/App/Controllers/PedidoController.php';
-require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/App/Controllers/AuthController.php'; // Necesario para requireAdmin
+require_once BASE_PATH . '/app/Controllers/PedidoController.php';
+require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/app/Controllers/AuthController.php'; // Necesario para requireAdmin
 
-use App\Controllers\PedidoController;
-use App\Middleware\AuthMiddleware;
-use App\Controllers\AuthController;
+use app\Controllers\PedidoController;
+use app\Middleware\AuthMiddleware;
+use app\Controllers\AuthController;
 
 // --- Lógica del Enrutador ---
 try {

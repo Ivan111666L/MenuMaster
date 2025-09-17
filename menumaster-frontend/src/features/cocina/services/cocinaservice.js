@@ -6,7 +6,7 @@ import api from '@/services/api'; // Importamos nuestra instancia de Axios
  */
 const getActiveOrders = async () => {
   // Hacemos una petición GET a /api/pedidos, filtrando por estado.
-  // El backend debe poder manejar múltiples estados en el query param.
+  // El backend debe poder manejar múltiples estados en el query param (ej. estado=pendiente,en preparacion).
   const response = await api.get('/pedidos?estado=pendiente,en preparacion');
   return response.data.data;
 };

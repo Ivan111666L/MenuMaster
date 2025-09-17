@@ -1,187 +1,207 @@
 <?php
-namespace App\Controllers;
 
-// --- Dependencias ---
-use App\Models\UsuarioModel;
-use App\Models\RolModel;
-use App\Utils\Validator;
-use App\Config\Config;
+namespace app\Controllers;
+
+use app\Models\UsuarioModel;
+use app\config\Config;
+use app\config\ConexionDb; // Corregido el namespace a mayúscula inicial
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PDO;
 use Exception;
+use Throwable; // Es mejor capturar Throwable para errores más genéricos
 
 class AuthController
 {
-    // Las dependencias ahora son propiedades
-    private $db;
-    private $usuarioModel;
-    private $rolModel;
+    private PDO $db;
+    private UsuarioModel $usuarioModel;
 
-    /**
-     * El constructor recibe la conexión e inyecta los modelos.
-     */
-    public function __construct(PDO $db, UsuarioModel $usuarioModel, RolModel $rolModel)
+    public function __construct()
     {
-        $this->db = $db;
-        $this->usuarioModel = $usuarioModel;
-        $this->rolModel = $rolModel;
+        // La conexión y el modelo se instancian directamente para simplificar
+        $this->db = ConexionDb::getConnection();
+        $this->usuarioModel = new UsuarioModel($this->db);
     }
 
     /**
-     * Registra un nuevo usuario.
+     * Registro de un nuevo usuario.
      */
-    public function register(array $data): void
+    public function register(): void
     {
-        Validator::validate($data, [
-            'nombre' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8',
-            'rol' => 'required'
-        ]);
-        
-        if ($this->usuarioModel->findByEmail($data['email'])) {
-            throw new Exception("El correo electrónico ya está registrado.", 409);
-        }
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
 
-        $rol = $this->rolModel->findByName(strtolower(trim($data['rol'])));
-        if (!$rol) {
-            throw new Exception("El rol especificado no es válido.", 400);
-        }
+            // Validación de datos de entrada
+            if (empty($data['nombre']) || empty($data['email']) || empty($data['password'])) {
+                $this->sendResponse(400, ["message" => "Nombre, email y contraseña son obligatorios."]);
+                return;
+            }
 
-        $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
-    
-        $nuevoUsuarioId = $this->usuarioModel->create(
-            $data['nombre'],
-            $data['email'],
-            $password_hash,
-            $rol['id']
-        );
-        if (!$nuevoUsuarioId) {
-        // Si el modelo devuelve 'false', lanzamos un error.
-        throw new Exception("No se pudo registrar el usuario en la base de datos.", 500);
-    }
-        
-        $nuevoUsuario = $this->usuarioModel->find($nuevoUsuarioId);
-        $this->sendResponse(201, [
-            "mensaje" => "Usuario creado correctamente.",
-            "usuario" => $nuevoUsuario
-        ]);
-    }
-    
-    /**
-     * Autentica a un usuario y devuelve un token JWT.
-     */
-    public function login(array $data): void
-    {
-        Validator::validate($data, ['email' => 'required|email', 'password' => 'required']);
+            // Validar si el email ya existe usando el modelo
+            if ($this->usuarioModel->findByEmail($data['email'])) {
+                $this->sendResponse(409, ["message" => "El correo electrónico ya está registrado."]);
+                return;
+            }
 
-        $usuario = $this->usuarioModel->findByEmail($data['email']);
+            // Crear el usuario usando el modelo
+            $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
+            $rolId = $data['rol_id'] ?? 2; // Rol de "usuario" por defecto
+            $estadoId = 1; // Estado "activo" por defecto
 
-        var_dump($data['password']); // lo que envías desde Postman
-        var_dump($usuario['password']); // el hash que viene de la DB
-        var_dump(password_verify($data['password'], $usuario['password']));
-        exit;
-
-        if ($usuario && password_verify($data['password'], $usuario['password'])) {
-            $jwtConfig = Config::getJwtConfig();
-            $secret_key = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];
-            $expire_claim = time() + $jwtConfig['expiration_time'];
-
-            $payload = [
-                "iat" => time(),
-                "exp" => $expire_claim,
-                "data" => ["id" => $usuario['id'], "rol_id" => $usuario['rol_id']]
-            ];
-
-            $jwt = JWT::encode($payload, $secret_key, $jwtConfig['algorithm']);
-            $datosUsuarioParaFrontend = $this->usuarioModel->find($usuario['id']);
-            
-            $this->sendResponse(200, [
-                "mensaje" => "Inicio de sesión exitoso.",
-                "token" => $jwt,
-                "expiraEn" => $expire_claim,
-                "usuario" => $datosUsuarioParaFrontend
+            $userId = $this->usuarioModel->create([
+                'nombre' => $data['nombre'],
+                'email' => $data['email'],
+                'password' => $hashedPassword,
+                'rol_id' => $rolId,
+                'estado_id' => $estadoId
             ]);
-        } else {
-            throw new Exception("Credenciales incorrectas.", 401);
+
+            if (!$userId) {
+                throw new Exception("No se pudo registrar el usuario en la base de datos.", 500);
+            }
+
+            // Obtener datos del usuario recién creado para la respuesta
+            $newUser = $this->usuarioModel->find($userId);
+            unset($newUser['password']); // Nunca devolver el hash
+
+            // Generar token para el nuevo usuario
+            $token = $this->generateToken($newUser);
+
+            $this->sendResponse(201, [
+                "message" => "Usuario registrado correctamente.",
+                "token" => $token,
+                "usuario" => $newUser
+            ]);
+
+        } catch (Throwable $e) {
+            $this->sendResponse(500, ["message" => "Error en el servidor: " . $e->getMessage()]);
         }
     }
 
-    /**
-     * Maneja la solicitud de restablecimiento de contraseña.
-     */
-    public function forgotPassword(array $data): void
+   public function login(): void
     {
-        Validator::validate($data, ['email' => 'required|email']);
-        $usuario = $this->usuarioModel->findByEmail($data['email']);
+        try {
+            $data = json_decode(file_get_contents("php://input"), true);
 
-        if ($usuario) {
-            $token = bin2hex(random_bytes(32));
-            $tokenHash = hash('sha256', $token);
-            $expiresAt = (new \DateTime('+1 hour'))->format('Y-m-d H:i:s');
-            $this->usuarioModel->setResetToken($usuario['id'], $tokenHash, $expiresAt);
-            $this->sendPasswordResetEmail($data['email'], $token);
+            // Validación de datos de entrada
+            if (empty($data['email']) || empty($data['password'])) {
+                $this->sendResponse(400, ["message" => "Email y contraseña son obligatorios."]);
+                return;
+            }
+
+            // Buscar usuario por email
+            $usuario = $this->usuarioModel->findByEmail($data['email']);
+
+            // Verificar si el usuario existe y la contraseña es correcta
+            if (!$usuario || !password_verify($data['password'], $usuario['password'])) {
+                $this->sendResponse(401, ["message" => "Credenciales incorrectas."]);
+                return;
+            }
+
+            // Limpiar datos sensibles antes de generar el token y la respuesta
+            unset($usuario['password']);
+
+            // Generar el token
+            $tokenData = $this->generateToken($usuario);
+
+            $this->sendResponse(200, [
+                "message" => "Inicio de sesión exitoso.",
+                "token" => $tokenData['token'],
+                "expiraEn" => $tokenData['expires_at'],
+                "usuario" => $usuario
+            ]);
+
+        } catch (Throwable $e) {
+            $this->sendResponse(500, ["message" => "Error en el servidor: " . $e->getMessage()]);
         }
-
-        $this->sendResponse(200, ["mensaje" => "Si una cuenta con ese correo existe, hemos enviado un enlace para restablecer la contraseña."]);
     }
 
-    /**
-     * Restablece la contraseña de un usuario usando un token válido.
-     */
-    public function resetPassword(array $data): void
+    public function verifyToken(): void
     {
-        Validator::validate($data, [
-            'token' => 'required',
-            'password' => 'required|min:8'
-        ]);
+        try {
+            $headers = getallheaders();
+            $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? null;
 
-        $tokenHash = hash('sha256', $data['token']);
-        $usuario = $this->usuarioModel->findByResetToken($tokenHash);
-        if (!$usuario) {
-            throw new Exception("Token inválido o expirado.", 400);
+            if (!$authHeader) {
+                $this->sendResponse(401, ["message" => "Token no proporcionado."]);
+                return;
+            }
+
+            if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+                $this->sendResponse(401, ["message" => "Formato de token inválido."]);
+                return;
+            }
+
+            $jwt = $matches[1];
+            $tokenData = self::decodeTokenData($jwt); // Usamos el decodificador que ya tenías
+            
+            // Si la decodificación fue exitosa, buscamos al usuario para devolver datos frescos
+            $usuario = $this->usuarioModel->find($tokenData['id']);
+            unset($usuario['password']);
+
+            $this->sendResponse(200, [
+                "message" => "Token válido.",
+                "usuario" => $usuario
+            ]);
+
+        } catch (Throwable $e) {
+            $this->sendResponse(401, ["message" => "Token inválido o expirado: " . $e->getMessage()]);
         }
-
-        $newPasswordHash = password_hash($data['password'], PASSWORD_BCRYPT);
-        $success = $this->usuarioModel->updatePasswordAndClearResetToken($usuario['id'], $newPasswordHash);
-        if (!$success) {
-            throw new Exception("Hubo un error al actualizar la contraseña.", 500);
-        }
-
-        $this->sendResponse(200, ["mensaje" => "Contraseña actualizada exitosamente."]);
     }
-    
+
+
     /**
-     * Decodifica un token JWT para obtener su contenido (payload).
+     * Genera un token JWT y su fecha de expiración.
+     */
+    private function generateToken(array $usuario): array
+    {
+        $jwtConfig = Config::getJwtConfig();
+        $issuedAt = time();
+        $expirationTime = $issuedAt + $jwtConfig['expiration_time'];
+        $secretKey = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];
+
+        $payload = [
+            "iat" => $issuedAt,
+            "exp" => $expirationTime,
+            "data" => [
+                "id" => $usuario['id'],
+                "email" => $usuario['email'],
+                "rol_id" => $usuario['rol_id']
+            ]
+        ];
+
+        $jwt = JWT::encode($payload, $secretKey, $jwtConfig['algorithm']);
+
+        return [
+            'token' => $jwt,
+            'expires_at' => $expirationTime
+        ];
+    }
+
+    /**
+     * Decodifica un token JWT para obtener los datos.
      */
     public static function decodeTokenData(string $token): array
     {
         $jwtConfig = Config::getJwtConfig();
-        $secret_key = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];
-        $decoded = JWT::decode($token, new Key($secret_key, $jwtConfig['algorithm']));
+        $secretKey = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];
+        $decoded = JWT::decode($token, new Key($secretKey, $jwtConfig['algorithm']));
         return (array) $decoded->data;
     }
 
     /**
-     * Envía el correo de restablecimiento (método de ayuda).
+     * Envía una respuesta JSON uniforme y termina la ejecución.
      */
-    private function sendPasswordResetEmail(string $email, string $token): void
+    private function sendResponse(int $statusCode, array $data): void
     {
-        $resetLink = ($_ENV['FRONTEND_URL'] ?? 'http://localhost:5173') . "/reset-password?token=" . $token;
-        $asunto = "Restablecimiento de Contraseña - MenuMaster";
-        $cuerpo = "<h1>Restablece tu Contraseña</h1><p>Haz clic en el siguiente enlace para continuar:</p><a href='{$resetLink}'>Restablecer Contraseña</a><p>El enlace expirará en 1 hora.</p>";
-        
-        file_put_contents(BASE_PATH . '/logs/emails.log', "--- EMAIL TO: {$email} ---\nLINK: {$resetLink}\n\n", FILE_APPEND);
-    }
-    
-    /**
-     * Envía la respuesta HTTP en formato JSON y termina la ejecución.
-     */
-    private function sendResponse(int $statusCode, $data): void
-    {
+        header("Content-Type: application/json; charset=UTF-8");
         http_response_code($statusCode);
-        echo json_encode(['success' => true, 'data' => $data]);
+
+        $response = [
+            "success" => $statusCode >= 200 && $statusCode < 300,
+        ];
+
+        echo json_encode($response + $data, JSON_UNESCAPED_UNICODE);
         exit;
     }
 }

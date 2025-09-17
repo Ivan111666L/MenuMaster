@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import dashboardService from '../services/dashboardService';
+import dashboardService from '@/features/dashboard/services/dashboardService';
 import Spinner from '@/components/Spinner';
 
 // Importamos los estilos desde su propio archivo
@@ -46,7 +46,6 @@ function Dashboard() {
         <div className="dashboard-app">
             <div className="main-content">
                 <header className="dashboard-header">
-                    {/* Saludamos al usuario por su nombre */}
                     <h1>Panel de Control</h1>
                     <p>Bienvenido de nuevo, {user?.nombre || 'usuario'}.</p>
                 </header>

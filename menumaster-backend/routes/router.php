@@ -1,72 +1,77 @@
 <?php
-// routes/router.php
+use app\config\ConexionDb;
+use app\Controllers\AuthController;
 
-/**
- * Enrutador Principal de la API.
- */
+require_once BASE_PATH . '/app/Utils/Validator.php';
+require_once BASE_PATH . '/app/config/ConexionDb.php';
+require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
-use App\config\Database;
-
-require_once __DIR__ . '/../config/Database.php';
-
-// --- Lógica Central de Enrutamiento ---
 try {
-    // Obtenemos la única instancia de la conexión a la BD
-    $db = Database::getConnection();
+    // Conexión BD
+    $db = ConexionDb::getConnection();
+    $authController = new AuthController($db);
 
-    // --- Análisis de URL Robusto ---
-    $basePath = dirname($_SERVER['SCRIPT_NAME']);
+    // Método HTTP
+    $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+    // Partes de la ruta
+    $basePath   = dirname($_SERVER['SCRIPT_NAME']);
     $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    
+
     $route = $requestUri;
     if (strpos($requestUri, $basePath) === 0) {
         $route = substr($requestUri, strlen($basePath));
     }
-    
+
     $route_parts = explode('/', trim($route, '/'));
 
+    // Verificar que empiece con /api
     if (($route_parts[0] ?? '') !== 'api') {
         throw new Exception("El endpoint solicitado no es parte de la API.", 404);
     }
-    
-    $main_resource = $route_parts[1] ?? null;
 
-    // --- Derivación al Sub-Enrutador Correspondiente ---
-    switch ($main_resource) {
+    // Segundo segmento = recurso (ej: auth, productos, pedidos, etc.)
+    $resource = $route_parts[1] ?? null;
+    $action   = $route_parts[2] ?? null;
+
+    switch ($resource) {
         case 'auth':
-            require_once BASE_PATH . '/routes/auth_api.php';
+            switch ($action) {
+                case 'register':
+                    if ($requestMethod === 'POST') {
+                        $authController->register();
+                    }
+                    break;
+                case 'login':
+                    if ($requestMethod === 'POST') {
+                        $authController->login();
+                    }
+                    break;
+                case 'verify':
+                    if ($requestMethod === 'GET') {
+                        $authController->verifyToken();
+                    }
+                    break;
+                default:
+                    throw new Exception("Acción '{$action}' no válida para auth.", 404);
+            }
             break;
-        case 'usuarios':
-            require_once BASE_PATH . '/routes/usuarios_api.php';
-            break;
+
         case 'productos':
             require_once BASE_PATH . '/routes/productos_api.php';
             break;
         case 'pedidos':
             require_once BASE_PATH . '/routes/pedidos_api.php';
             break;
-        case 'inventario':
-            require_once BASE_PATH . '/routes/inventario_api.php';
-            break;
-        case 'dashboard':
-            require_once BASE_PATH . '/routes/dashboard_api.php';
-            break;
-        case 'menu-del-dia':
-            require_once BASE_PATH . '/routes/menu_del_dia_api.php';
-            break;
-        case 'categorias':
-            require_once BASE_PATH . '/routes/categorias_api.php';
-            break;
-        case 'mesas':
-            require_once BASE_PATH . '/routes/mesas_api.php';
-            break;
+        // ...otros recursos
         default:
-            throw new Exception("Recurso no encontrado en la API.", 404);
+            throw new Exception("Recurso '{$resource}' no válido.", 404);
     }
 
 } catch (Exception $e) {
-    // Capturador de Errores Global
-    $code = $e->getCode() ?: 500;
-    http_response_code($code);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode([
+        'success' => false,
+        'error'   => $e->getMessage()
+    ]);
 }

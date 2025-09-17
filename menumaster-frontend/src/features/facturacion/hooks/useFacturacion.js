@@ -1,12 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import QRCode from 'qrcode'; // Librería para generar QR
-import facturacionService from '../services/facturacionService'; // Nuestro servicio de API
+import QRCode from 'qrcode'; // Asegúrate de haber instalado: npm install qrcode
+import { toast } from 'react-toastify'; // Importamos la librería de notificaciones
+import facturacionService from '@/features/facturacion/services/facturacionService';
 
 // --- Función de ayuda para la impresión ---
 const imprimirContenido = (contenido) => {
     const ventanaImpresion = window.open('', '_blank');
-    // Usamos <pre> para respetar los espacios y saltos de línea del texto
-    ventanaImpresion.document.write(`<pre>${contenido}</pre>`);
+    ventanaImpresion.document.write(`<pre style="font-family: monospace; font-size: 12px;">${contenido}</pre>`);
     ventanaImpresion.document.close();
     ventanaImpresion.focus();
     ventanaImpresion.print();
@@ -26,7 +26,6 @@ export const useFacturacion = () => {
     const cargarPedidos = useCallback(async () => {
         try {
             setLoading(true);
-            setError(null);
             const data = await facturacionService.getPedidosParaFacturar();
             setPedidos(data);
         } catch (err) {
@@ -47,33 +46,21 @@ export const useFacturacion = () => {
         setQrCodeDataUrl('');
     };
 
-    // CORRECCIÓN: Esta función ahora se conecta con el backend para facturar
-    const facturar = async (metodoPago) => {
-        if (!pedidoSeleccionado) return;
+    // Función unificada para facturar y recargar la lista
+    const facturarYRecargar = async (pedidoId, metodoPago) => {
         try {
-            const datosPago = {
-                metodo_pago: metodoPago,
-                dividir: numeroPersonas > 1,
-                personas: numeroPersonas,
-            };
-            await facturacionService.facturarPedido(pedidoSeleccionado.id, datosPago);
-            
-            // Si el método es 'Imprimir', se genera el texto de la factura
-            if (metodoPago === 'Imprimir') {
-                generarTextoFactura();
-            }
-
-            alert(`Pedido ${pedidoSeleccionado.id} facturado con ${metodoPago}.`);
+            const datosPago = { metodo_pago: metodoPago, dividir: numeroPersonas > 1, personas: numeroPersonas };
+            await facturacionService.facturarPedido(pedidoId, datosPago);
+            toast.success(`Pedido #${pedidoId} facturado con ${metodoPago}.`);
             setPedidoSeleccionado(null);
-            cargarPedidos(); // Recarga la lista de pedidos pendientes
-
+            await cargarPedidos();
         } catch (err) {
-            alert('Error al facturar el pedido.');
+            toast.error('Error al facturar el pedido.');
         }
     };
-    
-    // Tu lógica de generación de texto para imprimir, ahora como una función de ayuda
-    const generarTextoFactura = () => {
+
+    // Función para generar la factura para imprimir
+    const generarFacturaParaImprimir = () => {
         if (!pedidoSeleccionado) return;
 
         const totalPedido = pedidoSeleccionado.items.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
@@ -107,30 +94,30 @@ export const useFacturacion = () => {
         }
 
         imprimirContenido(facturaTexto);
+        // Marcamos el pedido como facturado en el backend después de imprimir
+        facturarYRecargar(pedidoSeleccionado.id, 'Impreso');
     };
 
-    // Tu lógica para generar el QR
+    // Función para generar el código QR
     const generarPagoQR = async () => {
         if (!pedidoSeleccionado) return;
     
         const totalPedido = pedidoSeleccionado.items.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
         const totalPorPersona = totalPedido / numeroPersonas;
         
-        // En una app real, aquí pondrías un enlace a tu pasarela de pago.
-        const textoQR = `https://tu-pago.com/pagar?monto=${totalPorPersona.toFixed(2)}&ref=PED-${pedidoSeleccionado.id}`;
+        const textoQR = `https://tu-pasarela-de-pago.com/pagar?monto=${totalPorPersona.toFixed(2)}&ref=PED-${pedidoSeleccionado.id}`;
     
         try {
             const dataUrl = await QRCode.toDataURL(textoQR);
             setQrCodeDataUrl(dataUrl);
-            // También podrías marcarlo como facturado aquí
-            // await facturar('QR'); 
+            // Opcional: podrías marcarlo como facturado aquí también
+            // await facturarYRecargar(pedidoSeleccionado.id, 'QR');
         } catch (err) {
-            console.error("Error generando el código QR", err);
-            alert("Hubo un error al generar el código QR.");
+            toast.error("Hubo un error al generar el código QR.");
         }
     };
 
-    // --- Devolvemos los estados y funciones que usarán los componentes ---
+    // Devolvemos todos los estados y funciones que usarán los componentes
     return {
         loading,
         error,
@@ -139,8 +126,9 @@ export const useFacturacion = () => {
         seleccionarPedido,
         numeroPersonas,
         setNumeroPersonas,
-        facturar, // Se usa para facturar con Efectivo y Tarjeta
-        generarPagoQR, // Función específica para el QR
-        qrCodeDataUrl,
+        facturar: facturarYRecargar,
+        generarFacturaParaImprimir,
+        generarPagoQR,
+        qrCodeDataUrl
     };
 };
