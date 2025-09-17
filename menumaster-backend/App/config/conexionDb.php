@@ -1,12 +1,12 @@
 <?php
 // Ubicación: App/Config/Database.php
 
-namespace App\Config;
+namespace app\config;
 
 use PDO;
 use PDOException;
 
-final class Database {
+final class conexionDb {
     private static ?PDO $conn = null;
 
     private function __construct() {}

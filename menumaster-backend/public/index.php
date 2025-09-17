@@ -1,4 +1,7 @@
 <?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 /**
  * Punto de Entrada Principal y Único de la API (Front Controller).
  */
@@ -9,7 +12,7 @@
 
 // Se establece el tipo de contenido por defecto para las respuestas de la API.
 header("Content-Type: application/json; charset=UTF-8");
-
+header("X-Content-Type-Options: nosniff");
 
 // --- Configuración del Entorno y Autoloader ---
 // Se define una constante con la ruta raíz del proyecto backend.

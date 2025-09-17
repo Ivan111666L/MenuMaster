@@ -1,4 +1,5 @@
 <?php
+namespace app\Models;
 
 class MetodoPagoModel {
     private $conn;

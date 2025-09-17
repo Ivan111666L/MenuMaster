@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import cocinaService from '@/features/cocina/services/cocinaService'; // Importamos el nuevo servicio
 import Spinner from '@/components/Spinner';
 import Button from '@/components/Button';
-import '@/styles/cocina.css'
+import '@/styles/cocina.css'; // Importamos los estilos
 
 const ESTADOS = {
   PENDIENTE: 'pendiente',
@@ -41,12 +41,12 @@ function Cocina() {
   // --- Lógica para actualizar el estado de un pedido ---
   const avanzarEstado = async (pedido) => {
     let nuevoEstado = '';
-    if (pedido.estado === ESTADOS.PENDIENTE) {
+    if (pedido.estado.toLowerCase() === ESTADOS.PENDIENTE) {
       nuevoEstado = ESTADOS.EN_PREPARACION;
-    } else if (pedido.estado === ESTADOS.EN_PREPARACION) {
+    } else if (pedido.estado.toLowerCase() === ESTADOS.EN_PREPARACION) {
       nuevoEstado = ESTADOS.LISTO_PARA_SERVIR;
     } else {
-      return; // No hay más estados que avanzar
+      return; // No hay más estados que avanzar desde la cocina
     }
 
     try {
@@ -61,8 +61,9 @@ function Cocina() {
   };
 
   const getBotonInfo = (estado) => {
-    if (estado === ESTADOS.PENDIENTE) return { texto: 'Marcar como En Preparación', variante: 'primary' };
-    if (estado === ESTADOS.EN_PREPARACION) return { texto: 'Marcar como Listo', variante: 'secondary' };
+    const estadoNormalizado = estado.toLowerCase();
+    if (estadoNormalizado === ESTADOS.PENDIENTE) return { texto: 'Marcar como En Preparación', variant: 'primary' };
+    if (estadoNormalizado === ESTADOS.EN_PREPARACION) return { texto: 'Marcar como Listo', variant: 'secondary' };
     return null;
   };
 
@@ -80,20 +81,20 @@ function Cocina() {
           pedidos.map(pedido => {
             const botonInfo = getBotonInfo(pedido.estado);
             return (
-              <div className={`pedido-card ${pedido.estado.replace(' ', '-')}`} key={pedido.id}>
+              <div className={`pedido-card ${pedido.estado.toLowerCase().replace(' ', '-')}`} key={pedido.id}>
                 <div className="pedido-header">
                   <span className="pedido-mesa">Mesa {pedido.mesa_numero}</span>
                   <span className="pedido-tiempo">{new Date(pedido.fecha_creacion).toLocaleTimeString()}</span>
                 </div>
                 <ul className="pedido-items">
-                  {pedido.items.map((item) => (
-                    <li key={item.producto_id}>{item.cantidad} x {item.nombre_producto}</li>
+                  {pedido.items && pedido.items.map((item, idx) => (
+                    <li key={idx}>{item.cantidad} x {item.nombre_producto}</li>
                   ))}
                 </ul>
                 <div className="pedido-estado">Estado: <b>{pedido.estado}</b></div>
                 {botonInfo && (
                   <Button
-                    variant={botonInfo.variante}
+                    variant={botonInfo.variant}
                     onClick={() => avanzarEstado(pedido)}
                     className="w-full"
                   >

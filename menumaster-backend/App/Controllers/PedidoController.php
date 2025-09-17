@@ -1,10 +1,10 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
-use App\Models\PedidoModel;
-use App\Middleware\AuthMiddleware;
-use App\Controllers\AuthController;
-use App\Utils\Validator;
+use app\Models\PedidoModel;
+use app\Middleware\AuthMiddleware;
+use app\Controllers\AuthController;
+use app\Utils\Validator;
 use PDO;
 use Exception;
 

@@ -1,12 +1,12 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // --- Dependencias ---
-use App\Models\MovimientoInventarioModel;
-use App\Models\IngredienteModel;
-use App\Middleware\AuthMiddleware;
-use App\Controllers\AuthController;
-use App\Utils\Validator; // Se importa el Validator
+use app\Models\MovimientoInventarioModel;
+use app\Models\IngredienteModel;
+use app\Middleware\AuthMiddleware;
+use app\Controllers\AuthController;
+use app\Utils\Validator; // Se importa el Validator
 use PDO;
 use Exception;
 

@@ -10,7 +10,7 @@
  * ✅ ESA INFORMACIÓN PERTENECE A TU ARCHIVO .env Y SE ACCEDE A TRAVÉS DE Config.php
  */
 
-namespace App;
+namespace app;
 
 /**
  * Define los IDs de los roles de usuario.

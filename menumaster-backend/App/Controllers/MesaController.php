@@ -1,10 +1,10 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // CORRECCIÓN: Se usan los nombres de clase correctos para los modelos.
 // Asumimos que el modelo para los estados se llama 'EstadoGeneral'.
-use App\Models\MesaModel;
-use App\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
+use app\Models\MesaModel;
+use app\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
 use PDO;
 use Exception;
 

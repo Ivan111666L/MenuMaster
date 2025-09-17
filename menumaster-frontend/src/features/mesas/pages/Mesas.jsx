@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import mesaService from '../services/mesaService'; // Nuestro servicio de API
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import '@/styles/Mesas.css'; // Nuestros estilos dedicados
+import '@/styles/mesas.css'; // Nuestros estilos dedicados
 
 function Mesas() {
     const [mesas, setMesas] = useState([]);
@@ -60,6 +60,14 @@ function Mesas() {
         }
     };
     
+    if (isLoading) {
+        return <div className="loader-container"><Spinner /></div>;
+    }
+
+    if (error) {
+        return <div className="error-message">{error}</div>;
+    }
+
     return (
         <div className="gestion-mesas-app">
             <div className="gestion-mesas-container">
@@ -70,30 +78,24 @@ function Mesas() {
                     </Button>
                 </div>
 
-                {isLoading ? (
-                    <div className="loader-container"><Spinner /></div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : (
-                    <div className="mesa-container">
-                        {mesas.length > 0 ? (
-                            mesas.map((mesa) => (
-                                <div
-                                    key={mesa.id}
-                                    className={`mesa-card ${mesa.estado}`}
-                                    onClick={() => cambiarEstado(mesa.id, mesa.estado)}
-                                >
-                                    <h3>Mesa {mesa.numero}</h3>
-                                    <p><strong>Capacidad:</strong> {mesa.capacidad} personas</p>
-                                    <p><strong>Ubicación:</strong> {mesa.ubicacion}</p>
-                                    <span className="estado-badge">{mesa.estado}</span>
-                                </div>
-                            ))
-                        ) : (
-                            <p className="no-mesas">No hay mesas configuradas.</p>
-                        )}
-                    </div>
-                )}
+                <div className="mesa-container">
+                    {mesas.length > 0 ? (
+                        mesas.map((mesa) => (
+                            <div
+                                key={mesa.id}
+                                className={`mesa-card ${mesa.estado}`}
+                                onClick={() => cambiarEstado(mesa.id, mesa.estado)}
+                            >
+                                <h3>Mesa {mesa.numero}</h3>
+                                <p><strong>Capacidad:</strong> {mesa.capacidad} personas</p>
+                                <p><strong>Ubicación:</strong> {mesa.ubicacion}</p>
+                                <span className="estado-badge">{mesa.estado}</span>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="no-mesas">No hay mesas configuradas.</p>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -1,11 +1,11 @@
 <?php
-namespace App\Controllers;
+namespace app\Controllers;
 
 // --- Dependencias ---
-use App\Models\ProductoModel;
-use App\Models\CategoriaModel;
-use App\Models\EstadoProductoModel;
-use App\Utils\Validator; // Se importa el Validator
+use app\Models\ProductoModel;
+use app\Models\EstadoProductoModel;
+use app\Models\CategoriaModel;
+use app\Utils\Validator; // Se importa el Validator
 use PDO;
 use Exception;
 

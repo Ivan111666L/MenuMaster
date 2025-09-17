@@ -2,7 +2,7 @@
 // Ubicación: App/Config/Config.php
 
 // CORRECCIÓN: Se ajusta el namespace a la ubicación del archivo.
-namespace App\Config;
+namespace app\config;
 
 class Config 
 {

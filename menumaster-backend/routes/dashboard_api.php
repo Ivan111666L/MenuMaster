@@ -1,12 +1,12 @@
 <?php
 // routes/dashboard_api.php
 
-require_once BASE_PATH . '/App/Controllers/DashboardController.php';
-require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/App/Controllers/AuthController.php';
+require_once BASE_PATH . '/app/Controllers/DashboardController.php';
+require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
-use App\Controllers\DashboardController;
-use App\Middleware\AuthMiddleware;
+use app\Controllers\DashboardController;
+use app\Middleware\AuthMiddleware;
 
 try {
     $controller = new DashboardController($db);

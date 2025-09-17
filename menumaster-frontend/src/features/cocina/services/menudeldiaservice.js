@@ -12,7 +12,6 @@ const getAllProducts = async () => {
  * Obtiene los productos que están actualmente en el menú del día.
  */
 const getMenuDelDia = async () => {
-  // Este es un nuevo endpoint que crearemos en el backend
   const response = await api.get('/menu-del-dia');
   return response.data.data;
 };
@@ -31,7 +30,6 @@ const addProductToMenu = async (productoId) => {
  * @param {number} productoId - El ID del producto a eliminar.
  */
 const removeProductFromMenu = async (productoId) => {
-  // Usamos el método DELETE en un endpoint específico para el producto
   const response = await api.delete(`/menu-del-dia/${productoId}`);
   return response.data;
 };

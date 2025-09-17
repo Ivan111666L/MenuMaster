@@ -5,14 +5,15 @@
  * Enrutador Principal de la API.
  */
 
-use App\Config\Database;
+use app\config\conexionDb;
+require_once BASE_PATH . '/app/Utils/Validator.php';
 
-require_once BASE_PATH . '/App/Config/Database.php';
+require_once BASE_PATH . '/app/config/conexionDb.php';
 
 // --- Lógica Central de Enrutamiento ---
 try {
     // Obtenemos la única instancia de la conexión a la BD
-    $db = Database::getConnection();
+    $db = conexionDb::getConnection();
 
     // --- Análisis de URL Robusto ---
     $basePath = dirname($_SERVER['SCRIPT_NAME']);

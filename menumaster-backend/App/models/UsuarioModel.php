@@ -1,5 +1,5 @@
 <?php
-namespace App\Models;
+namespace app\Models;
 
 use PDO;
 use PDOException;
@@ -101,10 +101,13 @@ class UsuarioModel {
     /**
      * Busca un usuario por su email. Esencial para el login.
      */
-    public function findByEmail(string $email): array|false {
-        $sql = "SELECT id, nombre, email, password, rol_id, estado_id 
-                FROM {$this->table} 
-                WHERE email = :email";
+   public function findByEmail(string $email): array|false {
+    $sql = "SELECT 
+                u.id, u.nombre, u.email, u.password, u.rol_id, u.estado_id,
+                r.nombre AS rol
+            FROM {$this->table} u
+            LEFT JOIN roles r ON u.rol_id = r.id
+            WHERE u.email = :email";
         
         try {
             $stmt = $this->db->prepare($sql);

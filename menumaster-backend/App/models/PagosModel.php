@@ -1,5 +1,7 @@
 <?php
-require_once __DIR__ . '/../config/db.php';
+
+require_once __DIR__ . '/../config/conexionDb.php';
+use app\config\conexonDb;
 
 class PagoModel {
     // Conexión a la base de datos y nombre de la tabla

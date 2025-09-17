@@ -1,26 +1,16 @@
-import axios from 'axios';
-import { getAuthToken } from '@/utils/auth'; // Se importa la función de ayuda
-
-const API_URL = 'http://localhost/MenuMaster/menumaster-backend/public/api/dashboard';
+// CORRECCIÓN: Se importa la instancia 'api' en lugar de 'axios' y 'getAuthToken'.
+import api from '@/services/api';
 
 /**
  * Obtiene los datos de resumen para el panel de control.
- * Requiere autenticación, por lo que se envía el token en la cabecera.
+ * El token de autenticación se añade automáticamente por el interceptor de 'api.js'.
  */
 const getSummary = async () => {
-    const token = getAuthToken(); // Leemos el token de localStorage
-    if (!token) {
-        // Si no hay token, no tiene sentido hacer la petición
-        throw new Error('No se encontró el token de autenticación.');
-    }
-
-    const response = await axios.get(`${API_URL}/summary`, {
-        headers: {
-            'Authorization': `Bearer ${token}`
-        }
-    });
+    // CORRECCIÓN: Se usa 'api.get' y una ruta relativa.
+    // Ya no es necesario obtener y añadir el token manualmente.
+    const response = await api.get('/dashboard/summary');
     
-    // Devolvemos la data que está dentro de la respuesta de la API
+    // Devolvemos la data que está dentro de la respuesta de la API.
     return response.data.data;
 };
 

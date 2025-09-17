@@ -2,9 +2,9 @@
 namespace App\Controllers;
 
 // Importamos los modelos que vamos a necesitar
-use App\Models\IngredienteModel;
-use App\Models\ProveedorModel;
-use App\Models\EstadoGeneralModel;
+use app\Models\IngredienteModel;
+use app\Models\ProveedorModel;
+use app\Models\EstadoGeneralModel;
 use PDO;
 use Exception;
 

@@ -1,26 +1,27 @@
-// src/components/ListaPedidos.js
 import React from 'react';
-import PropTypes from 'prop-types';
-import "@/styles/global.css";
-const ListaPedidos = ({ pedidos, seleccionarPedido, pedidoSeleccionado }) => {
-    return (
-        <div className="lista-pedidos">
-            <h2>Pedidos Completados</h2>
-            <ul>
-                {pedidos.map(pedido => (
-                    <li 
-                        key={pedido.id} 
-                        onClick={() => seleccionarPedido(pedido.id)}
-                        className={pedidoSeleccionado?.id === pedido.id ? 'seleccionado' : ''}
-                    >
-                        <span>Pedido: {pedido.id}</span>
-                        <span>Mesa: {pedido.mesa}</span>
-                        <strong>${pedido.total.toFixed(2)}</strong>
-                    </li>
-                ))}
-            </ul>
-        </div>
-    );
-};
+
+function ListaPedidos({ pedidos, pedidoSeleccionado, seleccionarPedido }) {
+  return (
+    <div className="facturacion-lista-pedidos">
+      <h2>Pedidos Listos</h2>
+      {pedidos.length === 0 ? (
+        <p>No hay pedidos listos para servir.</p>
+      ) : (
+        <ul>
+          {pedidos.map(pedido => (
+            <li
+              key={pedido.id}
+              className={`facturacion-pedido-resumen ${pedidoSeleccionado?.id === pedido.id ? 'seleccionado' : ''}`}
+              onClick={() => seleccionarPedido(pedido)}
+            >
+              <span>Mesa {pedido.mesa_numero}</span>
+              <span>Pedido #{pedido.id}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export default ListaPedidos;
