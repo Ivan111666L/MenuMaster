@@ -5,9 +5,9 @@
  * Enrutador Principal de la API.
  */
 
-use App\Config\Database;
+use App\config\Database;
 
-require_once BASE_PATH . '/App/Config/Database.php';
+require_once __DIR__ . '/../config/Database.php';
 
 // --- Lógica Central de Enrutamiento ---
 try {

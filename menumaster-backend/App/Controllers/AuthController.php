@@ -78,6 +78,11 @@ class AuthController
 
         $usuario = $this->usuarioModel->findByEmail($data['email']);
 
+        var_dump($data['password']); // lo que envías desde Postman
+        var_dump($usuario['password']); // el hash que viene de la DB
+        var_dump(password_verify($data['password'], $usuario['password']));
+        exit;
+
         if ($usuario && password_verify($data['password'], $usuario['password'])) {
             $jwtConfig = Config::getJwtConfig();
             $secret_key = $_ENV['JWT_SECRET_KEY'] ?? $jwtConfig['secret'];

@@ -1,7 +1,7 @@
 <?php
-// Ubicación: App/Config/Database.php
+// Ubicación: App/config/Database.php
 
-namespace App\Config;
+namespace App\config;
 
 use PDO;
 use PDOException;
