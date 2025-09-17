@@ -23,9 +23,6 @@ class AuthController
         $this->rolModel = $rolModel ?? new RolModel($this->db);
     }
 
-    /**
-     * Registro de usuario con JWT en la respuesta
-     */
     public function register(): void
     {
         try {
@@ -35,14 +32,12 @@ class AuthController
                 $this->sendResponse(400, "Nombre, email y contraseña son obligatorios.");
             }
 
-            // Validar si ya existe el email
             $stmt = $this->db->prepare("SELECT id FROM usuarios WHERE email = :email LIMIT 1");
             $stmt->execute([":email" => $data['email']]);
             if ($stmt->fetch()) {
                 $this->sendResponse(409, "El correo ya está registrado.");
             }
 
-            // Insertar usuario
             $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
 
             $stmt = $this->db->prepare("
@@ -53,13 +48,12 @@ class AuthController
                 ":nombre" => $data['nombre'],
                 ":email" => $data['email'],
                 ":password" => $hashedPassword,
-                ":rol_id" => $data['rol_id'] ?? 2, // rol por defecto
+                ":rol_id" => $data['rol_id'] ?? 2,
                 ":estado_id" => 1
             ]);
 
             $userId = $this->db->lastInsertId();
 
-            // Obtener datos del usuario recién creado
             $stmt = $this->db->prepare("
                 SELECT u.id, u.nombre, u.email, u.rol_id, u.estado_id, r.nombre AS rol
                 FROM usuarios u
@@ -77,9 +71,6 @@ class AuthController
         }
     }
 
-    /**
-     * Login con JWT
-     */
     public function login(): void
     {
         try {
@@ -95,9 +86,8 @@ class AuthController
                 $this->sendResponse(401, "Credenciales incorrectas.");
             }
 
-            unset($usuario['password']); // nunca enviar el hash
+            unset($usuario['password']);
             $token = $this->generateToken($usuario);
-
             $this->sendResponse(200, "Inicio de sesión exitoso.", $token, $usuario);
 
         } catch (Exception $e) {
@@ -105,9 +95,6 @@ class AuthController
         }
     }
 
-    /**
-     * Genera token JWT
-     */
     private function generateToken(array $usuario): string
     {
         $jwtConfig = Config::getJwtConfig();
@@ -127,9 +114,6 @@ class AuthController
         return JWT::encode($payload, $jwtConfig['secret'], $jwtConfig['algorithm']);
     }
 
-    /**
-     * Decodifica un token JWT
-     */
     public static function decodeTokenData(string $token): array
     {
         $jwtConfig = Config::getJwtConfig();
@@ -137,9 +121,6 @@ class AuthController
         return (array) $decoded;
     }
 
-    /**
-     * Respuesta uniforme
-     */
     private function sendResponse(
         int $statusCode,
         string $message,
@@ -148,11 +129,14 @@ class AuthController
     ): void {
         http_response_code($statusCode);
 
+        $expiraEn = time() + Config::getJwtConfig()['expiration_time'];
+
         echo json_encode([
-            "success" => $statusCode >= 200 && $statusCode < 300,
-            "message" => $message,
-            "token"   => $token,
-            "usuario" => $usuario
+            "success"  => $statusCode >= 200 && $statusCode < 300,
+            "message"  => $message,
+            "token"    => $token,
+            "usuario"  => $usuario,
+            "expiraEn" => $expiraEn
         ], JSON_UNESCAPED_UNICODE);
 
         exit;

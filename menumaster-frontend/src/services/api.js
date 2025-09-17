@@ -1,41 +1,38 @@
+// src/services/api.js
 import axios from 'axios';
-// Importamos las funciones desde el archivo de utilidades.
 import { getAuthToken, clearAuthSession } from '@/utils/auth.js';
 
-// 1. Creamos la instancia de Axios.
 const api = axios.create({
-  // CORRECCIÓN: Se usa la variable de entorno para apuntar al backend.
-  // Esto leerá la URL correcta: 'http://localhost/MenuMaster/menumaster-backend/public/api'
   baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// 2. Interceptor de Peticiones: Añade el token a cada llamada.
-// (Esta parte ya estaba perfecta)
+// Interceptor de peticiones: añade el token y lo loggea
 api.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
+    console.log('[API] Request interceptor — token:', token);
+
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
+      console.log('[API] Request interceptor — headers:', config.headers);
     }
+
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// 3. Interceptor de Respuestas: Maneja errores globales como tokens expirados.
-// (Esta parte también estaba perfecta)
+// Interceptor de respuestas: maneja 401 limpiando la sesión y redirigiendo
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Si el token expiró o no es válido (error 401), cerramos la sesión.
-    if (error.response && error.response.status === 401) {
+    if (error.response?.status === 401) {
+      console.warn('[API] 401 Unauthorized — clearing session');
       clearAuthSession();
-      window.location.href = '/login'; 
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }

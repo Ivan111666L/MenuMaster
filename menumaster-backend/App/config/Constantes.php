@@ -59,7 +59,7 @@ class EstadosMesa
 }
 
 
-// ❌ NO AÑADAS CÓDIGO EJECUTABLE AQUÍ.
+// NO AÑADAS CÓDIGO EJECUTABLE AQUÍ.
 // La línea '$rol_id_defecto = ROL_MESERO;' fue eliminada porque la asignación
 // de variables debe ocurrir en la lógica de negocio (ej. en un controlador),
 // no en un archivo de configuración/definición.

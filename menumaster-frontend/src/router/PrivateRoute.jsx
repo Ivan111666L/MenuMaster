@@ -1,28 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext'; // Hook del contexto de autenticación
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
-const PrivateRoute = ({ children, allowedRoles = [] }) => {
-  const { user, rol } = useAuth(); // Obtén datos del contexto
+function PrivateRoute({ roles, children }) {
+  const { isAuthenticated, isLoading, rol } = useAuth();
 
-  // Si no hay un usuario autenticado, redirige al login
-  if (!user) {
+  if (isLoading) return null; // o un <Spinner /> si prefieres
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si el usuario no tiene uno de los roles permitidos
-  if (allowedRoles.length > 0 && !allowedRoles.includes(rol)) {
+  if (roles && !roles.includes(rol)) {
     return <Navigate to="/unauthorized" replace />;
   }
 
-  // Acceso permitido
-  return children;
-};
-
-PrivateRoute.propTypes = {
-  children: PropTypes.node.isRequired,
-  allowedRoles: PropTypes.arrayOf(PropTypes.string) // Asegura que los roles sean un array de strings
-};
+  return children || <Outlet />;
+  
+}
 
 export default PrivateRoute;
