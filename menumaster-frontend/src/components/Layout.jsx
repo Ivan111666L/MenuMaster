@@ -28,7 +28,7 @@ const Layout = () => {
             mesero: [
                 { path: "/mesas", label: "Mesas", icon: <FaFileInvoiceDollar /> },
                 { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
-                { path: "/pedido/nuevo", label: "Nuevo Pedido", icon: <FaHome /> },
+                
             ],
             cocinero: [
                 { path: "/cocina", label: "Cocina", icon: <FaClipboardList /> },

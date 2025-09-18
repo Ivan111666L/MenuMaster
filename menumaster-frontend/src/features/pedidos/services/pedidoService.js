@@ -1,13 +1,27 @@
 import api from '@/services/api'; // Tu instancia central de Axios
+import { getMesasDisponibles } from '@/services/mesasService';
+import { getProductos } from '@/services/productosService';
 
 /**
  * Obtiene los datos iniciales necesarios para tomar un pedido:
- * la lista de productos disponibles y la lista de mesas.
+ * la lista de productos disponibles y la lista de mesas disponibles.
  */
 const getTomaPedidoData = async () => {
-    // Hacemos una petición a un nuevo endpoint que debe devolver ambos listados.
-    axios.get('http://localhost:8000/api/toma-pedido-data')
-    return response.data.data;
+    try {
+        // Obtenemos productos y mesas disponibles en paralelo
+        const [productos, mesas] = await Promise.all([
+            getProductos(),
+            getMesasDisponibles()
+        ]);
+        
+        return {
+            productos,
+            mesas
+        };
+    } catch (error) {
+        console.error('Error al obtener datos para toma de pedido:', error);
+        return { productos: [], mesas: [] };
+    }
 };
 
 /**
