@@ -10,9 +10,10 @@ import PropTypes from 'prop-types';
  * @param {string} props.value Valor del input (para componentes controlados).
  * @param {function} props.onChange Función que maneja los cambios en el input.
  * @param {string} [props.className] Clases CSS adicionales.
+ * @param {string} [props.error] Mensaje de error a mostrar.
  */
-function Input({ label, id, type = 'text', value, onChange, className = '', ...props }) {
-  const finalClassName = `form-input ${className}`;
+function Input({ label, id, type = 'text', value, onChange, className = '', error, ...props }) {
+  const finalClassName = `form-input ${className} ${error ? 'form-input-error' : ''}`;
   
   return (
     <div className="form-group">
@@ -25,6 +26,7 @@ function Input({ label, id, type = 'text', value, onChange, className = '', ...p
         className={finalClassName}
         {...props}
       />
+      {error && <div className="form-error-message">{error}</div>}
     </div>
   );
 }
@@ -36,6 +38,7 @@ Input.propTypes = {
   value: PropTypes.any.isRequired,
   onChange: PropTypes.func.isRequired,
   className: PropTypes.string,
+  error: PropTypes.string,
 };
 
 export default Input;

@@ -23,15 +23,32 @@ class PedidoController
      * GET /api/pedidos
      * GET /api/pedidos?estado=pendiente,en preparacion
      */
-    public function index(): void
-    {
-        $estados = $_GET['estado'] ?? null;
-        $pedidos = $this->pedidoModel->findAll($estados);
-        if ($pedidos === false) {
-            throw new Exception("Error al obtener los pedidos.", 500);
+    public function index()
+{
+    // Obtener parámetro 'estado' desde query string (forma segura)
+    $estado = isset($_GET['estado']) ? trim($_GET['estado']) : null;
+
+    try {
+        if ($estado) {
+            // Buscar pedidos filtrados por estado
+            $pedidos = $this->pedidoModel->findAll($estado);
+        } else {
+            // Obtener todos los pedidos
+            $pedidos = $this->pedidoModel->findAll();
         }
+
+        if ($pedidos === false) {
+            throw new Exception("Error al obtener los pedidos.");
+        }
+
+        // Enviar respuesta exitosa
         $this->sendResponse(200, $pedidos);
+
+    } catch (Exception $e) {
+        // Enviar error con código 500
+        $this->sendResponse(500, ['error' => $e->getMessage()]);
     }
+}
 
     /**
      * GET /api/pedidos/{id}

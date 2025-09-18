@@ -64,6 +64,19 @@
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
+.form-input-error {
+    border-color: #dc2626;
+}
+.form-input-error:focus {
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+.form-error-message {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #dc2626;
+    font-weight: 500;
+}
 
 /* === Spinner === */
 .spinner-container {

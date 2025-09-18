@@ -56,6 +56,7 @@ class PedidoModel
         }
     }
     
+    
     /**
      * Busca un pedido y todos sus ítems asociados.
      */
@@ -127,6 +128,19 @@ class PedidoModel
     }
 }
     
+    public function getTomaPedidoData(): void
+    {
+        // Aquí iría la lógica para buscar en la BD los productos, mesas, etc.
+        $data = [
+            'productos' => [['id' => 1, 'nombre' => 'Producto 1']],
+            'mesas' => [['id' => 1, 'numero' => 'Mesa 1']],
+            'meseros' => [['id' => 1, 'nombre' => 'Mesero 1']]
+        ];
+
+        http_response_code(200);
+        echo json_encode($data);
+    }
+
     /**
      * Actualiza el estado de un pedido por su ID y el nombre del nuevo estado.
      */

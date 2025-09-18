@@ -112,7 +112,7 @@ class AuthController
     {
         $jwtConfig = Config::getJwtConfig();
         $issuedAt = time();
-        $expirationTime = $issuedAt + $jwtConfig['expiration_time'];
+        $expirationTime = $issuedAt + $jwtConfig['expiration'];
 
         $payload = [
             "iat" => $issuedAt,

@@ -4,7 +4,7 @@ import api from '@/services/api'; // Tu instancia central de Axios
  * Obtiene los pedidos que están listos para ser facturados (ej. estado 'listo para servir').
  */
 const getPedidosParaFacturar = async () => {
-    const response = await api.get('/pedidos?estado=listo para servir');
+    axios.get('http://localhost:8000/api/pedidos?estado=listo para servir');
     return response.data.data;
 };
 

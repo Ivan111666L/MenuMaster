@@ -47,22 +47,38 @@ try {
                         $authController->login();
                     }
                     break;
-                case 'verify':
-                    if ($requestMethod === 'GET') {
-                        $authController->verifyToken();
-                    }
-                    break;
+                // case 'verify':
+                //     if ($requestMethod === 'GET') {
+                //         $authController->verifyToken();
+                //     }
+                //     break;
+                case 'pedidos':
+                require_once BASE_PATH . '/routes/pedidos_api.php';
+                break;
+                case 'productos':
+                require_once BASE_PATH . '/routes/productos_api.php';
+                break;
+                case 'categoria':
+                require_once BASE_PATH . '/routes/categoria_api.php';  
+                case 'dashboard':
+                require_once BASE_PATH . '/routes/ingredientes_api.php'; 
+                case 'ingredientes':
+                require_once BASE_PATH . '/routes/dashboard_api.php';  
+                case 'inventario':
+                require_once BASE_PATH . '/routes/inventario_api.php'; 
+                case 'menudeldia':
+                require_once BASE_PATH . '/routes/menudeldia_api.php'; 
+                case 'movimientosinventario':
+                require_once BASE_PATH . '/routes/movimientosinventario_api.php'; 
+                case 'usuarios':
+                require_once BASE_PATH . '/routes/usuarios_api.php';       
                 default:
                     throw new Exception("Acción '{$action}' no válida para auth.", 404);
             }
             break;
 
-        case 'productos':
-            require_once BASE_PATH . '/routes/productos_api.php';
-            break;
-        case 'pedidos':
-            require_once BASE_PATH . '/routes/pedidos_api.php';
-            break;
+        
+           
         // ...otros recursos
         default:
             throw new Exception("Recurso '{$resource}' no válido.", 404);

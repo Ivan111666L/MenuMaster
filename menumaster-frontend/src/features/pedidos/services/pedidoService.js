@@ -6,7 +6,7 @@ import api from '@/services/api'; // Tu instancia central de Axios
  */
 const getTomaPedidoData = async () => {
     // Hacemos una petición a un nuevo endpoint que debe devolver ambos listados.
-    const response = await api.get('/toma-pedido-data'); 
+    axios.get('http://localhost:8000/api/toma-pedido-data')
     return response.data.data;
 };
 

@@ -14,7 +14,7 @@ const estadoInicialFormulario = {
     email: '',
     password: '',
     passwordConfirm: '',
-    rol: 'mesero', // El rol por defecto
+    rol: 'administrador', // El rol por defecto
 };
 
 function Register() {
@@ -107,9 +107,10 @@ function Register() {
                             onChange={handleInputChange}
                             disabled={isLoading}
                         >
+                            <option value="administrador">Administrador</option>
                             <option value="mesero">Mesero</option>
                             <option value="cocinero">Cocinero</option>
-                            {/* Un admin probablemente se crea desde otro panel, no por registro público */}
+                            <option value="cajero">Cajero</option>
                         </select>
                     </div>
 

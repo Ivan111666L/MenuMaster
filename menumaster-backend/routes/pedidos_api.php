@@ -92,4 +92,22 @@ if (!function_exists('requireAdmin')) {
             throw new Exception("No tienes permisos para realizar esta acción.", 403);
         }
     }
+
+    switch ($action) {
+    case 'toma-pedido-data':
+        if ($requestMethod === 'GET') {
+            // Llama a la función del controlador que obtiene estos datos
+            // $pedidoController->getTomaPedidoData(); 
+            // POR AHORA, PARA PROBAR, PON UNA RESPUESTA SIMPLE:
+            http_response_code(200);
+            echo json_encode(['message' => 'Ruta toma-pedido-data funciona!']);
+        } else {
+            http_response_code(405);
+            echo json_encode(['error' => 'Método no permitido.']);
+        }
+        break;
+
+    default:
+        throw new Exception("Acción '{$action}' no válida para el recurso de pedidos.", 404);
+}
 }
