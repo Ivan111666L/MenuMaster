@@ -43,6 +43,8 @@ try {
         case 'GET':
             if ($id) {
                 $controller->show($id);
+            } else if ($action === 'disponibles') {
+                $controller->disponibles();
             } else {
                 $controller->index();
             }

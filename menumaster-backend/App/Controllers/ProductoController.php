@@ -30,10 +30,18 @@ class ProductoController
     /**
      * Obtiene una lista de todos los productos.
      * Corresponde a: GET /api/productos
+     * Soporta el parámetro ?todos=true para obtener todos los productos incluyendo inactivos
      */
     public function index(): void
     {
-        $productos = $this->productoModel->findAll();
+        $todos = isset($_GET['todos']) && $_GET['todos'] === 'true';
+        
+        if ($todos) {
+            $productos = $this->productoModel->findAll(true);
+        } else {
+            $productos = $this->productoModel->findAll();
+        }
+        
         if ($productos === false) {
             throw new Exception("No se pudieron obtener los productos.", 500);
         }

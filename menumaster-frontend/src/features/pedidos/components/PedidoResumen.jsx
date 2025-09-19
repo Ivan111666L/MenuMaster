@@ -2,12 +2,14 @@ import React from 'react';
 import Button from '@/components/Button';
 
 function PedidoResumen({ pedidoActual, eliminarItem, limpiarPedido, enviarPedido }) {
-  const total = pedidoActual.items.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
+  // Verificamos que pedidoActual exista, si no, usamos un objeto con items como array vacío
+  const pedido = pedidoActual || { items: [] };
+  const total = pedido.items.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
 
   return (
     <div className="pedido-resumen">
       <h2>2. Resumen del Pedido</h2>
-      {pedidoActual.items.length === 0 ? (
+      {pedido.items.length === 0 ? (
         <p className="resumen-vacio">Añade productos desde el panel de la izquierda.</p>
       ) : (
         <>
@@ -21,7 +23,7 @@ function PedidoResumen({ pedidoActual, eliminarItem, limpiarPedido, enviarPedido
               </tr>
             </thead>
             <tbody>
-              {pedidoActual.items.map(item => (
+              {pedido.items.map(item => (
                 <tr key={item.producto_id}>
                   <td>{item.nombre}</td>
                   <td>{item.cantidad}</td>

@@ -40,7 +40,7 @@ class DashboardModel {
 
     public function getLowStockIngredientsCount(): int {
         // Compara el stock actual con un stock mínimo definido por ingrediente
-        $stmt = $this->db->prepare("SELECT COUNT(id) FROM ingredientes WHERE cantidad_stock <= stock_minimo");
+        $stmt = $this->db->prepare("SELECT COUNT(id) FROM ingredientes WHERE stock_actual <= stock_minimo");
         $stmt->execute();
         return (int)$stmt->fetchColumn();
     }
@@ -62,9 +62,9 @@ class DashboardModel {
         $sql = "SELECT 
                     p.nombre as name,
                     p.id,
-                    SUM(pi.cantidad) as sales
-                FROM pedido_items pi
-                JOIN productos p ON pi.producto_id = p.id
+                    COUNT(dp.id) as sales
+                FROM detalles_pedido dp
+                JOIN productos p ON dp.producto_id = p.id
                 GROUP BY p.id, p.nombre
                 ORDER BY sales DESC
                 LIMIT 5";

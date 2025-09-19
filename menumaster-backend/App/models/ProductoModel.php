@@ -16,9 +16,10 @@ class ProductoModel
 
     /**
      * Obtiene todos los productos con el nombre de su categoría y estado.
+     * @param bool $todos Si es true, devuelve todos los productos incluyendo inactivos
      * @return array|false
      */
-    public function findAll(): array|false
+    public function findAll(bool $todos = false): array|false
     {
         $sql = "SELECT 
                     p.id,
@@ -33,8 +34,14 @@ class ProductoModel
                 FROM 
                     {$this->table} p
                 LEFT JOIN categorias c ON p.categoria_id = c.id
-                LEFT JOIN estados_producto ep ON p.estado_id = ep.id
-                ORDER BY p.nombre ASC";
+                LEFT JOIN estados_producto ep ON p.estado_id = ep.id";
+                
+        if (!$todos) {
+            // Si no se solicitan todos, filtramos por productos activos/disponibles
+            $sql .= " WHERE ep.nombre = 'disponible'";
+        }
+        
+        $sql .= " ORDER BY p.nombre ASC";
         
         try {
             $stmt = $this->conn->prepare($sql);

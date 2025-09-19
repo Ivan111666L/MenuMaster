@@ -6,7 +6,10 @@ export const getProductos = async () => {
     const response = await api.get('/productos?todos=true');
     
     // Aseguramos que todos los productos estén disponibles
-    if (response.data && Array.isArray(response.data)) {
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      console.log(`Productos cargados: ${response.data.data.length}`);
+      return response.data.data;
+    } else if (response.data && Array.isArray(response.data)) {
       console.log(`Productos cargados: ${response.data.length}`);
       return response.data;
     } else {

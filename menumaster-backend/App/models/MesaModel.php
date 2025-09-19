@@ -87,6 +87,33 @@ class MesaModel
     }
 
     /**
+     * Obtiene todas las mesas disponibles.
+     */
+    public function findDisponibles(): array|false
+    {
+        $sql = "SELECT 
+                    m.id, m.numero, m.capacidad, m.ubicacion,
+                    e.nombre AS estado
+                FROM 
+                    {$this->table} m
+                LEFT JOIN 
+                    estados_generales e ON m.estado_id = e.id
+                WHERE 
+                    e.nombre = 'disponible'
+                ORDER BY 
+                    m.numero ASC";
+        
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::findDisponibles: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Actualiza una mesa a partir de un array de datos.
      */
     public function update(int $id, array $data): bool

@@ -126,7 +126,22 @@ class AuthController
 
         return JWT::encode($payload, $jwtConfig['secret'], $jwtConfig['algorithm']);
     }
-
+     
+    // public function verifyToken(): void
+    // {
+    //     $decoded = null;
+    //     try {
+    //         $token = $_SERVER['HTTP_AUTHORIZATION'] ?? null;
+    //         if (!$token) {
+    //             $this->sendResponse(401, "Token no proporcionado.");
+    //         }
+    //         $token = str_replace('Bearer ', '', $token);
+    //         $decoded = $this->decodeTokenData($token);
+    //         $this->sendResponse(200, "Token válido.", $decoded);
+    //     } catch (Exception $e) {
+    //         $this->sendResponse(401, "Token inválido: " . $e->getMessage());
+    //     }
+    // }
     /**
      * Decodifica un token JWT
      */

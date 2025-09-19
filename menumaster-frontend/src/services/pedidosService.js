@@ -3,10 +3,19 @@ import api from './api';
 export const getPedidos = async () => {
   try {
     const response = await api.get('/pedidos');
-    return response.data;
+    
+    // Verificamos la estructura de la respuesta
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      return response.data.data;
+    } else if (response.data && Array.isArray(response.data)) {
+      return response.data;
+    } else {
+      console.error('Formato de respuesta incorrecto en getPedidos:', response.data);
+      return []; // Formato inesperado, devolvemos array vacío
+    }
   } catch (error) {
     console.error('Error al obtener pedidos:', error);
-    throw error;
+    return []; // Devolvemos array vacío en caso de error para evitar errores en la UI
   }
 };
 
