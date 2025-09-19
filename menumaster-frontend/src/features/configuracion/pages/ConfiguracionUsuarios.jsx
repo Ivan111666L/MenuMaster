@@ -3,7 +3,7 @@ import { useUsuarios } from '@/features/configuracion/hooks/useUsuarios'; // Imp
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import './ConfiguracionUsuarios.css';
+import '@/styles/configuracion.css'; // Asegúrate de tener este archivo de estilos
 
 function ConfiguracionUsuarios() {
   // Toda la lógica y el estado ahora viven dentro del hook.

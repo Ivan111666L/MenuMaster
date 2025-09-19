@@ -29,7 +29,7 @@ const getTomaPedidoData = async () => {
  * @param {object} pedidoData - Datos del pedido (mesa_id, items, etc.).
  */
 const createPedido = async (pedidoData) => {
-    const response = await api.post('/pedidos', pedidoData);
+    const response = await api.post('/api/pedidos', pedidoData);
     return response.data.data;
 };
 

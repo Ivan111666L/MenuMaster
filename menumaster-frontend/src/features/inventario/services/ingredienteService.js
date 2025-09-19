@@ -21,7 +21,7 @@ async function handleRequest(request) {
  */
 const getIngredientes = async () => {
   try {
-    const response = await api.get('/ingredientes');
+    const response = await api.get('/api/ingredientes');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener ingredientes:", error);
@@ -51,7 +51,7 @@ const getIngredienteById = async (id) => {
  */
 const crearIngrediente = async (ingredienteData) => {
   try {
-    const response = await api.post('/ingredientes', ingredienteData);
+    const response = await api.post('/api/ingredientes', ingredienteData);
     return response.data.data;
   } catch (error) {
     console.error("Error al crear ingrediente:", error);

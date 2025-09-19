@@ -1,5 +1,6 @@
 import api from '@/services/api'; // Tu instancia central de Axios
 
+// $data = json_decode(file_get_contents('php://input'), true);
 /**
  * Maneja las solicitudes a la API y procesa las respuestas
  * @param {Function} request - Función que realiza la solicitud a la API
@@ -18,12 +19,12 @@ async function handleRequest(request) {
 
 
 /**
- * Obtiene todos los productos desde el backend.
+ * Obtiene todos los productos desde elbackend.
  * @returns {Promise<Array>} Lista de productos
  */
 const getProductos = async () => {
   try {
-    const response = await api.get('/productos');
+    const response = await api.get('/api/productos');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener productos:", error);
@@ -38,7 +39,7 @@ const getProductos = async () => {
  */
 const getProductoById = async (id) => {
   try {
-    const response = await api.get(`/productos/${id}`);
+    const response = await api.get(`/api/productos/${id}`);
     return response.data.data;
   } catch (error) {
     console.error(`Error al obtener el producto ${id}:`, error);
@@ -49,14 +50,14 @@ const getProductoById = async (id) => {
 /**
  * Crea un nuevo producto en la base de datos.
  * @param {object} productoData - Datos del nuevo producto.
- * @returns {Promise<Object>} Producto creado
+ * @returns {Promise<Object} Producto creado
  */
 const createProducto = async (productoData) => {
   try {
-    const response = await api.post('/productos', productoData);
-    return response.data.data;
+    const response = await api.post('/api/productos', productoData);
+    return { "data": { ...response.data.data } };
   } catch (error) {
-    console.error("Error al crear producto:", error);
+    console.error("Error al crear producto:", error.response?.data || error.message);
     throw error;
   }
 };
@@ -69,7 +70,7 @@ const createProducto = async (productoData) => {
  */
 const updateProducto = async (id, productoData) => {
   try {
-    const response = await api.put(`/productos/${id}`, productoData);
+    const response = await api.put(`/api/productos/${id}`, productoData);
     return response.data.data;
   } catch (error) {
     console.error(`Error al actualizar el producto ${id}:`, error);
@@ -83,7 +84,7 @@ const updateProducto = async (id, productoData) => {
  */
 const deleteProducto = async (id) => {
   try {
-    await api.delete(`/productos/${id}`);
+    await api.delete(`/api/productos/${id}`);
   } catch (error) {
     console.error(`Error al eliminar el producto ${id}:`, error);
     throw error;
@@ -96,7 +97,7 @@ const deleteProducto = async (id) => {
  */
 const getCategorias = async () => {
   try {
-    const response = await api.get('/categorias');
+    const response = await api.get('/api/categorias');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener categorías:", error);
@@ -112,7 +113,7 @@ const getCategorias = async () => {
  */
 const cambiarCantidad = async (id, cantidad) => {
   try {
-    const response = await api.put(`/productos/${id}/cantidad`, { cantidad });
+    const response = await api.put(`/api/productos/${id}/cantidad`, { cantidad });
     return response.data.data;
   } catch (error) {
     console.error(`Error al cambiar cantidad del producto ${id}:`, error);
@@ -131,3 +132,14 @@ const productoService = {
 };
 
 export default productoService;
+
+/**
+ * Ejemplo de datos para crear un producto
+ */
+const nuevoProducto = {
+  nombre: "Producto",
+  descripcion: "Descripción",
+  precio: 100,
+  categoria_id: 1,
+  cantidad: 10
+};

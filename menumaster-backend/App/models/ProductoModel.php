@@ -94,23 +94,26 @@ class ProductoModel
      * @param array $data Datos del producto (ej. ['nombre' => 'Pizza', 'precio' => 10.50, 'categoria_id' => 1])
      * @return int|false El ID del nuevo producto o false si falla.
      */
-    public function create(array $data): int|false
+    public function create(array $data)
     {
-        // Construye la consulta dinámicamente a partir de las claves del array
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
-        
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
 
         try {
             $stmt = $this->conn->prepare($sql);
-            // Vincula los valores del array a los placeholders de la consulta
             foreach ($data as $key => &$value) {
                 $stmt->bindParam(':' . $key, $value);
             }
-            
             $stmt->execute();
-            return (int)$this->conn->lastInsertId();
+            $id = (int)$this->conn->lastInsertId();
+            // Recupera el producto recién creado como array
+            $producto = $this->find($id);
+            if ($producto) {
+                return $producto;
+            } else {
+                return false;
+            }
         } catch (PDOException $e) {
             error_log('Error en ProductoModel::create: ' . $e->getMessage());
             return false;

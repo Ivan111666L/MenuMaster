@@ -29,13 +29,7 @@ function Configuracion() {
           </Link>
         </div>
 
-        <div className="card">
-          <h3 className="card-title">Configuración de Roles</h3>
-          <p>Define permisos y accesos según el rol del usuario.</p>
-          <Link to="/configuracion/roles" className="card-link">
-            <Button variant="primary">Ir a Roles</Button>
-          </Link>
-        </div>
+       
       </div>
     </div>
   );

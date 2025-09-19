@@ -48,6 +48,37 @@ class ProductoController
         $this->sendResponse(200, $productos);
     }
 
+    public function create()
+{
+    // Leer datos JSON enviados por el frontend
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // Validar campos requeridos
+    if (
+        empty($data['nombre']) ||
+        empty($data['descripcion']) ||
+        !isset($data['precio']) ||
+        empty($data['categoria_id']) ||
+        !isset($data['cantidad'])
+    ) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Faltan campos requeridos']);
+        exit;
+    }
+
+    // Insertar el producto en la base de datos
+    $productoCreado = $this->productoModel->create($data);
+
+    if ($productoCreado) {
+        // Devolver el producto creado bajo la clave 'data'
+        http_response_code(201);
+        echo json_encode(['data' => $productoCreado]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'No se pudo crear el producto']);
+    }
+}
+
     /**
      * Obtiene un único producto por su ID.
      * Corresponde a: GET /api/productos/{id}

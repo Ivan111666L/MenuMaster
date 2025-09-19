@@ -30,6 +30,8 @@ import ProductosLayout from '@/features/productos/pages/ProductosLayout.jsx';
 import ProductosMenu from '@/features/productos/components/ProductosMenu.jsx';
 import ProductosCreados from '@/features/productos/pages/ProductosCreados.jsx';
 import ProductoNuevo from '@/features/productos/pages/ProductoNuevos.jsx';
+import ConfiguracionUsuarios from '@/features/configuracion/pages/ConfiguracionUsuarios.jsx';
+import ConfiguracionMesas from '@/features/configuracion/pages/ConfiguracionMesas.jsx';
 
 
 const router = createBrowserRouter([
@@ -134,6 +136,24 @@ const router = createBrowserRouter([
                 <Configuracion />
               </PrivateRoute>
             ),
+            children: [
+              {
+                path: 'usuarios',
+                element: (
+                  <PrivateRoute roles={['administrador']}>
+                    <ConfiguracionUsuarios />
+                  </PrivateRoute>
+                ),
+              },
+              {
+                path: 'mesas',
+                element: (
+                  <PrivateRoute roles={['administrador']}>
+                    <ConfiguracionMesas />
+                  </PrivateRoute>
+                ),
+              },
+            ],
           },
         ],
       },
