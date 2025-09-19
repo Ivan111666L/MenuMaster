@@ -46,9 +46,9 @@ export const usePedido = () => {
     const fetchData = useCallback(async () => {
         try {
             const data = await pedidoService.getTomaPedidoData();
-            // Filtramos solo las mesas que están disponibles
+            // Las mesas ya vienen filtradas como disponibles desde el backend
             setProductos(data.productos || []);
-            setMesas(data.mesas.filter(mesa => mesa.estado === 'disponible') || []);
+            setMesas(data.mesas || []);
         } catch (err) {
             setError('No se pudieron cargar los datos para tomar pedidos.');
         } finally {
@@ -61,37 +61,52 @@ export const usePedido = () => {
     }, [fetchData]);
 
     // --- Acciones ---
-    const seleccionarMesa = (mesaId) => {
+    const handleChangeMesa = (mesaId) => {
         setPedidoActual(prev => ({ ...prev, mesa_id: mesaId }));
     };
 
-    const agregarItem = (producto) => {
+    const handleChangeCliente = (cliente) => {
+        setPedidoActual(prev => ({ ...prev, cliente }));
+    };
+
+    const addProducto = (producto) => {
         setPedidoActual(prev => {
             const items = [...prev.items];
             const itemExistente = items.find(item => item.producto_id === producto.id);
             if (itemExistente) {
                 itemExistente.cantidad += 1;
             } else {
-                items.push({ producto_id: producto.id, nombre: producto.nombre, cantidad: 1, precio: producto.precio });
+                items.push({ 
+                    producto_id: producto.id, 
+                    nombre: producto.nombre, 
+                    cantidad: 1, 
+                    precio: producto.precio 
+                });
             }
             return { ...prev, items };
         });
     };
-    
-    const eliminarItem = (productoId) => {
+
+    const removeProducto = (productoId) => {
         setPedidoActual(prev => ({
             ...prev,
             items: prev.items.filter(item => item.producto_id !== productoId)
         }));
     };
 
-    const limpiarPedido = () => {
-        setPedidoActual({ mesa_id: '', items: [], notas: '' });
+    const updateCantidad = (productoId, cantidad) => {
+        setPedidoActual(prev => ({
+            ...prev,
+            items: prev.items.map(item => 
+                item.producto_id === productoId 
+                    ? { ...item, cantidad: Math.max(1, cantidad) }
+                    : item
+            )
+        }));
     };
 
-    const enviarPedido = async () => {
+    const savePedido = async () => {
         if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
-            // CORRECCIÓN: Se usa toast en lugar de alert
             toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
             return;
         }
@@ -102,20 +117,46 @@ export const usePedido = () => {
             // Se conserva la lógica de impresión
             generarTicketCocina(pedidoCreado);
             
-            // CORRECCIÓN: Se usa toast en lugar de alert
             toast.success('¡Pedido enviado a cocina exitosamente!');
-            limpiarPedido();
+            setPedidoActual({ mesa_id: '', items: [], notas: '' });
         } catch (err) {
-            // CORRECCIÓN: Se usa toast en lugar de alert, mostrando el error de la API
             toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
         } finally {
             setLoading(false);
         }
     };
     
+    const eliminarItem = (productoId) => {
+        removeProducto(productoId);
+    };
+
+    const limpiarPedido = () => {
+        setPedidoActual({ mesa_id: '', items: [], notas: '' });
+    };
+
+    const enviarPedido = async () => {
+        await savePedido();
+    };
+    
     // Devolvemos todo lo que los componentes necesitan
     return {
-        loading, error, productos, mesas, pedidoActual,
-        seleccionarMesa, agregarItem, eliminarItem, limpiarPedido, enviarPedido
+        pedido: pedidoActual,
+        loading, 
+        error, 
+        productos, 
+        mesas, 
+        handleChangeMesa, 
+        handleChangeCliente, 
+        addProducto, 
+        removeProducto, 
+        updateCantidad, 
+        savePedido,
+        // Mantenemos compatibilidad con nombres antiguos
+        pedidoActual,
+        seleccionarMesa: handleChangeMesa,
+        agregarItem: addProducto,
+        eliminarItem,
+        limpiarPedido,
+        enviarPedido
     };
 };

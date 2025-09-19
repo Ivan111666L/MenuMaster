@@ -1,7 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 // CORRECCIÓN: Se importa el hook useAuth desde el contexto que creamos.
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
+// Importamos el logo
+import MenuMasterIcon from '@/assets/menumaster-icon.svg';
 
 /**
  * Navbar principal de la aplicación.
@@ -24,14 +26,17 @@ function Navbar() {
     return (
         <nav className="navbar">
             <div className="navbar-brand">
-                <Link to="/">MenuMaster</Link>
+                <Link to="/" className="navbar-brand">
+                    <img src={MenuMasterIcon} alt="MenuMaster" width="32" height="32" />
+                    <span>MenuMaster</span>
+                </Link>
             </div>
             
             <ul className="navbar-links">
                 {/* Si el usuario está logueado y tiene una ruta de dashboard, se muestra el enlace. */}
                 {isAuthenticated && userDashboardPath && (
                     <li>
-                        <Link to={userDashboardPath}>Dashboard</Link>
+                        <Link to={userDashboardPath} className="nav-link">Dashboard</Link>
                     </li>
                 )}
                 {/* Puedes añadir más enlaces públicos o protegidos aquí */}
@@ -42,10 +47,10 @@ function Navbar() {
                 {isAuthenticated && user ? (
                     <div className="user-info">
                         <span className="user-greeting">Hola, {user.nombre}</span>
-                        <button onClick={logout} className="logout-button">Cerrar Sesión</button>
+                        <button onClick={logout} className="btn btn-outline logout-button">Cerrar Sesión</button>
                     </div>
                 ) : (
-                    <Link to="/login" className="login-link">Iniciar Sesión</Link>
+                    <Link to="/login" className="nav-link login-link">Iniciar Sesión</Link>
                 )}
             </div>
         </nav>

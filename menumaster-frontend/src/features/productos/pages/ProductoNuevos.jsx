@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import productoService from '@/features/productos/services/productoService';
+import SelectorIngredientes from '@/features/productos/components/SelectorIngredientes';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
@@ -10,8 +11,9 @@ const estadoInicial = {
     nombre: '',
     descripcion: '',
     precio: '',
-    categoria_nombre: '', // Usaremos el nombre para enviarlo al backend
-    // Los campos de stock podrían manejarse en la sección de inventario, pero los dejamos aquí por ahora.
+    categoria_id: '', // Cambiado a categoria_id para coincidir con el backend
+    cantidad: 1, // Campo añadido para la cantidad
+    ingredientes: [], // Array para los IDs de ingredientes
 };
 
 function ProductoNuevo() {
@@ -23,24 +25,29 @@ function ProductoNuevo() {
 
     // Cargar las categorías al montar el componente
     useEffect(() => {
-        const cargarCategorias = async () => {
+        const cargarDatos = async () => {
             try {
-                const data = await productoService.getCategorias();
-                setCategorias(data);
-                if (data.length > 0) {
+                const categoriasData = await productoService.getCategorias();
+                setCategorias(categoriasData);
+
+                if (categoriasData.length > 0) {
                     // Establecemos una categoría por defecto
-                    setFormData(prev => ({ ...prev, categoria_nombre: data[0].nombre }));
+                    setFormData(prev => ({ ...prev, categoria_id: categoriasData[0].id }));
                 }
             } catch (err) {
                 setError('No se pudieron cargar las categorías.');
             }
         };
-        cargarCategorias();
+        cargarDatos();
     }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
+    };
+
+    const handleIngredientesChange = (ingredientesSeleccionados) => {
+        setFormData(prev => ({ ...prev, ingredientes: ingredientesSeleccionados }));
     };
 
     const handleSubmit = async (e) => {
@@ -49,9 +56,8 @@ function ProductoNuevo() {
         setError('');
 
         try {
-            // El backend espera 'estado_nombre', lo añadimos por defecto.
-            const dataToSend = { ...formData, estado_nombre: 'disponible' };
-            await productoService.createProducto(dataToSend);
+            // Enviamos el producto con los datos del formulario
+            await productoService.createProducto(formData);
             alert('Producto creado con éxito.');
             navigate('/productos/creados'); // Redirige a la lista de productos
         } catch (err) {
@@ -91,16 +97,16 @@ function ProductoNuevo() {
                     </div>
 
                     <div className="form-group">
-                        <label htmlFor="categoria_nombre">Categoría</label>
+                        <label htmlFor="categoria_id">Categoría</label>
                         <select
-                            id="categoria_nombre"
-                            name="categoria_nombre"
-                            value={formData.categoria_nombre}
+                            id="categoria_id"
+                            name="categoria_id"
+                            value={formData.categoria_id}
                             onChange={handleInputChange}
                             className="form-input"
                         >
                             {categorias.map(cat => (
-                                <option key={cat.id} value={cat.nombre}>{cat.nombre}</option>
+                                <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                             ))}
                         </select>
                     </div>
@@ -114,6 +120,22 @@ function ProductoNuevo() {
                         onChange={handleInputChange}
                         required
                         step="0.01"
+                    />
+
+                    <Input
+                        label="Cantidad en inventario"
+                        id="cantidad"
+                        name="cantidad"
+                        type="number"
+                        value={formData.cantidad}
+                        onChange={handleInputChange}
+                        required
+                        min="0"
+                    />
+
+                    <SelectorIngredientes
+                        ingredientesSeleccionados={formData.ingredientes}
+                        onIngredientesChange={handleIngredientesChange}
                     />
                     
                     {error && <p className="auth-error-message">{error}</p>}

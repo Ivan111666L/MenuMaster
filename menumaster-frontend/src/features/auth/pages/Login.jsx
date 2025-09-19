@@ -8,6 +8,8 @@ import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '@/styles/auth.css'; // Asegúrate de que los estilos estén aquí
+// Importamos el logo
+import MenuMasterLogo from '@/assets/menumaster-logo.svg';
 
 function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -49,6 +51,9 @@ function Login() {
   return (
     <div className='auth-container'>
       <div className="auth-form-container">
+        <div className="auth-logo-container">
+          <img src={MenuMasterLogo} alt="MenuMaster" className="auth-logo" />
+        </div>
         <h1 className='auth-title'>Iniciar Sesión</h1>
         <p className="auth-subtitle">Bienvenido de nuevo a MenuMaster</p>
 

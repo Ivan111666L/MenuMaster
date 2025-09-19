@@ -36,7 +36,7 @@ const getIngredientes = async () => {
  */
 const getIngredienteById = async (id) => {
   try {
-    const response = await api.get(`/ingredientes/${id}`);
+    const response = await api.get(`/api/ingredientes/${id}`);
     return response.data.data;
   } catch (error) {
     console.error(`Error al obtener el ingrediente ${id}:`, error);
@@ -67,7 +67,7 @@ const crearIngrediente = async (ingredienteData) => {
  */
 const actualizarIngrediente = async (id, ingredienteData) => {
   try {
-    const response = await api.put(`/ingredientes/${id}`, ingredienteData);
+    const response = await api.put(`/api/ingredientes/${id}`, ingredienteData);
     return response.data.data;
   } catch (error) {
     console.error(`Error al actualizar el ingrediente ${id}:`, error);
@@ -81,7 +81,7 @@ const actualizarIngrediente = async (id, ingredienteData) => {
  */
 const eliminarIngrediente = async (id) => {
   try {
-    await api.delete(`/ingredientes/${id}`);
+    await api.delete(`/api/ingredientes/${id}`);
   } catch (error) {
     console.error(`Error al eliminar el ingrediente ${id}:`, error);
     throw error;
@@ -96,7 +96,7 @@ const eliminarIngrediente = async (id) => {
  */
 const cambiarCantidad = async (id, cantidad) => {
   try {
-    const response = await api.put(`/ingredientes/${id}/cantidad`, { cantidad });
+    const response = await api.put(`/api/ingredientes/${id}/cantidad`, { cantidad });
     return response.data.data;
   } catch (error) {
     console.error(`Error al cambiar cantidad del ingrediente ${id}:`, error);

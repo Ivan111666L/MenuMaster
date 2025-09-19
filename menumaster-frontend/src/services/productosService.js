@@ -42,3 +42,23 @@ export const getProductosByCategoria = async (categoriaId) => {
     throw error;
   }
 };
+
+export const getCategorias = async () => {
+  try {
+    const response = await api.get('/api/categorias');
+    return response.data.data;
+  } catch (error) {
+    console.error("Error al obtener categorías:", error);
+    return [];
+  }
+};
+
+export const cambiarCantidad = async (id, cantidad) => {
+  try {
+    const response = await api.put(`/api/productos/${id}/cantidad`, { cantidad });
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error al cambiar cantidad del producto ${id}:`, error);
+    throw error;
+  }
+};

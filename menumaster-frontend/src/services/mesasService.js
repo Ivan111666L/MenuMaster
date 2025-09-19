@@ -58,3 +58,12 @@ export const cambiarEstadoMesa = async (id, estado) => {
     throw error;
   }
 };
+
+export const deleteMesa = async (id) => {
+  try {
+    await api.delete(`/mesas/${id}`);
+  } catch (error) {
+    console.error(`Error al eliminar la mesa ${id}:`, error);
+    throw error;
+  }
+};

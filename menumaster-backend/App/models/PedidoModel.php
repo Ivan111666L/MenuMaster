@@ -81,10 +81,10 @@ class PedidoModel
         }
 
         // 2. Obtenemos los ítems del pedido.
-        $sqlItems = "SELECT pi.cantidad, pi.precio_unitario, pr.nombre AS nombre_producto
-                     FROM pedido_items pi
-                     JOIN productos pr ON pi.producto_id = pr.id
-                     WHERE pi.pedido_id = :id";
+        $sqlItems = "SELECT dp.cantidad, dp.precio_unitario, pr.nombre AS nombre_producto
+                     FROM detalles_pedido dp
+                     JOIN productos pr ON dp.producto_id = pr.id
+                     WHERE dp.pedido_id = :id";
         
         $stmtItems = $this->db->prepare($sqlItems);
         $stmtItems->bindParam(':id', $id, PDO::PARAM_INT);
@@ -101,32 +101,56 @@ class PedidoModel
      * Crea un pedido y sus detalles en una transacción.
      */
     public function createPedido(int $mesa_id, int $usuario_id, array $items, ?string $notas): int|false
-{
-    try {
-        $this->db->beginTransaction();
+    {
+        try {
+            $this->db->beginTransaction();
 
-        $stmtPedido = $this->db->prepare(
-            // Se usa el $usuario_id dinámico en lugar de un '1' fijo
-            "INSERT INTO pedidos (mesa_id, usuario_id, estado_id, notas) 
-             VALUES (:mesa_id, :usuario_id, (SELECT id FROM estados_pedido WHERE nombre = 'pendiente'), :notas)"
-        );
-        $stmtPedido->bindParam(':mesa_id', $mesa_id, PDO::PARAM_INT);
-        $stmtPedido->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT); // <-- Se usa el ID real
-        $stmtPedido->bindParam(':notas', $notas);
-        $stmtPedido->execute();
-        $pedidoId = (int)$this->db->lastInsertId();
+            // 1. Insertar el pedido principal
+            $stmtPedido = $this->db->prepare(
+                "INSERT INTO pedidos (mesa_id, usuario_id, estado_id, notas) 
+                 VALUES (:mesa_id, :usuario_id, (SELECT id FROM estados_pedido WHERE nombre = 'pendiente'), :notas)"
+            );
+            $stmtPedido->bindParam(':mesa_id', $mesa_id, PDO::PARAM_INT);
+            $stmtPedido->bindParam(':usuario_id', $usuario_id, PDO::PARAM_INT);
+            $stmtPedido->bindParam(':notas', $notas);
+            $stmtPedido->execute();
+            $pedidoId = (int)$this->db->lastInsertId();
 
-        // ... (el resto del método para insertar los items permanece igual) ...
+            // 2. Preparar statement para insertar items del pedido
+            $stmtItems = $this->db->prepare(
+                "INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario) 
+                 VALUES (:pedido_id, :producto_id, :cantidad, :precio_unitario)"
+            );
 
-        $this->db->commit();
-        return $pedidoId;
+            // 3. Insertar cada item del pedido
+            foreach ($items as $item) {
+                // Obtener el precio actual del producto
+                $stmtPrecio = $this->db->prepare("SELECT precio FROM productos WHERE id = :producto_id");
+                $stmtPrecio->bindParam(':producto_id', $item['producto_id'], PDO::PARAM_INT);
+                $stmtPrecio->execute();
+                $producto = $stmtPrecio->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$producto) {
+                    throw new Exception("Producto con ID {$item['producto_id']} no encontrado.");
+                }
 
-    } catch (Exception $e) {
-        $this->db->rollBack();
-        error_log('Error en PedidoModel::createPedido: ' . $e->getMessage());
-        return false;
+                // Insertar el item con el precio actual
+                $stmtItems->bindParam(':pedido_id', $pedidoId, PDO::PARAM_INT);
+                $stmtItems->bindParam(':producto_id', $item['producto_id'], PDO::PARAM_INT);
+                $stmtItems->bindParam(':cantidad', $item['cantidad'], PDO::PARAM_INT);
+                $stmtItems->bindParam(':precio_unitario', $producto['precio']);
+                $stmtItems->execute();
+            }
+
+            $this->db->commit();
+            return $pedidoId;
+
+        } catch (Exception $e) {
+            $this->db->rollBack();
+            error_log('Error en PedidoModel::createPedido: ' . $e->getMessage());
+            return false;
+        }
     }
-}
     
     public function getTomaPedidoData(): void
     {

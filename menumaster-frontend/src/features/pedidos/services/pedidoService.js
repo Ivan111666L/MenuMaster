@@ -1,6 +1,6 @@
 import api from '@/services/api'; // Tu instancia central de Axios
 import { getMesasDisponibles } from '@/services/mesasService';
-import { getProductos } from '@/services/productosService';
+import { getProductosDisponibles } from '@/services/productosSimpleService';
 
 /**
  * Obtiene los datos iniciales necesarios para tomar un pedido:
@@ -10,7 +10,7 @@ const getTomaPedidoData = async () => {
     try {
         // Obtenemos productos y mesas disponibles en paralelo
         const [productos, mesas] = await Promise.all([
-            getProductos(),
+            getProductosDisponibles(),
             getMesasDisponibles()
         ]);
         

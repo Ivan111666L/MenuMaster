@@ -48,6 +48,163 @@
     cursor: pointer;
     background: #fff;
     border: 1px solid #F57C00;
+
+/* Estilos para categorías de productos */
+.categoria-filtros {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
+}
+
+.categoria-btn {
+    padding: 0.5rem 1rem;
+    border: 2px solid #F57C00;
+    background: white;
+    color: #F57C00;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.categoria-btn:hover {
+    background: #FFF3E0;
+    transform: translateY(-1px);
+}
+
+.categoria-btn.active {
+    background: #F57C00;
+    color: white;
+    box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+}
+
+.productos-por-categoria {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+}
+
+.categoria-seccion {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1.5rem;
+}
+
+.categoria-seccion:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.categoria-titulo {
+    color: #F57C00;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.categoria-titulo::before {
+    content: '🍽️';
+}
+
+.categoria-seccion:nth-child(1) .categoria-titulo::before { content: '🥗'; } /* Entradas */
+.categoria-seccion:nth-child(2) .categoria-titulo::before { content: '🍽️'; } /* Platos Fuertes */
+.categoria-seccion:nth-child(3) .categoria-titulo::before { content: '🥤'; } /* Bebidas */
+.categoria-seccion:nth-child(4) .categoria-titulo::before { content: '🍰'; } /* Postres */
+
+.productos-categoria-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.producto-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.producto-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #F57C00;
+}
+
+.producto-btn {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: background-color 0.2s ease;
+}
+
+.producto-btn:hover {
+    background: #FFF8F0;
+}
+
+.producto-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.producto-nombre {
+    font-weight: 600;
+    color: #333;
+    font-size: 1rem;
+    flex: 1;
+}
+
+.producto-precio {
+    font-weight: 700;
+    color: #F57C00;
+    font-size: 1.1rem;
+}
+
+.producto-descripcion {
+    color: #666;
+    font-size: 0.85rem;
+    line-height: 1.3;
+    margin-top: 0.25rem;
+}
+
+/* Responsive para dispositivos móviles */
+@media (max-width: 768px) {
+    .categoria-filtros {
+        justify-content: center;
+    }
+    
+    .categoria-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.8rem;
+    }
+    
+    .productos-categoria-lista {
+        grid-template-columns: 1fr;
+    }
+    
+    .categoria-titulo {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+    
+    .productos-por-categoria {
+        max-height: 400px;
+    }
+}
     transition: background 0.2s, border 0.2s;
 }
 .pedido-resumen.seleccionado {

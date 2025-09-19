@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Impresión de Pedidos - MenuMaster</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .pedido {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .actions {
+            margin: 10px 0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .ticket-preview {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-line;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de Impresión de Pedidos - MenuMaster</h1>
+    <p>Esta página prueba la funcionalidad de impresión de pedidos completos.</p>
+    
+    <div class="actions">
+        <label>Seleccionar Pedido: </label>
+        <select id="pedidoSelect">
+            <option value="">-- Selecciona un pedido --</option>
+            <option value="10">Pedido #10</option>
+            <option value="11">Pedido #11</option>
+            <option value="12">Pedido #12</option>
+        </select>
+        <button onclick="cargarPedido()">Cargar Pedido</button>
+        <button onclick="imprimirPedido()">Imprimir Pedido</button>
+    </div>
+    
+    <div id="status"></div>
+    <div id="pedido-details"></div>
+    <div id="ticket-preview"></div>
+
+    <script>
+        let pedidoActual = null;
+        
+        async function cargarPedido() {
+            const pedidoId = document.getElementById('pedidoSelect').value;
+            if (!pedidoId) {
+                alert('Selecciona un pedido');
+                return;
+            }
+            
+            document.getElementById('status').innerHTML = '<div class="loading">Cargando pedido...</div>';
+            
+            try {
+                const response = await fetch(`http://localhost/MenuMaster/menumaster-backend/public/imprimir_pedido.php?id=${pedidoId}`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                pedidoActual = data.data;
+                mostrarPedido(pedidoActual);
+                document.getElementById('status').innerHTML = '<div class="success">Pedido cargado correctamente</div>';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('status').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+        
+        function mostrarPedido(pedido) {
+            const container = document.getElementById('pedido-details');
+            
+            let html = `
+                <div class="pedido">
+                    <h3>Pedido #${pedido.id}</h3>
+                    <p><strong>Mesa:</strong> ${pedido.mesa_numero} (${pedido.mesa_ubicacion})</p>
+                    <p><strong>Mesero:</strong> ${pedido.usuario_nombre}</p>
+                    <p><strong>Estado:</strong> ${pedido.estado_nombre}</p>
+                    <p><strong>Fecha:</strong> ${new Date(pedido.fecha_creacion).toLocaleString()}</p>
+                    ${pedido.notas ? `<p><strong>Notas:</strong> ${pedido.notas}</p>` : ''}
+                    
+                    <h4>Items del Pedido:</h4>
+                    <ul>
+            `;
+            
+            let total = 0;
+            pedido.items.forEach(item => {
+                html += `
+                    <li>
+                        ${item.cantidad}x ${item.producto_nombre} - $${parseFloat(item.subtotal).toFixed(2)}
+                        ${item.ingredientes && item.ingredientes.length > 0 ? `
+                            <br><small>Ingredientes: ${item.ingredientes.map(ing => 
+                                `${ing.ingrediente_nombre} (${ing.cantidad} ${ing.unidad_medida})`
+                            ).join(', ')}</small>
+                        ` : ''}
+                    </li>
+                `;
+                total += parseFloat(item.subtotal);
+            });
+            
+            html += `
+                    </ul>
+                    <p><strong>Total: $${total.toFixed(2)}</strong></p>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        async function imprimirPedido() {
+            if (!pedidoActual) {
+                alert('Primero carga un pedido');
+                return;
+            }
+            
+            document.getElementById('status').innerHTML = '<div class="loading">Generando impresión...</div>';
+            
+            try {
+                const response = await fetch('http://localhost/MenuMaster/menumaster-backend/public/imprimir_pedido.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: pedidoActual.id })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error);
+                }
+                
+                // Show ticket preview
+                document.getElementById('ticket-preview').innerHTML = `
+                    <h4>Vista Previa del Ticket:</h4>
+                    <div class="ticket-preview">${data.ticket}</div>
+                    ${data.html}
+                `;
+                
+                // Open print window
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>Pedido #${pedidoActual.id}</title>
+                            <style>
+                                body { font-family: monospace; margin: 20px; }
+                                @media print { 
+                                    body { margin: 0; }
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <pre>${data.ticket}</pre>
+                            <hr>
+                            ${data.html}
+                        </body>
+                    </html>
+                `);
+                printWindow.document.close();
+                printWindow.focus();
+                
+                document.getElementById('status').innerHTML = '<div class="success">¡Pedido listo para imprimir!</div>';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('status').innerHTML = `<div class="error">Error: ${error.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>

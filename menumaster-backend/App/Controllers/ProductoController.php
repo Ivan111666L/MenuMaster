@@ -1,11 +1,11 @@
 <?php
 namespace app\Controllers;
 
-// --- Dependencias ---
 use app\Models\ProductoModel;
-use app\Models\EstadoProductoModel;
+use app\Models\ProductoIngredientesModel;
 use app\Models\CategoriaModel;
-use app\Utils\Validator; // Se importa el Validator
+use app\Models\EstadoProductoModel;
+use app\Utils\Validator;
 use PDO;
 use Exception;
 
@@ -13,187 +13,333 @@ class ProductoController
 {
     private $db;
     private $productoModel;
+    private $productoIngredientesModel;
     private $categoriaModel;
     private $estadoProductoModel;
 
-    /**
-     * El constructor recibe la conexión a la DB e instancia los modelos necesarios.
-     */
     public function __construct(PDO $db)
     {
         $this->db = $db;
         $this->productoModel = new ProductoModel($this->db);
+        $this->productoIngredientesModel = new ProductoIngredientesModel($this->db);
         $this->categoriaModel = new CategoriaModel($this->db);
         $this->estadoProductoModel = new EstadoProductoModel($this->db);
     }
 
     /**
-     * Obtiene una lista de todos los productos.
-     * Corresponde a: GET /api/productos
-     * Soporta el parámetro ?todos=true para obtener todos los productos incluyendo inactivos
+     * Obtiene todos los productos
+     * GET /api/productos
      */
     public function index(): void
     {
-        $todos = isset($_GET['todos']) && $_GET['todos'] === 'true';
-        
-        if ($todos) {
-            $productos = $this->productoModel->findAll(true);
-        } else {
-            $productos = $this->productoModel->findAll();
+        try {
+            $todos = isset($_GET['todos']) && $_GET['todos'] === 'true';
+            $productos = $this->productoModel->findAll($todos);
+            
+            if ($productos === false) {
+                throw new Exception("No se pudieron obtener los productos.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al obtener productos: " . $e->getMessage());
         }
-        
-        if ($productos === false) {
-            throw new Exception("No se pudieron obtener los productos.", 500);
-        }
-        $this->sendResponse(200, $productos);
     }
-
-    public function create()
-{
-    // Leer datos JSON enviados por el frontend
-    $data = json_decode(file_get_contents('php://input'), true);
-
-    // Validar campos requeridos
-    if (
-        empty($data['nombre']) ||
-        empty($data['descripcion']) ||
-        !isset($data['precio']) ||
-        empty($data['categoria_id']) ||
-        !isset($data['cantidad'])
-    ) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Faltan campos requeridos']);
-        exit;
-    }
-
-    // Insertar el producto en la base de datos
-    $productoCreado = $this->productoModel->create($data);
-
-    if ($productoCreado) {
-        // Devolver el producto creado bajo la clave 'data'
-        http_response_code(201);
-        echo json_encode(['data' => $productoCreado]);
-    } else {
-        http_response_code(500);
-        echo json_encode(['error' => 'No se pudo crear el producto']);
-    }
-}
 
     /**
-     * Obtiene un único producto por su ID.
-     * Corresponde a: GET /api/productos/{id}
+     * Obtiene un producto específico con sus ingredientes
+     * GET /api/productos/{id}
      */
     public function show(int $id): void
     {
-        $producto = $this->productoModel->find($id);
-        if (!$producto) {
-            throw new Exception("Producto no encontrado.", 404);
+        try {
+            $producto = $this->productoModel->find($id);
+            
+            if (!$producto) {
+                throw new Exception("Producto no encontrado.", 404);
+            }
+
+            // Convertir a array si es necesario
+            if (is_object($producto)) {
+                $producto = (array) $producto;
+            }
+
+            // Obtener ingredientes del producto
+            $ingredientes = $this->productoIngredientesModel->getByProducto($id);
+            $producto['ingredientes'] = $ingredientes;
+
+            $this->sendResponse(200, $producto);
+        } catch (Exception $e) {
+            $this->sendError($e->getCode() ?: 500, "Error al obtener el producto: " . $e->getMessage());
         }
-        $this->sendResponse(200, $producto);
     }
 
     /**
-     * Crea un nuevo producto.
-     * Corresponde a: POST /api/productos
+     * Crea un nuevo producto con ingredientes
+     * POST /api/productos
      */
-    public function store(array $data): void
+    public function store(): void
     {
-        // CORRECCIÓN: Se usa el Validator centralizado.
-        Validator::validate($data, [
-            'nombre' => 'required',
-            'precio' => 'required',
-            'categoria_nombre' => 'required',
-            'estado_nombre' => 'required'
-        ]);
+        try {
+            // Leer datos JSON
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$data) {
+                throw new Exception("Datos inválidos.", 400);
+            }
 
-        $categoria = $this->categoriaModel->findByName($data['categoria_nombre']);
-        if (!$categoria) {
-            throw new Exception("La categoría '{$data['categoria_nombre']}' no es válida.", 400);
+            // Validar campos requeridos
+            $this->validarCamposRequeridos($data, ['nombre', 'precio', 'categoria_id']);
+
+            // Preparar datos del producto
+            $productoData = [
+                'nombre' => $data['nombre'],
+                'descripcion' => $data['descripcion'] ?? '',
+                'precio' => floatval($data['precio']),
+                'categoria_id' => intval($data['categoria_id']),
+                'imagen_url' => $data['imagen_url'] ?? null,
+                'tiempo_preparacion_min' => $data['tiempo_preparacion_min'] ?? null,
+                'destacado' => isset($data['destacado']) ? (bool)$data['destacado'] : false
+            ];
+
+            // Buscar estado 'disponible' por nombre
+            $stmt = $this->db->prepare("SELECT id FROM estados_producto WHERE nombre = 'disponible' LIMIT 1");
+            $stmt->execute();
+            $estadoDisponible = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if ($estadoDisponible) {
+                $productoData['estado_id'] = $estadoDisponible['id'];
+            } else {
+                $productoData['estado_id'] = 1; // Default
+            }
+
+            // Crear el producto
+            $productoCreado = $this->productoModel->create($productoData);
+            
+            if (!$productoCreado) {
+                throw new Exception("No se pudo crear el producto.", 500);
+            }
+
+            // Obtener ID del producto creado
+            $productoId = is_array($productoCreado) ? $productoCreado['id'] : $productoCreado;
+
+            // Si hay ingredientes, asociarlos al producto
+            if (!empty($data['ingredientes']) && is_array($data['ingredientes'])) {
+                foreach ($data['ingredientes'] as $ingrediente) {
+                    $ingredienteData = [
+                        'producto_id' => $productoId,
+                        'ingrediente_id' => $ingrediente['ingrediente_id'],
+                        'cantidad' => $ingrediente['cantidad'] ?? 1
+                    ];
+                    
+                    if (!$this->productoIngredientesModel->create($ingredienteData)) {
+                        throw new Exception("Error al asociar ingredientes al producto.", 500);
+                    }
+                }
+            }
+
+            // Obtener el producto completo
+            $producto = $this->productoModel->find($productoId);
+            
+            // Convertir a array si es necesario
+            if (is_object($producto)) {
+                $producto = (array) $producto;
+            }
+            
+            $producto['ingredientes'] = $this->productoIngredientesModel->getByProducto($productoId);
+
+            $this->sendResponse(201, $producto);
+        } catch (Exception $e) {
+            $this->sendError($e->getCode() ?: 500, "Error al crear producto: " . $e->getMessage());
         }
-        
-        $estado = $this->estadoProductoModel->findByName($data['estado_nombre']);
-        if (!$estado) {
-            throw new Exception("El estado '{$data['estado_nombre']}' no es válido.", 400);
-        }
-
-        $datosParaCrear = [
-            'nombre' => $data['nombre'],
-            'descripcion' => $data['descripcion'] ?? null,
-            'precio' => $data['precio'],
-            'categoria_id' => $categoria['id'],
-            'estado_id' => $estado['id']
-        ];
-
-        $nuevoId = $this->productoModel->create($datosParaCrear);
-        if (!$nuevoId) {
-            throw new Exception("No se pudo crear el producto.", 500);
-        }
-
-        $nuevoProducto = $this->productoModel->find($nuevoId);
-        $this->sendResponse(201, $nuevoProducto);
     }
 
     /**
-     * Actualiza un producto existente.
-     * Corresponde a: PUT /api/productos/{id}
+     * Actualiza un producto existente
+     * PUT /api/productos/{id}
      */
-    public function update(int $id, array $data): void
+    public function update(int $id): void
     {
-        if (empty($data)) {
-            throw new Exception("No se proporcionaron datos para actualizar.", 400);
-        }
-        if (!$this->productoModel->find($id)) {
-            throw new Exception("Producto no encontrado.", 404);
-        }
-        
-        if (isset($data['categoria_nombre'])) {
-            $categoria = $this->categoriaModel->findByName($data['categoria_nombre']);
-            if (!$categoria) throw new Exception("Categoría no válida.", 400);
-            $data['categoria_id'] = $categoria['id'];
-            unset($data['categoria_nombre']);
-        }
-        if (isset($data['estado_nombre'])) {
-            $estado = $this->estadoProductoModel->findByName($data['estado_nombre']);
-            if (!$estado) throw new Exception("Estado no válido.", 400);
-            $data['estado_id'] = $estado['id'];
-            unset($data['estado_nombre']);
-        }
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (empty($data)) {
+                throw new Exception("No se proporcionaron datos para actualizar.", 400);
+            }
 
-        if (!$this->productoModel->update($id, $data)) {
-            throw new Exception("No se pudo actualizar el producto.", 500);
-        }
+            if (!$this->productoModel->find($id)) {
+                throw new Exception("Producto no encontrado.", 404);
+            }
 
-        $productoActualizado = $this->productoModel->find($id);
-        $this->sendResponse(200, $productoActualizado);
+            // Separar ingredientes de datos del producto
+            $ingredientes = $data['ingredientes'] ?? null;
+            unset($data['ingredientes']);
+
+            // Actualizar producto
+            $success = $this->productoModel->update($id, $data);
+            if (!$success) {
+                throw new Exception("No se pudo actualizar el producto.", 500);
+            }
+
+            // Si se enviaron ingredientes, actualizarlos
+            if ($ingredientes !== null && is_array($ingredientes)) {
+                if (!$this->productoIngredientesModel->updateProductoIngredientes($id, $ingredientes)) {
+                    throw new Exception("Error al actualizar ingredientes del producto.", 500);
+                }
+            }
+
+            // Obtener producto actualizado
+            $producto = $this->productoModel->find($id);
+            
+            // Convertir a array si es necesario
+            if (is_object($producto)) {
+                $producto = (array) $producto;
+            }
+            
+            $producto['ingredientes'] = $this->productoIngredientesModel->getByProducto($id);
+
+            $this->sendResponse(200, $producto);
+        } catch (Exception $e) {
+            $this->sendError($e->getCode() ?: 500, "Error al actualizar producto: " . $e->getMessage());
+        }
     }
 
     /**
-     * Elimina un producto.
-     * Corresponde a: DELETE /api/productos/{id}
+     * Elimina un producto
+     * DELETE /api/productos/{id}
      */
     public function destroy(int $id): void
     {
-        if (!$this->productoModel->find($id)) {
-            throw new Exception("Producto no encontrado.", 404);
+        try {
+            if (!$this->productoModel->find($id)) {
+                throw new Exception("Producto no encontrado.", 404);
+            }
+
+            if (!$this->productoModel->delete($id)) {
+                throw new Exception("No se pudo eliminar el producto.", 500);
+            }
+
+            $this->sendResponse(204, []);
+        } catch (Exception $e) {
+            $this->sendError($e->getCode() ?: 500, "Error al eliminar producto: " . $e->getMessage());
         }
-        if (!$this->productoModel->delete($id)) {
-            throw new Exception("No se pudo eliminar el producto.", 500);
-        }
-        $this->sendResponse(204, null);
     }
 
-    // --- Métodos de Ayuda ---
+    /**
+     * Obtiene productos agrupados por categoría (optimizado para menús)
+     * GET /api/productos/by-category
+     */
+    public function byCategory(): void
+    {
+        try {
+            $productos = $this->productoModel->findByCategory();
+            
+            if ($productos === false) {
+                throw new Exception("No se pudieron obtener los productos por categoría.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al obtener productos por categoría: " . $e->getMessage());
+        }
+    }
 
     /**
-     * Envía la respuesta HTTP en formato JSON y termina la ejecución del script.
+     * Busca productos por nombre
+     * GET /api/productos/search?q={termino}&limit={limite}
+     */
+    public function searchProducts(): void
+    {
+        try {
+            $query = $_GET['q'] ?? '';
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+            
+            if (empty($query)) {
+                throw new Exception("Se requiere un término de búsqueda.", 400);
+            }
+            
+            $productos = $this->productoModel->search($query, $limit);
+            
+            if ($productos === false) {
+                throw new Exception("Error en la búsqueda de productos.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error en la búsqueda: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Obtiene productos destacados
+     * GET /api/productos/featured?limit={limite}
+     */
+    public function featured(): void
+    {
+        try {
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 6;
+            $productos = $this->productoModel->findFeatured($limit);
+            
+            if ($productos === false) {
+                throw new Exception("No se pudieron obtener los productos destacados.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al obtener productos destacados: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualiza el estado de un producto
+     * PATCH /api/productos/{id}/status
+     */
+    public function updateProductStatus(int $id, array $data): void
+    {
+        try {
+            Validator::validate($data, ['estado' => 'required']);
+            
+            if (!$this->productoModel->updateStatus($id, $data['estado'])) {
+                throw new Exception("No se pudo actualizar el estado del producto.", 500);
+            }
+            
+            $this->sendResponse(200, ["mensaje" => "Estado del producto actualizado correctamente."]);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al actualizar estado: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Valida campos requeridos
+     */
+    private function validarCamposRequeridos(array $data, array $campos): void
+    {
+        foreach ($campos as $campo) {
+            if (!isset($data[$campo]) || $data[$campo] === '') {
+                throw new Exception("El campo '{$campo}' es obligatorio.", 400);
+            }
+        }
+    }
+
+    /**
+     * Envía respuesta JSON de éxito
      */
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);
         if ($statusCode !== 204) {
-            // CORRECCIÓN: Se estandariza la respuesta de éxito.
             echo json_encode(['success' => true, 'data' => $data]);
         }
+        exit;
+    }
+
+    /**
+     * Envía respuesta JSON de error
+     */
+    private function sendError(int $statusCode, string $message): void
+    {
+        http_response_code($statusCode);
+        echo json_encode(['success' => false, 'error' => $message]);
         exit;
     }
 }

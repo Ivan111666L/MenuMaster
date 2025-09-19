@@ -35,8 +35,7 @@ const updateMesa = async (id, mesaData) => {
  * @param {number} id - ID de la mesa a eliminar.
  */
 const deleteMesa = async (id) => {
-    // Llama a: DELETE /api/mesas/{id}
-    await api.delete(`/mesas/${id}`);
+  await api.delete(`/api/mesas/${id}`);
 };
 
 /**

@@ -106,6 +106,20 @@ const getCategorias = async () => {
 };
 
 /**
+ * Obtiene todos los ingredientes desde el backend.
+ * @returns {Promise<Array>} Lista de ingredientes
+ */
+const getIngredientes = async () => {
+  try {
+    const response = await api.get('/api/ingredientes');
+    return response.data.data;
+  } catch (error) {
+    console.error("Error al obtener ingredientes:", error);
+    return [];
+  }
+};
+
+/**
  * Actualiza la cantidad de un producto en inventario
  * @param {number} id - ID del producto
  * @param {number} cantidad - Nueva cantidad
@@ -128,6 +142,7 @@ const productoService = {
   updateProducto,
   deleteProducto,
   getCategorias,
+  getIngredientes,
   cambiarCantidad
 };
 

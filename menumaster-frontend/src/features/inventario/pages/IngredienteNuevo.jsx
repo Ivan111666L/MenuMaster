@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import '@/styles/global.css'; // Asegúrate de que los estilos globales estén importados
-// Estilos CSS dentro del componente para simplicidad
+import { crearIngrediente } from '@/services/ingredienteService';
+import '@/styles/global.css';
 
 const IngredienteNuevo = () => {
-    const API_URL = '/api/ingredientes'; // Endpoint donde tu router escuchará
-
     const initialState = {
         nombre: '',
         descripcion: '',
@@ -12,7 +10,7 @@ const IngredienteNuevo = () => {
         stock_actual: '',
         stock_minimo: '',
         precio_compra: '',
-        proveedor: ''
+        proveedor_nombre: ''
     };
 
     const [ingrediente, setIngrediente] = useState(initialState);
@@ -30,26 +28,17 @@ const IngredienteNuevo = () => {
         setMensaje(null);
 
         try {
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(ingrediente),
+            const nuevoIngrediente = await crearIngrediente(ingrediente);
+            setMensaje({ 
+                tipo: 'exito', 
+                texto: `Ingrediente "${nuevoIngrediente.nombre}" creado exitosamente.` 
             });
-            
-            const result = await response.json();
-
-            if (!response.ok) {
-                // Si la respuesta no es 2xx, lanzamos un error con el mensaje de la API
-                throw new Error(result.error || 'Ocurrió un error desconocido.');
-            }
-
-            setMensaje({ tipo: 'exito', texto: result.mensaje });
             setIngrediente(initialState); // Limpiar el formulario
 
         } catch (error) {
-            setMensaje({ tipo: 'error', texto: error.message });
+            console.error('Error al crear ingrediente:', error);
+            const errorMessage = error.response?.data?.error || error.message || 'Error al crear el ingrediente';
+            setMensaje({ tipo: 'error', texto: errorMessage });
         } finally {
             setIsLoading(false);
         }
@@ -94,8 +83,8 @@ const IngredienteNuevo = () => {
                             </div>
 
                             <div className="form-group">
-                                <label htmlFor="proveedor">Proveedor</label>
-                                <input type="text" id="proveedor" name="proveedor" value={ingrediente.proveedor} onChange={handleInputChange} />
+                                <label htmlFor="proveedor_nombre">Proveedor</label>
+                                <input type="text" id="proveedor_nombre" name="proveedor_nombre" value={ingrediente.proveedor_nombre} onChange={handleInputChange} />
                             </div>
 
                             <div className="form-group">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import dashboardService from '@/features/dashboard/services/dashboardService';
 import Spinner from '@/components/Spinner';
@@ -11,61 +11,129 @@ function Dashboard() {
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [lastUpdated, setLastUpdated] = useState(null);
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    // Función para cargar datos del dashboard
+    const fetchData = useCallback(async (showRefreshIndicator = false) => {
+        try {
+            if (showRefreshIndicator) {
+                setIsRefreshing(true);
+            } else {
+                setIsLoading(true);
+            }
+            
+            setError(null);
+            const summaryData = await dashboardService.getSummary();
+            setData(summaryData);
+            setLastUpdated(new Date());
+        } catch (err) {
+            setError('No se pudieron cargar los datos del dashboard.');
+            console.error('Dashboard fetch error:', err);
+            
+            // Si no tenemos datos, usar datos por defecto
+            if (!data) {
+                setData(dashboardService.getDefaultDashboardData());
+            }
+        } finally {
+            setIsLoading(false);
+            setIsRefreshing(false);
+        }
+    }, [data]);
 
     // useEffect para cargar los datos cuando el componente se monta
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const summaryData = await dashboardService.getSummary();
-                setData(summaryData);
-            } catch (err) {
-                setError('No se pudieron cargar los datos del dashboard.');
-                console.error(err);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
         fetchData();
-    }, []); // El array vacío asegura que se ejecute solo una vez
+    }, [fetchData]);
+
+    // useEffect para auto-refresh cada 30 segundos
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isLoading && !isRefreshing) {
+                fetchData(true); // Usar indicador de refresh
+            }
+        }, 30000); // 30 segundos
+
+        return () => clearInterval(interval);
+    }, [fetchData, isLoading, isRefreshing]);
+
+    // Función para refresh manual
+    const handleManualRefresh = () => {
+        fetchData(true);
+    };
 
     // 1. Mientras carga, mostramos el Spinner
-    if (isLoading) {
+    if (isLoading && !data) {
         return <Spinner />;
     }
 
-    // 2. Si hay un error, mostramos un mensaje
-    if (error) {
-        return <div className="error-message">{error}</div>;
+    // 2. Si hay un error y no tenemos datos, mostramos un mensaje
+    if (error && !data) {
+        return (
+            <div className="error-message">
+                <p>{error}</p>
+                <button onClick={() => fetchData()} className="retry-button">
+                    Reintentar
+                </button>
+            </div>
+        );
     }
     
     // 3. Si todo está bien, mostramos el dashboard con los datos reales
-    const maxSales = data ? Math.max(...data.ventasSemanales.map(d => d.sales)) : 0;
+    const maxSales = data && data.ventasSemanales ? Math.max(...data.ventasSemanales.map(d => d.sales)) : 0;
 
     return (
         <div className="dashboard-app">
             <div className="main-content">
                 <header className="dashboard-header">
-                    <h1>Panel de Control</h1>
-                    <p>Bienvenido de nuevo, {user?.nombre || 'usuario'}.</p>
+                    <div>
+                        <h1>Panel de Control</h1>
+                        <p>Bienvenido de nuevo, {user?.nombre || 'usuario'}.</p>
+                    </div>
+                    <div className="dashboard-actions">
+                        {lastUpdated && (
+                            <span className="last-updated">
+                                Última actualización: {lastUpdated.toLocaleTimeString()}
+                            </span>
+                        )}
+                        <button 
+                            onClick={handleManualRefresh} 
+                            className={`refresh-button ${isRefreshing ? 'refreshing' : ''}`}
+                            disabled={isRefreshing}
+                        >
+                            {isRefreshing ? '🔄' : '↻'} {isRefreshing ? 'Actualizando...' : 'Actualizar'}
+                        </button>
+                    </div>
                 </header>
+
+                {error && (
+                    <div className="error-banner">
+                        ⚠️ {error} - Mostrando últimos datos disponibles
+                    </div>
+                )}
 
                 <div className="dashboard-widgets">
                     <div className="widget">
                         <h3>Pedidos Activos</h3>
-                        <p className="widget-value">{data.pedidosActivos}</p>
+                        <p className="widget-value">{data?.pedidosActivos || 0}</p>
+                        <span className="widget-subtitle">En preparación</span>
                     </div>
                     <div className="widget">
                         <h3>Ventas del Día</h3>
-                        <p className="widget-value">${data.ventasDia.toLocaleString('es-CO')}</p>
+                        <p className="widget-value">${(data?.ventasDia || 0).toLocaleString('es-CO')}</p>
+                        <span className="widget-subtitle">Ingresos hoy</span>
                     </div>
                     <div className="widget">
                         <h3>Mesas Ocupadas</h3>
-                        <p className="widget-value">{`${data.mesasOcupadas}/${data.mesasTotales}`}</p>
+                        <p className="widget-value">{`${data?.mesasOcupadas || 0}/${data?.mesasTotales || 0}`}</p>
+                        <span className="widget-subtitle">
+                            {data?.mesasTotales > 0 ? `${Math.round((data.mesasOcupadas / data.mesasTotales) * 100)}% ocupación` : 'Sin datos'}
+                        </span>
                     </div>
                     <div className="widget">
                         <h3>Inventario Bajo</h3>
-                        <p className="widget-value">{data.inventarioBajo} items</p>
+                        <p className="widget-value">{data?.inventarioBajo || 0} items</p>
+                        <span className="widget-subtitle">Requieren restock</span>
                     </div>
                 </div>
 
@@ -73,27 +141,35 @@ function Dashboard() {
                     <div className="chart-container">
                         <h3>Ventas de la Última Semana</h3>
                         <div className="sales-chart">
-                            {data.ventasSemanales.map(d => (
-                                <div key={d.day} className="chart-bar-group" title={`$${d.sales.toLocaleString('es-CO')}`}>
-                                    <div 
-                                        className="chart-bar" 
-                                        style={{ height: maxSales > 0 ? `${(d.sales / maxSales) * 100}%` : '0%' }}
-                                    ></div>
-                                    <span className="chart-label">{d.day}</span>
-                                </div>
-                            ))}
+                            {data?.ventasSemanales && data.ventasSemanales.length > 0 ? (
+                                data.ventasSemanales.map((d, index) => (
+                                    <div key={index} className="chart-bar-group" title={`$${(d.sales || 0).toLocaleString('es-CO')}`}>
+                                        <div 
+                                            className="chart-bar" 
+                                            style={{ height: maxSales > 0 ? `${(d.sales / maxSales) * 100}%` : '5%' }}
+                                        ></div>
+                                        <span className="chart-label">{d.day}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="no-data">No hay datos de ventas disponibles</div>
+                            )}
                         </div>
                     </div>
                     <div className="top-products-container">
                         <h3>Productos Populares</h3>
-                        <ul className="product-list">
-                            {data.topProductos.sort((a,b) => b.sales - a.sales).map(product => (
-                                 <li key={product.id}>
-                                    <span className="product-name">{product.name}</span>
-                                    <span className="product-sales">{product.sales} vendidos</span>
-                                </li>
-                            ))}
-                        </ul>
+                        {data?.topProductos && data.topProductos.length > 0 ? (
+                            <ul className="product-list">
+                                {data.topProductos.map((product, index) => (
+                                     <li key={product.id || index}>
+                                        <span className="product-name">{product.name || 'Producto sin nombre'}</span>
+                                        <span className="product-sales">{product.sales || 0} vendidos</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <div className="no-data">No hay datos de productos disponibles</div>
+                        )}
                     </div>
                 </div>
             </div>
