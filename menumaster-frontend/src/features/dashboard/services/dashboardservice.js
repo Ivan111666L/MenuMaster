@@ -7,7 +7,7 @@ import api from '@/services/api';
  */
 const getSummary = async () => {
     try {
-        const response = await api.get('/api/dashboard/summary');
+        const response = await api.get('/dashboard/summary');
         
         // Verificar que tenemos la estructura esperada
         if (response.data && response.data.success && response.data.data) {

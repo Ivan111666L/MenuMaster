@@ -45,7 +45,7 @@ export const getProductosByCategoria = async (categoriaId) => {
 
 export const getCategorias = async () => {
   try {
-    const response = await api.get('/api/categorias');
+    const response = await api.get('/categorias');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener categorías:", error);

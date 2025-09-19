@@ -24,7 +24,7 @@ async function handleRequest(request) {
  */
 const getProductos = async () => {
   try {
-    const response = await api.get('/api/productos');
+    const response = await api.get('/productos');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener productos:", error);
@@ -54,7 +54,7 @@ const getProductoById = async (id) => {
  */
 const createProducto = async (productoData) => {
   try {
-    const response = await api.post('/api/productos', productoData);
+    const response = await api.post('/productos', productoData);
     return { "data": { ...response.data.data } };
   } catch (error) {
     console.error("Error al crear producto:", error.response?.data || error.message);
@@ -97,7 +97,7 @@ const deleteProducto = async (id) => {
  */
 const getCategorias = async () => {
   try {
-    const response = await api.get('/api/categorias');
+    const response = await api.get('/categorias');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener categorías:", error);
@@ -111,7 +111,7 @@ const getCategorias = async () => {
  */
 const getIngredientes = async () => {
   try {
-    const response = await api.get('/api/ingredientes');
+    const response = await api.get('/ingredientes');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener ingredientes:", error);
