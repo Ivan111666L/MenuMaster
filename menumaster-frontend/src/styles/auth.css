@@ -27,6 +27,23 @@
 .auth-logo {
     max-width: 120px;
     height: auto;
+/* Responsive para auth */
+@media (max-width: 600px) {
+    .auth-form-container {
+        padding: 1rem;
+        border-radius: 8px;
+        max-width: 98vw;
+    }
+    .auth-logo {
+        max-width: 80px;
+    }
+    .auth-title {
+        font-size: 1.3rem;
+    }
+    .auth-subtitle {
+        font-size: 0.95rem;
+    }
+}
 }
 
 .auth-title {

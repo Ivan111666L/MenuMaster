@@ -23,6 +23,7 @@ const Layout = () => {
                 { path: "/inventario", label: "Inventario", icon: <FaClipboardList /> },
                 { path: "/facturacion", label: "Facturación", icon: <FaChartBar /> },
                 { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
+                { path: "/mesas", label: "Mesas", icon: <FaFileInvoiceDollar /> },
                 { path: "/configuracion", label: "Configuracion", icon: <FaCog /> }, // Ruta para gestionar usuarios
             ],
             mesero: [

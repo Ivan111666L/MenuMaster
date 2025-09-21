@@ -52,9 +52,16 @@ const getIngredienteById = async (id) => {
 const crearIngrediente = async (ingredienteData) => {
   try {
     const response = await api.post('/ingredientes', ingredienteData);
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error || 'Error al crear ingrediente');
+    }
   } catch (error) {
-    console.error("Error al crear ingrediente:", error);
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
+    console.error("Error al crear ingrediente:", error.response?.data?.error || error.message);
     throw error;
   }
 };

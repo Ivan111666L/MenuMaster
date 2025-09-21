@@ -25,9 +25,19 @@ async function handleRequest(request) {
 const getProductos = async () => {
   try {
     const response = await api.get('/productos');
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      console.error("Error al obtener productos:", response.data.error || response.statusText);
+      return [];
+    }
   } catch (error) {
-    console.error("Error al obtener productos:", error);
+    // Si la respuesta es HTML, muestra un error claro
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      console.error("Error: El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.");
+    } else {
+      console.error("Error al obtener productos:", error);
+    }
     return [];
   }
 };
@@ -40,8 +50,15 @@ const getProductos = async () => {
 const getProductoById = async (id) => {
   try {
     const response = await api.get(`/api/productos/${id}`);
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error || 'Error al obtener el producto');
+    }
   } catch (error) {
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
     console.error(`Error al obtener el producto ${id}:`, error);
     throw error;
   }
@@ -55,8 +72,15 @@ const getProductoById = async (id) => {
 const createProducto = async (productoData) => {
   try {
     const response = await api.post('/productos', productoData);
-    return { "data": { ...response.data.data } };
+    if (response.data && response.data.success) {
+      return { "data": { ...response.data.data } };
+    } else {
+      throw new Error(response.data.error || 'Error al crear producto');
+    }
   } catch (error) {
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
     console.error("Error al crear producto:", error.response?.data || error.message);
     throw error;
   }
@@ -71,8 +95,15 @@ const createProducto = async (productoData) => {
 const updateProducto = async (id, productoData) => {
   try {
     const response = await api.put(`/api/productos/${id}`, productoData);
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error || 'Error al actualizar el producto');
+    }
   } catch (error) {
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
     console.error(`Error al actualizar el producto ${id}:`, error);
     throw error;
   }
@@ -84,8 +115,16 @@ const updateProducto = async (id, productoData) => {
  */
 const deleteProducto = async (id) => {
   try {
-    await api.delete(`/api/productos/${id}`);
+    const response = await api.delete(`/api/productos/${id}`);
+    if (response.data && response.data.success) {
+      return true;
+    } else {
+      throw new Error(response.data.error || 'Error al eliminar el producto');
+    }
   } catch (error) {
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
     console.error(`Error al eliminar el producto ${id}:`, error);
     throw error;
   }
@@ -98,9 +137,18 @@ const deleteProducto = async (id) => {
 const getCategorias = async () => {
   try {
     const response = await api.get('/categorias');
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      console.error("Error al obtener categorías:", response.data.error || response.statusText);
+      return [];
+    }
   } catch (error) {
-    console.error("Error al obtener categorías:", error);
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      console.error("Error: El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.");
+    } else {
+      console.error("Error al obtener categorías:", error);
+    }
     return [];
   }
 };
@@ -112,9 +160,18 @@ const getCategorias = async () => {
 const getIngredientes = async () => {
   try {
     const response = await api.get('/ingredientes');
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      console.error("Error al obtener ingredientes:", response.data.error || response.statusText);
+      return [];
+    }
   } catch (error) {
-    console.error("Error al obtener ingredientes:", error);
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      console.error("Error: El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.");
+    } else {
+      console.error("Error al obtener ingredientes:", error);
+    }
     return [];
   }
 };

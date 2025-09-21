@@ -107,13 +107,7 @@ class ProductoModel
             }
             $stmt->execute();
             $id = (int)$this->conn->lastInsertId();
-            // Recupera el producto recién creado como array
-            $producto = $this->find($id);
-            if ($producto) {
-                return $producto;
-            } else {
-                return false;
-            }
+            return $id > 0 ? $id : false;
         } catch (PDOException $e) {
             error_log('Error en ProductoModel::create: ' . $e->getMessage());
             return false;

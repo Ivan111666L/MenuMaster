@@ -1,8 +1,12 @@
+// --- Componente para seleccionar ingredientes ---
+// Permite al usuario elegir ingredientes y cantidades para un producto.
 import React, { useState, useEffect } from 'react';
 import ingredienteService from '@/features/inventario/services/ingredienteService';
 import Button from '@/components/Button';
 import '@/styles/productos.css';
 
+// --- Componente principal ---
+// Gestiona la selección, búsqueda y cantidad de ingredientes.
 function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados = [] }) {
   const [ingredientes, setIngredientes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,6 +17,8 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
   );
 
   // Cargar ingredientes al montar el componente
+  // --- Cargar ingredientes al montar el componente ---
+  // Obtiene la lista de ingredientes desde el backend.
   useEffect(() => {
     const cargarIngredientes = async () => {
       try {
@@ -31,11 +37,17 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
   }, []);
 
   // Filtrar ingredientes por búsqueda
-  const ingredientesFiltrados = ingredientes.filter(ingrediente =>
-    ingrediente.nombre.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  // --- Filtrar ingredientes por búsqueda ---
+  // Permite buscar ingredientes por nombre.
+  const ingredientesFiltrados = Array.isArray(ingredientes)
+    ? ingredientes.filter(ingrediente =>
+        ingrediente.nombre && ingrediente.nombre.toLowerCase().includes(busqueda.toLowerCase())
+      )
+    : [];
 
   // Manejar selección/deselección de ingredientes
+  // --- Manejar selección/deselección de ingredientes ---
+  // Permite agregar o quitar ingredientes seleccionados.
   const toggleIngrediente = (ingrediente) => {
     const yaSeleccionado = ingredientesSeleccionadosInternos.find(
       ing => ing.id === ingrediente.id
@@ -60,6 +72,8 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
   };
 
   // Actualizar cantidad de un ingrediente seleccionado
+  // --- Actualizar cantidad de un ingrediente seleccionado ---
+  // Permite modificar la cantidad de cada ingrediente elegido.
   const actualizarCantidad = (ingredienteId, nuevaCantidad) => {
     const nuevosSeleccionados = ingredientesSeleccionadosInternos.map(ing =>
       ing.id === ingredienteId
@@ -71,6 +85,8 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
     onIngredientesChange(nuevosSeleccionados);
   };
 
+  // --- Renderizado condicional ---
+  // Muestra mensajes de carga o error si corresponde.
   if (loading) {
     return <div className="selector-ingredientes-loading">Cargando ingredientes...</div>;
   }
@@ -79,6 +95,8 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
     return <div className="selector-ingredientes-error">{error}</div>;
   }
 
+  // --- Renderizado del selector ---
+  // Muestra la interfaz para buscar, seleccionar y ajustar ingredientes.
   return (
     <div className="selector-ingredientes">
       <h3>Seleccionar Ingredientes</h3>

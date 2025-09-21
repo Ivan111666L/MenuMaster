@@ -67,7 +67,6 @@ function ProductosCreados() {
                     value={busqueda}
                     onChange={(e) => setBusqueda(e.target.value)}
                 />
-                
                 <div className="productos-table-wrapper">
                     <table className="productos-table">
                         <thead>
@@ -93,6 +92,14 @@ function ProductosCreados() {
                                             className="btn-eliminar"
                                         >
                                             Eliminar
+                                        </Button>
+                                        <Button
+                                            onClick={() => window.location.href = `/productos/${producto.id}/editar-ingredientes`}
+                                            variant="secondary"
+                                            className="btn-editar"
+                                            style={{ marginLeft: '8px' }}
+                                        >
+                                            Editar Ingredientes
                                         </Button>
                                     </td>
                                 </tr>

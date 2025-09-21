@@ -41,6 +41,8 @@ export const usePedido = () => {
     const [pedidoActual, setPedidoActual] = useState({ mesa_id: '', items: [], notas: '' });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [ticketHtml, setTicketHtml] = useState(null);
+    const [ticketOpen, setTicketOpen] = useState(false);
 
     // --- Carga de Datos ---
     const fetchData = useCallback(async () => {
@@ -113,10 +115,10 @@ export const usePedido = () => {
         try {
             setLoading(true);
             const pedidoCreado = await pedidoService.createPedido(pedidoActual);
-            
-            // Se conserva la lógica de impresión
-            generarTicketCocina(pedidoCreado);
-            
+            // Obtener el ticket HTML desde el backend
+            const ticketData = await pedidoService.getPedidoTicket(pedidoCreado.id);
+            setTicketHtml(ticketData.html);
+            setTicketOpen(true);
             toast.success('¡Pedido enviado a cocina exitosamente!');
             setPedidoActual({ mesa_id: '', items: [], notas: '' });
         } catch (err) {
@@ -157,6 +159,9 @@ export const usePedido = () => {
         agregarItem: addProducto,
         eliminarItem,
         limpiarPedido,
-        enviarPedido
+        enviarPedido,
+        ticketHtml,
+        ticketOpen,
+        setTicketOpen
     };
 };

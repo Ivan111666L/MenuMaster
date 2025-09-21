@@ -1,5 +1,8 @@
 <?php
 namespace app\Controllers;
+// --- Controlador de Productos ---
+// Este archivo gestiona toda la lógica relacionada con los productos: crear, consultar, actualizar y eliminar.
+// Se conecta con los modelos y responde a las peticiones del backend.
 
 use app\Models\ProductoModel;
 use app\Models\ProductoIngredientesModel;
@@ -9,6 +12,7 @@ use app\Utils\Validator;
 use PDO;
 use Exception;
 
+// Clase principal que gestiona los productos en el sistema.
 class ProductoController
 {
     private $db;
@@ -17,6 +21,8 @@ class ProductoController
     private $categoriaModel;
     private $estadoProductoModel;
 
+    // --- Constructor ---
+    // Inicializa los modelos y la conexión a la base de datos.
     public function __construct(PDO $db)
     {
         $this->db = $db;
@@ -30,6 +36,8 @@ class ProductoController
      * Obtiene todos los productos
      * GET /api/productos
      */
+    // --- Listar productos ---
+    // Devuelve todos los productos registrados en la base de datos.
     public function index(): void
     {
         try {
@@ -50,6 +58,8 @@ class ProductoController
      * Obtiene un producto específico con sus ingredientes
      * GET /api/productos/{id}
      */
+    // --- Consultar producto por ID ---
+    // Devuelve la información de un producto específico, incluyendo sus ingredientes.
     public function show(int $id): void
     {
         try {
@@ -78,6 +88,8 @@ class ProductoController
      * Crea un nuevo producto con ingredientes
      * POST /api/productos
      */
+    // --- Crear producto ---
+    // Recibe los datos de un nuevo producto y lo guarda en la base de datos, junto con sus ingredientes.
     public function store(): void
     {
         try {
@@ -158,6 +170,8 @@ class ProductoController
      * Actualiza un producto existente
      * PUT /api/productos/{id}
      */
+    // --- Actualizar producto ---
+    // Modifica los datos de un producto existente y actualiza sus ingredientes si es necesario.
     public function update(int $id): void
     {
         try {
@@ -208,6 +222,8 @@ class ProductoController
      * Elimina un producto
      * DELETE /api/productos/{id}
      */
+    // --- Eliminar producto ---
+    // Elimina un producto de la base de datos.
     public function destroy(int $id): void
     {
         try {
@@ -229,6 +245,8 @@ class ProductoController
      * Obtiene productos agrupados por categoría (optimizado para menús)
      * GET /api/productos/by-category
      */
+    // --- Listar productos por categoría ---
+    // Devuelve los productos agrupados por categoría para mostrar en menús.
     public function byCategory(): void
     {
         try {
@@ -248,6 +266,8 @@ class ProductoController
      * Busca productos por nombre
      * GET /api/productos/search?q={termino}&limit={limite}
      */
+    // --- Buscar productos ---
+    // Permite buscar productos por nombre y limitar la cantidad de resultados.
     public function searchProducts(): void
     {
         try {
@@ -274,6 +294,8 @@ class ProductoController
      * Obtiene productos destacados
      * GET /api/productos/featured?limit={limite}
      */
+    // --- Productos destacados ---
+    // Devuelve los productos marcados como destacados para mostrar en la portada o menú principal.
     public function featured(): void
     {
         try {
@@ -294,6 +316,8 @@ class ProductoController
      * Actualiza el estado de un producto
      * PATCH /api/productos/{id}/status
      */
+    // --- Actualizar estado de producto ---
+    // Permite cambiar el estado (disponible/no disponible) de un producto.
     public function updateProductStatus(int $id, array $data): void
     {
         try {
@@ -312,6 +336,8 @@ class ProductoController
     /**
      * Valida campos requeridos
      */
+    // --- Validar campos requeridos ---
+    // Verifica que los datos obligatorios estén presentes antes de guardar o actualizar.
     private function validarCamposRequeridos(array $data, array $campos): void
     {
         foreach ($campos as $campo) {
@@ -324,6 +350,8 @@ class ProductoController
     /**
      * Envía respuesta JSON de éxito
      */
+    // --- Enviar respuesta JSON de éxito ---
+    // Envía una respuesta JSON al frontend cuando la operación fue exitosa.
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);
@@ -336,6 +364,8 @@ class ProductoController
     /**
      * Envía respuesta JSON de error
      */
+    // --- Enviar respuesta JSON de error ---
+    // Envía una respuesta JSON al frontend cuando ocurre un error.
     private function sendError(int $statusCode, string $message): void
     {
         http_response_code($statusCode);

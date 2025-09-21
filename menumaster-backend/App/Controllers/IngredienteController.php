@@ -1,6 +1,8 @@
 <?php
 namespace app\Controllers;
-
+// --- Controlador de Ingredientes ---
+// Este archivo gestiona toda la lógica relacionada con los ingredientes: crear, consultar, actualizar y eliminar.
+// Se conecta con los modelos y responde a las peticiones del backend.
 // Importamos los modelos que vamos a necesitar
 use app\Models\IngredienteModel;
 use app\Models\ProveedorModel;
@@ -8,6 +10,7 @@ use app\Models\EstadoGeneralModel;
 use PDO;
 use Exception;
 
+// Clase principal que gestiona los ingredientes en el sistema.
 class IngredienteController
 {
     private $db;
@@ -15,6 +18,8 @@ class IngredienteController
     private $proveedorModel;
     private $estadoGeneralModel;
 
+    // --- Constructor ---
+    // Inicializa los modelos y la conexión a la base de datos.
     public function __construct(PDO $db)
     {
         $this->db = $db;
@@ -27,6 +32,8 @@ class IngredienteController
      * Obtiene una lista de todos los ingredientes.
      * Corresponde a: GET /api/ingredientes
      */
+    // --- Listar ingredientes ---
+    // Devuelve todos los ingredientes registrados en la base de datos.
     public function index(): void
     {
         $ingredientes = $this->ingredienteModel->findAll();
@@ -40,6 +47,8 @@ class IngredienteController
      * Obtiene un único ingrediente por su ID.
      * Corresponde a: GET /api/ingredientes/{id}
      */
+    // --- Consultar ingrediente por ID ---
+    // Devuelve la información de un ingrediente específico.
     public function show(int $id): void
     {
         $ingrediente = $this->ingredienteModel->find($id);
@@ -53,6 +62,8 @@ class IngredienteController
      * Crea un nuevo ingrediente.
      * Corresponde a: POST /api/ingredientes
      */
+    // --- Crear ingrediente ---
+    // Recibe los datos de un nuevo ingrediente y lo guarda en la base de datos.
     public function store(array $data): void
     {
         $this->validarCampos($data, ['nombre', 'unidad_medida', 'stock_actual', 'stock_minimo']);
@@ -60,13 +71,15 @@ class IngredienteController
         $datosParaCrear = [
             'nombre' => $data['nombre'],
             'unidad_medida' => $data['unidad_medida'],
-            'stock_actual' => $data['stock_actual'],
-            'stock_minimo' => $data['stock_minimo'],
-            'descripcion' => $data['descripcion'] ?? null,
-            'precio_compra' => $data['precio_compra'] ?? null,
+            'stock_actual' => ($data['stock_actual'] === '' ? null : $data['stock_actual']),
+            'stock_minimo' => ($data['stock_minimo'] === '' ? null : $data['stock_minimo']),
+            'descripcion' => (isset($data['descripcion']) && $data['descripcion'] === '' ? null : ($data['descripcion'] ?? null)),
+            'precio_compra' => (isset($data['precio_compra']) && $data['precio_compra'] === '' ? null : ($data['precio_compra'] ?? null)),
+            // Si no se envía proveedor, se guarda como null
+            'proveedor_id' => null,
         ];
 
-        // Manejar relaciones: proveedor y estado
+        // Si se envía proveedor_nombre, buscar el id
         if (!empty($data['proveedor_nombre'])) {
             $proveedor = $this->proveedorModel->findByName($data['proveedor_nombre']);
             if (!$proveedor) throw new Exception("El proveedor '{$data['proveedor_nombre']}' no existe.", 400);
@@ -76,20 +89,30 @@ class IngredienteController
         $estadoActivo = $this->estadoGeneralModel->findByName('activo');
         if (!$estadoActivo) throw new Exception("El estado 'activo' no está configurado.", 500);
         $datosParaCrear['estado_id'] = $estadoActivo['id'];
-        
-        $nuevoId = $this->ingredienteModel->create($datosParaCrear);
-        if (!$nuevoId) {
-            throw new Exception("No se pudo crear el ingrediente.", 500);
-        }
 
-        $nuevoIngrediente = $this->ingredienteModel->find($nuevoId);
-        $this->sendResponse(201, $nuevoIngrediente);
+        try {
+            $nuevoId = $this->ingredienteModel->create($datosParaCrear);
+            if (!$nuevoId) {
+                throw new Exception("No se pudo crear el ingrediente.", 500);
+            }
+            $nuevoIngrediente = $this->ingredienteModel->find($nuevoId);
+            $this->sendResponse(201, $nuevoIngrediente);
+        } catch (\Throwable $e) {
+            http_response_code(500);
+            echo json_encode([
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            exit;
+        }
     }
 
     /**
      * Actualiza un ingrediente existente.
      * Corresponde a: PUT /api/ingredientes/{id}
      */
+    // --- Actualizar ingrediente ---
+    // Modifica los datos de un ingrediente existente.
     public function update(int $id, array $data): void
     {
         if (empty($data)) {
@@ -128,6 +151,8 @@ class IngredienteController
      * Elimina un ingrediente.
      * Corresponde a: DELETE /api/ingredientes/{id}
      */
+    // --- Eliminar ingrediente ---
+    // Elimina un ingrediente de la base de datos.
     public function destroy(int $id): void
     {
         if (!$this->ingredienteModel->find($id)) {
@@ -140,6 +165,8 @@ class IngredienteController
     }
 
     // --- Métodos de Ayuda ---
+    // --- Validar campos requeridos ---
+    // Verifica que los datos obligatorios estén presentes antes de guardar o actualizar.
     private function validarCampos(array $data, array $camposRequeridos): void
     {
         foreach ($camposRequeridos as $campo) {
@@ -149,6 +176,8 @@ class IngredienteController
         }
     }
 
+    // --- Enviar respuesta JSON de éxito ---
+    // Envía una respuesta JSON al frontend cuando la operación fue exitosa.
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);

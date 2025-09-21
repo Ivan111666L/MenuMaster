@@ -28,7 +28,12 @@ const IngredienteNuevo = () => {
         setMensaje(null);
 
         try {
-            const nuevoIngrediente = await crearIngrediente(ingrediente);
+            // Copia el objeto y elimina proveedor_nombre si está vacío
+            const payload = { ...ingrediente };
+            if (!payload.proveedor_nombre || payload.proveedor_nombre.trim() === '') {
+                delete payload.proveedor_nombre;
+            }
+            const nuevoIngrediente = await crearIngrediente(payload);
             setMensaje({ 
                 tipo: 'exito', 
                 texto: `Ingrediente "${nuevoIngrediente.nombre}" creado exitosamente.` 

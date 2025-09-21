@@ -4,8 +4,64 @@ namespace app\Models;
 use PDO;
 use PDOException;
 
-class ProveedorModel 
-{
+class ProveedorModel {
+    /**
+     * Asocia un ingrediente a un proveedor
+     * @param int $proveedor_id
+     * @param int $ingrediente_id
+     * @return bool
+     */
+    public function asociarIngrediente(int $proveedor_id, int $ingrediente_id): bool
+    {
+        $sql = "UPDATE ingredientes SET proveedor_id = :proveedor_id WHERE id = :ingrediente_id";
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':proveedor_id', $proveedor_id, PDO::PARAM_INT);
+            $stmt->bindParam(':ingrediente_id', $ingrediente_id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorModel::asociarIngrediente: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Desasocia un ingrediente de cualquier proveedor
+     * @param int $ingrediente_id
+     * @return bool
+     */
+    public function desasociarIngrediente(int $ingrediente_id): bool
+    {
+        $sql = "UPDATE ingredientes SET proveedor_id = NULL WHERE id = :ingrediente_id";
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':ingrediente_id', $ingrediente_id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorModel::desasociarIngrediente: ' . $e->getMessage());
+            return false;
+        }
+    }
+    // ...existing code...
+
+    /**
+     * Obtener ingredientes que maneja el proveedor
+     * @param int $proveedor_id
+     * @return array|false
+     */
+    public function getIngredientes(int $proveedor_id): array|false
+    {
+        $sql = "SELECT i.* FROM ingredientes i WHERE i.proveedor_id = :proveedor_id";
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':proveedor_id', $proveedor_id, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en ProveedorModel::getIngredientes: ' . $e->getMessage());
+            return false;
+        }
+    }
     private $conn;
     private $table_name = "proveedores";
 
