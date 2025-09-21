@@ -18,8 +18,17 @@ export const getProductos = async () => {
     }
   } catch (error) {
     console.error('Error al obtener productos:', error);
-    // En caso de error, devolvemos un array vacío para evitar errores en la UI
     return [];
+  }
+};
+
+export const crearProducto = async (productoData) => {
+  try {
+    const response = await api.post('/productos', productoData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    throw error;
   }
 };
 

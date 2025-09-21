@@ -1,17 +1,24 @@
 <?php
 
 // ===== INICIO DEL CÓDIGO CORS =====
-// Permitir solicitudes desde tu frontend (ajusta el puerto si es diferente)
-header("Access-Control-Allow-Origin: http://localhost:5173");
+// Permitir solicitudes desde tu frontend
+$allowedOrigins = ['http://localhost:5173'];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
+}
+
 // Permitir los métodos HTTP que tu API utiliza
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
-// Permitir las cabeceras que el frontend pueda enviar (Authorization es clave para tokens)
+// Permitir las cabeceras necesarias y credenciales
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
+header('Access-Control-Max-Age: 86400'); // 24 horas
 
-// Manejar la solicitud de pre-vuelo (preflight) del navegador
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    // No es necesario procesar nada más, solo enviar las cabeceras y salir.
-    http_response_code(204); // 204 No Content
+// Manejar la solicitud de pre-vuelo (preflight)
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
     exit;
 }
 // ===== FIN DEL CÓDIGO CORS =====

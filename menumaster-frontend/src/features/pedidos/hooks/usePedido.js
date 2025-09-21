@@ -11,14 +11,18 @@ const generarTicketCocina = (pedidoCompleto) => {
     ticket += `Pedido: #${pedidoCompleto.id}\n`;
     ticket += `Hora: ${new Date(pedidoCompleto.fecha_creacion).toLocaleTimeString()}\n`;
     ticket += "--------------------------------\n";
-    
+
     pedidoCompleto.items.forEach(item => {
-        ticket += `${item.cantidad} x ${item.nombre_producto}\n`;
+        ticket += `${item.cantidad} x ${item.nombre_producto || item.nombre} `;
+        if (item.notas) {
+            ticket += ` [Notas: ${item.notas}]`;
+        }
+        ticket += "\n";
     });
 
     if (pedidoCompleto.notas) {
         ticket += "--------------------------------\n";
-        ticket += `NOTAS: ${pedidoCompleto.notas}\n`;
+        ticket += `NOTAS GENERALES: ${pedidoCompleto.notas}\n`;
     }
     ticket += "================================\n";
     imprimirContenido(ticket);
@@ -105,6 +109,7 @@ export const usePedido = () => {
                     : item
             )
         }));
+<<<<<<< HEAD
     };
 
     const savePedido = async () => {
@@ -138,6 +143,41 @@ export const usePedido = () => {
 
     const enviarPedido = async () => {
         await savePedido();
+=======
+    };
+
+    const savePedido = async () => {
+        if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
+            toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
+            return;
+        }
+        try {
+            setLoading(true);
+            const pedidoCreado = await pedidoService.createPedido(pedidoActual);
+            
+            // Se conserva la lógica de impresión
+            generarTicketCocina(pedidoCreado);
+            
+            toast.success('¡Pedido enviado a cocina exitosamente!');
+            setPedidoActual({ mesa_id: '', items: [], notas: '' });
+        } catch (err) {
+            toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
+        } finally {
+            setLoading(false);
+        }
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
+    };
+    
+    const eliminarItem = (productoId) => {
+        removeProducto(productoId);
+    };
+
+    const limpiarPedido = () => {
+        setPedidoActual({ mesa_id: '', items: [], notas: '' });
+    };
+
+    const enviarPedido = async () => {
+        await savePedido();
     };
     
     // Devolvemos todo lo que los componentes necesitan
@@ -159,9 +199,13 @@ export const usePedido = () => {
         agregarItem: addProducto,
         eliminarItem,
         limpiarPedido,
+<<<<<<< HEAD
         enviarPedido,
         ticketHtml,
         ticketOpen,
         setTicketOpen
+=======
+        enviarPedido
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     };
 };

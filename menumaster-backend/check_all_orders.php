@@ -3,7 +3,11 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 require_once __DIR__ . '/App/config/conexionDb.php';
+<<<<<<< HEAD
 use app\config\ConexionDb;
+=======
+use App\Config\ConexionDb;
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
 $db = ConexionDb::getConnection();
 
 echo "=== ALL RECENT ORDERS ===\n";

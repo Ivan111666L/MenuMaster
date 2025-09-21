@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import api from '@/services/api'; // Importar la instancia central de Axios
 
 const getAllIngredientes = async () => {
@@ -6,10 +7,21 @@ const getAllIngredientes = async () => {
     return response.data.data;
   } catch (error) {
     console.error('Error al obtener todos los ingredientes:', error);
+=======
+import api from '@/services/api';
+
+export const crearIngrediente = async (ingredienteData) => {
+  try {
+    const response = await api.post('/api/ingredientes', ingredienteData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear ingrediente:', error);
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     throw error;
   }
 };
 
+<<<<<<< HEAD
 
 const getIngredienteById = async (id) => {
   try {
@@ -68,3 +80,63 @@ export {
   eliminarIngrediente, 
   cambiarCantidad 
 };;
+=======
+const ingredienteService = {
+  async getIngredientes() {
+    try {
+      const response = await api.get('/api/ingredientes');
+      return response.data || [];
+    } catch (error) {
+      console.error('Error al obtener los ingredientes:', error);
+      throw error;
+    }
+  },
+
+  async getAllIngredientes() {
+    return this.getIngredientes();
+  },
+
+  async getIngredienteById(id) {
+    try {
+      const response = await api.get(`/api/ingredientes/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error al obtener el ingrediente ${id}:`, error);
+      throw error;
+    }
+  },
+
+  // crearIngrediente ya exportado de forma independiente
+
+  async actualizarIngrediente(id, ingredienteData) {
+    try {
+      const response = await api.put(`/api/ingredientes/${id}`, ingredienteData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error al actualizar el ingrediente ${id}:`, error);
+      throw error;
+    }
+  },
+
+  async eliminarIngrediente(id) {
+    try {
+      await api.delete(`/api/ingredientes/${id}`);
+    } catch (error) {
+      console.error(`Error al eliminar el ingrediente ${id}:`, error);
+      throw error;
+    }
+  },
+
+  async cambiarCantidad(id, cantidad) {
+    try {
+      const response = await api.put(`/api/ingredientes/${id}/cantidad`, { cantidad });
+      return response.data;
+    } catch (error) {
+      console.error(`Error al cambiar cantidad del ingrediente ${id}:`, error);
+      throw error;
+    }
+  }
+};
+
+export default ingredienteService;
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a

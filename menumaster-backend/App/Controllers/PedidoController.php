@@ -1,11 +1,19 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
+<<<<<<< HEAD
 use app\Models\PedidoModel;
 use app\Models\MesaModel;
 use app\Middleware\AuthMiddleware;
 use app\Controllers\AuthController;
 use app\Utils\Validator;
+=======
+use App\Models\PedidoModel;
+use App\Models\MesaModel;
+use App\Middleware\AuthMiddleware;
+use App\Controllers\AuthController;
+use App\Utils\Validator;
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
 use PDO;
 use Exception;
 
@@ -20,6 +28,74 @@ class PedidoController
         $this->db = $db;
         $this->pedidoModel = new PedidoModel($this->db);
         $this->mesaModel = new MesaModel($this->db);
+<<<<<<< HEAD
+=======
+    }
+
+    public function exportarPDF($pedidoId)
+    {
+        try {
+            // Obtener los datos del pedido
+            $pedido = $this->pedidoModel->getPedidoById($pedidoId);
+            if (!$pedido) {
+                throw new Exception("Pedido no encontrado");
+            }
+
+            // Crear el PDF usando FPDF
+            require_once __DIR__ . '/../../vendor/setasign/fpdf/fpdf.php';
+            $pdf = new \FPDF();
+            $pdf->AddPage();
+            
+            // Encabezado
+            $pdf->SetFont('Arial', 'B', 16);
+            $pdf->Cell(0, 10, 'Pedido #' . $pedidoId, 0, 1, 'C');
+            $pdf->Ln(10);
+            
+            // Detalles del pedido
+            $pdf->SetFont('Arial', '', 12);
+            $pdf->Cell(0, 10, 'Fecha: ' . $pedido['fecha_pedido'], 0, 1);
+            $pdf->Cell(0, 10, 'Mesa: ' . $pedido['mesa_id'], 0, 1);
+            $pdf->Cell(0, 10, 'Estado: ' . $pedido['estado'], 0, 1);
+            $pdf->Ln(10);
+            
+            // Tabla de productos
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Cell(90, 10, 'Producto', 1);
+            $pdf->Cell(30, 10, 'Cantidad', 1);
+            $pdf->Cell(30, 10, 'Precio', 1);
+            $pdf->Cell(40, 10, 'Subtotal', 1);
+            $pdf->Ln();
+            
+            // Obtener y listar los detalles del pedido
+            $detalles = $this->pedidoModel->getDetallesPedido($pedidoId);
+            $total = 0;
+            
+            $pdf->SetFont('Arial', '', 12);
+            foreach ($detalles as $detalle) {
+                $subtotal = $detalle['cantidad'] * $detalle['precio_unitario'];
+                $total += $subtotal;
+                
+                $pdf->Cell(90, 10, $detalle['nombre_producto'], 1);
+                $pdf->Cell(30, 10, $detalle['cantidad'], 1);
+                $pdf->Cell(30, 10, '$' . number_format($detalle['precio_unitario'], 2), 1);
+                $pdf->Cell(40, 10, '$' . number_format($subtotal, 2), 1);
+                $pdf->Ln();
+            }
+            
+            // Total
+            $pdf->SetFont('Arial', 'B', 12);
+            $pdf->Cell(150, 10, 'Total:', 1);
+            $pdf->Cell(40, 10, '$' . number_format($total, 2), 1);
+            
+            // Enviar el PDF al navegador
+            $pdf->Output('D', 'pedido-' . $pedidoId . '.pdf');
+            
+        } catch (Exception $e) {
+            header('Content-Type: application/json');
+            http_response_code(500);
+            echo json_encode(['error' => $e->getMessage()]);
+        }
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     }
 
     /**
@@ -95,6 +171,29 @@ class PedidoController
         }
         
         $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
+
+        // Automatizar envío del pedido a la cocina (imprimir ticket)
+        try {
+            $imprimirUrl = $_ENV['IMPRIMIR_PEDIDO_URL'] ?? null;
+            if ($imprimirUrl) {
+                $payload = json_encode(['id' => $pedidoId]);
+                $opts = [
+                    'http' => [
+                        'method' => 'POST',
+                        'header' => "Content-Type: application/json\r\n",
+                        'content' => $payload
+                    ]
+                ];
+                $context = stream_context_create($opts);
+                $result = file_get_contents($imprimirUrl, false, $context);
+                // Opcional: log o procesar $result
+            } else {
+                error_log('IMPRIMIR_PEDIDO_URL no definido en .env');
+            }
+        } catch (Exception $e) {
+            error_log('Error al enviar pedido a cocina: ' . $e->getMessage());
+        }
+
         $this->sendResponse(201, $nuevoPedido);
     }
     

@@ -35,6 +35,10 @@ try {
     $action   = $route_parts[2] ?? null;
 
     switch ($resource) {
+        case 'pedidos':
+            require_once BASE_PATH . '/routes/pedidos_api.php';
+            return;
+
         case 'auth':
             switch ($action) {
                 case 'register':

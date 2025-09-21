@@ -20,14 +20,12 @@ try {
     $authMiddleware->handle();
 
     // 3. Analizamos la URL RESTful
-    $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    $uri_segments = explode('/', trim($request_uri, '/'));
-    $resource_index = array_search('pedidos', $uri_segments);
+    global $route_parts;
     
-    $id = isset($uri_segments[$resource_index + 1]) && is_numeric($uri_segments[$resource_index + 1])
-        ? (int)$uri_segments[$resource_index + 1]
+    $id = isset($route_parts[2]) && is_numeric($route_parts[2]) 
+        ? (int)$route_parts[2] 
         : null;
-    $action = $uri_segments[$resource_index + 2] ?? null;
+    $action = $route_parts[3] ?? null;
 
     $method = $_SERVER['REQUEST_METHOD'];
     $data = json_decode(file_get_contents("php://input"), true) ?? [];

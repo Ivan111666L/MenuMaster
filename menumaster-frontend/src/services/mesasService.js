@@ -30,6 +30,37 @@ export const getMesaById = async (id) => {
   }
 };
 
+export const createMesa = async (mesaData) => {
+  try {
+    const response = await api.post('/mesas', mesaData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al crear mesa:', error);
+    throw error;
+  }
+};
+
+export const updateMesa = async (id, mesaData) => {
+  try {
+    const response = await api.put(`/mesas/${id}`, mesaData);
+    return response.data;
+  } catch (error) {
+    console.error('Error al actualizar mesa:', error);
+    throw error;
+  }
+};
+
+export const deleteMesa = async (id) => {
+  try {
+    const response = await api.delete(`/mesas/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error al eliminar mesa:', error);
+    throw error;
+  }
+};
+
+
 export const getMesasDisponibles = async () => {
   try {
     const response = await api.get('/mesas/disponibles');
@@ -59,6 +90,7 @@ export const cambiarEstadoMesa = async (id, estado) => {
   }
 };
 
+<<<<<<< HEAD
 export const deleteMesa = async (id) => {
   try {
     await api.delete(`/mesas/${id}`);
@@ -67,3 +99,5 @@ export const deleteMesa = async (id) => {
     throw error;
   }
 };
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a

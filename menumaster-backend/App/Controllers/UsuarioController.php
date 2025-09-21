@@ -1,13 +1,13 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
 // --- Dependencias ---
-use app\Models\UsuarioModel;
-use app\Models\RolModel;
-use app\Models\EstadoGeneralModel;
-use app\Utils\Validator;
-use app\Middleware\AuthMiddleware;
-use app\Controllers\AuthController;
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
+use App\Models\EstadoGeneralModel;
+use App\Utils\Validator;
+use App\Middleware\AuthMiddleware;
+use App\Controllers\AuthController;
 use PDO;
 use Exception;
 
@@ -34,8 +34,122 @@ class UsuarioController
      */
     public function index(): void
     {
-        $usuarios = $this->usuarioModel->findAll();
-        $this->sendResponse(200, $usuarios);
+        try {
+            $usuarios = $this->usuarioModel->findAll();
+            if (!$usuarios) {
+                throw new Exception("Error al obtener usuarios");
+            }
+            
+            // Preparamos los datos para la respuesta
+            $usuariosPreparados = array_map(function($usuario) {
+                // Obtenemos el nombre del rol y estado
+                $rol = $this->rolModel->findById($usuario['rol_id']);
+                $estado = $this->estadoGeneralModel->findById($usuario['estado_id']);
+                
+                return [
+                    'id' => $usuario['id'],
+                    'nombre' => $usuario['nombre'],
+                    'email' => $usuario['email'],
+                    'rol' => $rol ? $rol['nombre'] : 'usuario',
+                    'estado' => $estado ? $estado['nombre'] : 'activo'
+                ];
+            }, $usuarios);
+            
+            $this->sendResponse(200, ['data' => $usuariosPreparados]);
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'Error al obtener usuarios: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Actualiza un usuario existente
+     * Corresponde a: PUT /api/usuarios/{id}
+     */
+    public function update($id): void
+    {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$data) {
+                throw new Exception('Datos inválidos');
+            }
+
+            // Validamos los datos recibidos
+            Validator::validate($data, [
+                'nombre' => 'required',
+                'email' => 'required|email',
+                'rol' => 'required',
+                'estado' => 'required'
+            ]);
+
+            // Validamos que el usuario exista
+            $usuario = $this->usuarioModel->findById($id);
+            if (!$usuario) {
+                $this->sendResponse(404, ['error' => 'Usuario no encontrado']);
+                return;
+            }
+
+            // Obtenemos el rol y estado
+            $rol = $this->rolModel->findByName($data['rol']);
+            $estado = $this->estadoGeneralModel->findByName($data['estado']);
+            if (!$rol || !$estado) {
+                $this->sendResponse(400, ['error' => 'El rol o estado especificado no es válido']);
+                return;
+            }
+
+            // Preparamos los datos para actualizar
+            $datosActualizar = [
+                'nombre' => $data['nombre'],
+                'email' => $data['email'],
+                'rol_id' => $rol['id'],
+                'estado_id' => $estado['id']
+            ];
+            
+            // Actualizamos el usuario
+            if (!$this->usuarioModel->update($id, $datosActualizar)) {
+                throw new Exception('No se pudo actualizar el usuario');
+            }
+            
+            // Obtenemos el usuario actualizado con sus relaciones
+            $usuarioActualizado = $this->usuarioModel->findById($id);
+            $rolActualizado = $this->rolModel->findById($usuarioActualizado['rol_id']);
+            $estadoActualizado = $this->estadoGeneralModel->findById($usuarioActualizado['estado_id']);
+
+            // Preparamos la respuesta
+            $respuesta = [
+                'id' => $usuarioActualizado['id'],
+                'nombre' => $usuarioActualizado['nombre'],
+                'email' => $usuarioActualizado['email'],
+                'rol' => $rolActualizado ? $rolActualizado['nombre'] : 'usuario',
+                'estado' => $estadoActualizado ? $estadoActualizado['nombre'] : 'activo'
+            ];
+
+            $this->sendResponse(200, ['data' => $respuesta]);
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'Error al actualizar usuario: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Elimina un usuario
+     * Corresponde a: DELETE /api/usuarios/{id}
+     */
+    public function delete($id): void
+    {
+        try {
+            // Validamos que el usuario exista
+            $usuario = $this->usuarioModel->findById($id);
+            if (!$usuario) {
+                $this->sendResponse(404, ['error' => 'Usuario no encontrado']);
+                return;
+            }
+
+            $this->usuarioModel->delete($id);
+            $this->sendResponse(200, ['message' => 'Usuario eliminado correctamente']);
+
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'Error al eliminar usuario: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -85,37 +199,7 @@ class UsuarioController
         $this->sendResponse(201, $nuevoUsuario);
     }
 
-    /**
-     * Actualiza un usuario existente.
-     * Corresponde a: PUT /api/usuarios/{id}
-     */
-    public function update(int $id, array $data): void
-    {
-        // El validador se adapta para los campos de actualización
-        Validator::validate($data, [
-            'nombre' => 'required',
-            'email' => 'required|email',
-            'rol' => 'required',
-            'estado' => 'required'
-        ]);
-        
-        if (!$this->usuarioModel->find($id)) {
-            throw new Exception("Usuario no encontrado.", 404);
-        }
-
-        $rol = $this->rolModel->findByName($data['rol']);
-        $estado = $this->estadoGeneralModel->findByName($data['estado']);
-        if (!$rol || !$estado) {
-            throw new Exception("El rol o estado especificado no es válido.", 400);
-        }
-
-        if (!$this->usuarioModel->update($id, $data['nombre'], $data['email'], $rol['id'], $estado['id'])) {
-            throw new Exception("No se pudo actualizar el usuario.", 500);
-        }
-
-        $usuarioActualizado = $this->usuarioModel->find($id);
-        $this->sendResponse(200, $usuarioActualizado);
-    }
+    // El método update ya está definido arriba
 
     /**
      * Elimina un usuario.

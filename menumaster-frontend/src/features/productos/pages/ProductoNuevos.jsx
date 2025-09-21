@@ -56,20 +56,27 @@ function ProductoNuevo() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+<<<<<<< HEAD
     // --- Manejar selección de ingredientes ---
     // Actualiza el estado cuando el usuario selecciona ingredientes.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     const handleIngredientesChange = (ingredientesSeleccionados) => {
         setFormData(prev => ({ ...prev, ingredientes: ingredientesSeleccionados }));
     };
 
+<<<<<<< HEAD
     // --- Enviar el formulario ---
     // Envía los datos al backend y muestra un mensaje de éxito o error.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
         setError('');
 
         try {
+<<<<<<< HEAD
             // Mapeamos los ingredientes para que tengan la propiedad 'ingrediente_id'
             const ingredientesFormateados = (formData.ingredientes || []).map(ing => ({
                 ingrediente_id: ing.id,
@@ -83,6 +90,10 @@ function ProductoNuevo() {
             };
 
             await productoService.createProducto(datosEnviar);
+=======
+            // Enviamos el producto con los datos del formulario
+            await productoService.createProducto(formData);
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
             alert('Producto creado con éxito.');
             navigate('/productos/creados'); // Redirige a la lista de productos
         } catch (err) {

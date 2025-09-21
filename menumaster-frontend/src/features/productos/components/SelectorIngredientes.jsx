@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // --- Componente para seleccionar ingredientes ---
 // Permite al usuario elegir ingredientes y cantidades para un producto.
 import React, { useState, useEffect } from 'react';
@@ -7,27 +8,49 @@ import '@/styles/productos.css';
 
 // --- Componente principal ---
 // Gestiona la selección, búsqueda y cantidad de ingredientes.
+=======
+import React, { useState, useEffect } from 'react';
+import ingredienteService from '@/services/ingredienteService';
+import Button from '@/components/Button';
+import '@/styles/productos.css';
+
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
 function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados = [] }) {
   const [ingredientes, setIngredientes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [busqueda, setBusqueda] = useState('');
   const [ingredientesSeleccionadosInternos, setIngredientesSeleccionadosInternos] = useState(
+<<<<<<< HEAD
     ingredientesSeleccionados || []
   );
 
   // Cargar ingredientes al montar el componente
   // --- Cargar ingredientes al montar el componente ---
   // Obtiene la lista de ingredientes desde el backend.
+=======
+    ingredientesSeleccionados
+  );
+
+  // Cargar ingredientes al montar el componente
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   useEffect(() => {
     const cargarIngredientes = async () => {
       try {
         setLoading(true);
         const data = await ingredienteService.getIngredientes();
+<<<<<<< HEAD
         setIngredientes(data);
       } catch (err) {
         setError('Error al cargar los ingredientes');
         console.error('Error:', err);
+=======
+        setIngredientes(Array.isArray(data) ? data : []); // Aseguramos que siempre sea un array
+      } catch (err) {
+        setError('Error al cargar los ingredientes');
+        console.error('Error:', err);
+        setIngredientes([]); // En caso de error, inicializamos como array vacío
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
       } finally {
         setLoading(false);
       }
@@ -36,6 +59,7 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
     cargarIngredientes();
   }, []);
 
+<<<<<<< HEAD
   // Filtrar ingredientes por búsqueda
   // --- Filtrar ingredientes por búsqueda ---
   // Permite buscar ingredientes por nombre.
@@ -48,6 +72,19 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
   // Manejar selección/deselección de ingredientes
   // --- Manejar selección/deselección de ingredientes ---
   // Permite agregar o quitar ingredientes seleccionados.
+=======
+  // Actualizar ingredientes seleccionados cuando cambien las props
+  useEffect(() => {
+    setIngredientesSeleccionadosInternos(ingredientesSeleccionados);
+  }, [ingredientesSeleccionados]);
+
+  // Filtrar ingredientes por búsqueda
+  const ingredientesFiltrados = ingredientes.filter(ingrediente =>
+    ingrediente.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
+  // Manejar selección/deselección de ingredientes
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   const toggleIngrediente = (ingrediente) => {
     const yaSeleccionado = ingredientesSeleccionadosInternos.find(
       ing => ing.id === ingrediente.id
@@ -72,8 +109,11 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
   };
 
   // Actualizar cantidad de un ingrediente seleccionado
+<<<<<<< HEAD
   // --- Actualizar cantidad de un ingrediente seleccionado ---
   // Permite modificar la cantidad de cada ingrediente elegido.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   const actualizarCantidad = (ingredienteId, nuevaCantidad) => {
     const nuevosSeleccionados = ingredientesSeleccionadosInternos.map(ing =>
       ing.id === ingredienteId
@@ -85,8 +125,11 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
     onIngredientesChange(nuevosSeleccionados);
   };
 
+<<<<<<< HEAD
   // --- Renderizado condicional ---
   // Muestra mensajes de carga o error si corresponde.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   if (loading) {
     return <div className="selector-ingredientes-loading">Cargando ingredientes...</div>;
   }
@@ -95,8 +138,11 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
     return <div className="selector-ingredientes-error">{error}</div>;
   }
 
+<<<<<<< HEAD
   // --- Renderizado del selector ---
   // Muestra la interfaz para buscar, seleccionar y ajustar ingredientes.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   return (
     <div className="selector-ingredientes">
       <h3>Seleccionar Ingredientes</h3>

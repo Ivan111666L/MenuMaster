@@ -1,16 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import usuarioService from '@/features/usuarios/services/usuarioService';
 
-export const useUsuarios = () => {
+const useUsuarios = () => {
     const [usuarios, setUsuarios] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
 
     const cargarUsuarios = useCallback(async () => {
         try {
+            setIsLoading(true);
             const data = await usuarioService.getUsuarios();
             setUsuarios(Array.isArray(data) ? data : []);
+            setError(null);
         } catch (err) {
+            console.error('Error al cargar usuarios:', err);
             setError('Error al cargar los usuarios.');
         } finally {
             setIsLoading(false);
@@ -23,33 +26,57 @@ export const useUsuarios = () => {
 
     const updateUsuario = async (id, dataToUpdate) => {
         const usuarioOriginal = usuarios.find(u => u.id === id);
+        if (!usuarioOriginal) {
+            throw new Error('Usuario no encontrado');
+        }
+
         // Actualización optimista
-        setUsuarios(prev => prev.map(u => u.id === id ? { ...u, ...dataToUpdate } : u));
+        setUsuarios(prev => prev.map(u => 
+            u.id === id ? { ...u, ...dataToUpdate } : u
+        ));
         
         try {
-            const fullData = {
-                nombre: usuarioOriginal.nombre,
-                email: usuarioOriginal.email,
-                rol: dataToUpdate.rol || usuarioOriginal.rol,
-                estado: dataToUpdate.estado || usuarioOriginal.estado
-            };
-            await usuarioService.updateUsuario(id, fullData);
-        } catch (err) {
-            alert('Error al actualizar. El cambio será revertido.');
-            setUsuarios(prev => prev.map(u => u.id === id ? usuarioOriginal : u));
+            await usuarioService.actualizarUsuario(id, {
+                ...usuarioOriginal,
+                ...dataToUpdate
+            });
+            await cargarUsuarios(); // Recargamos para asegurar consistencia
+        } catch (error) {
+            // Revertimos en caso de error
+            setUsuarios(prev => prev.map(u => 
+                u.id === id ? usuarioOriginal : u
+            ));
+            throw error;
         }
     };
 
     const deleteUsuario = async (id) => {
-        if (window.confirm('¿Eliminar este usuario?')) {
-            try {
-                await usuarioService.deleteUsuario(id);
-                setUsuarios(prev => prev.filter(u => u.id !== id));
-            } catch (err) {
-                alert('Error al eliminar el usuario.');
-            }
+        const usuarioOriginal = usuarios.find(u => u.id === id);
+        if (!usuarioOriginal) {
+            throw new Error('Usuario no encontrado');
+        }
+
+        // Eliminación optimista
+        setUsuarios(prev => prev.filter(u => u.id !== id));
+
+        try {
+            await usuarioService.eliminarUsuario(id);
+            await cargarUsuarios(); // Recargamos para asegurar consistencia
+        } catch (error) {
+            // Revertimos en caso de error
+            setUsuarios(prev => [...prev, usuarioOriginal]);
+            throw error;
         }
     };
 
-    return { usuarios, isLoading, error, updateUsuario, deleteUsuario };
+    return {
+        usuarios,
+        isLoading,
+        error,
+        updateUsuario,
+        deleteUsuario,
+        recargarUsuarios: cargarUsuarios
+    };
 };
+
+export default useUsuarios;

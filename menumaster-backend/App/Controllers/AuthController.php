@@ -1,10 +1,10 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\UsuarioModel;
-use app\Models\RolModel;
-use app\Config\Config;
-use app\Config\conexionDb;
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
+use App\Config\Config;
+use App\Config\conexionDb;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PDO;
@@ -42,6 +42,19 @@ class AuthController
                 $this->sendResponse(409, "El correo ya está registrado.");
             }
 
+            if (!isset($data['rol'])) {
+                $this->sendResponse(400, "El rol es obligatorio.");
+            }
+
+            // Obtener el ID del rol
+            $stmtRol = $this->db->prepare("SELECT id FROM roles WHERE nombre = :nombre LIMIT 1");
+            $stmtRol->execute([":nombre" => $data['rol']]);
+            $rol = $stmtRol->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$rol) {
+                $this->sendResponse(400, "Rol no válido.");
+            }
+
             // Insertar usuario
             $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
 
@@ -53,7 +66,7 @@ class AuthController
                 ":nombre" => $data['nombre'],
                 ":email" => $data['email'],
                 ":password" => $hashedPassword,
-                ":rol_id" => $data['rol_id'] ?? 2, // rol por defecto
+                ":rol_id" => $rol['id'], // Usar el ID del rol obtenido
                 ":estado_id" => 1
             ]);
 

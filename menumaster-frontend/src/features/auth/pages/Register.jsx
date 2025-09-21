@@ -91,6 +91,23 @@ function Register() {
                         disabled={isLoading}
                     />
 
+                    <div className="form-group">
+                        <label htmlFor="rol">Rol</label>
+                        <select
+                            id="rol"
+                            value={formData.rol}
+                            onChange={handleInputChange}
+                            disabled={isLoading}
+                            className={`form-control ${errors.rol ? 'error' : ''}`}
+                        >
+                            <option value="administrador">Administrador</option>
+                            <option value="mesero">Mesero</option>
+                            <option value="cocinero">Cocinero</option>
+                            <option value="cajero">Cajero</option>
+                        </select>
+                        {errors.rol && <span className="error-message">{errors.rol}</span>}
+                    </div>
+
                     <Input
                         id="email"
                         label="Email"

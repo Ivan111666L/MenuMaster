@@ -1,0 +1,145 @@
+.order-details-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.order-details-popup {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.order-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-details-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 5px;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.close-button:hover {
+  color: #333;
+}
+
+.order-info {
+  margin-bottom: 20px;
+}
+
+.order-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.order-info strong {
+  color: #333;
+}
+
+.order-items {
+  margin-bottom: 20px;
+}
+
+.order-items h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.quantity {
+  font-weight: bold;
+  color: #333;
+  min-width: 40px;
+}
+
+.name {
+  flex-grow: 1;
+  margin: 0 15px;
+}
+
+.price {
+  color: #666;
+}
+
+.order-total {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 2px solid #eee;
+}
+
+.total-amount {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.order-notes {
+  margin-top: 20px;
+  padding-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.order-notes h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.order-notes p {
+  color: #666;
+  white-space: pre-wrap;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .order-details-popup {
+    width: 95%;
+    padding: 15px;
+  }
+  
+  .order-details-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .order-item {
+    font-size: 0.9rem;
+  }
+}

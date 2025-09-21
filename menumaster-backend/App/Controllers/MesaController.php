@@ -1,10 +1,10 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
 // CORRECCIÓN: Se usan los nombres de clase correctos para los modelos.
 // Asumimos que el modelo para los estados se llama 'EstadoGeneral'.
-use app\Models\MesaModel;
-use app\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
+use App\Models\MesaModel;
+use App\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
 use PDO;
 use Exception;
 
@@ -28,12 +28,60 @@ class MesaController
      */
     public function index(): void
     {
-        $mesas = $this->mesaModel->findAll();
-        if ($mesas === false) {
-            throw new Exception("No se pudieron obtener las mesas.", 500);
+        try {
+            $mesas = $this->mesaModel->findAll();
+            foreach ($mesas as &$mesa) {
+                $mesa['estado'] = $this->estadoGeneralModel->findById($mesa['estado_id'])['nombre'] ?? 'desconocido';
+            }
+            $this->sendResponse(200, ['data' => $mesas]);
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'Error al obtener las mesas']);
         }
-        $this->sendResponse(200, ['success' => true, 'data' => $mesas]);
     }
+
+    /**
+     * Crea una nueva mesa.
+     * Corresponde a: POST /api/mesas
+     */
+    public function create(): void
+    {
+        try {
+            $data = json_decode(file_get_contents('php://input'), true);
+            
+            if (!$data || !isset($data['numero']) || !isset($data['capacidad'])) {
+                $this->sendResponse(400, ['error' => 'Datos incompletos']);
+                return;
+            }
+
+            // Validar que el número de mesa no exista
+            if ($this->mesaModel->findByNumero($data['numero'])) {
+                $this->sendResponse(400, ['error' => 'El número de mesa ya existe']);
+                return;
+            }
+
+            // Obtener el ID del estado "disponible"
+            $estadoDisponible = $this->estadoGeneralModel->findByNombre('disponible');
+            if (!$estadoDisponible) {
+                $this->sendResponse(500, ['error' => 'Estado no encontrado']);
+                return;
+            }
+
+            $mesaData = [
+                'numero' => $data['numero'],
+                'capacidad' => $data['capacidad'],
+                'estado_id' => $estadoDisponible['id']
+            ];
+
+            $id = $this->mesaModel->create($mesaData);
+            $mesa = $this->mesaModel->findById($id);
+            $this->sendResponse(201, ['data' => $mesa]);
+
+        } catch (Exception $e) {
+            $this->sendResponse(500, ['error' => 'Error al crear la mesa']);
+        }
+    }
+
+    // El método update ha sido movido más abajo con una implementación más robusta
 
     /**
      * Obtiene una única mesa por su ID.

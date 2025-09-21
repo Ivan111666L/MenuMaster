@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 namespace app\Controllers;
 // --- Controlador de Productos ---
 // Este archivo gestiona toda la lógica relacionada con los productos: crear, consultar, actualizar y eliminar.
@@ -9,6 +10,15 @@ use app\Models\ProductoIngredientesModel;
 use app\Models\CategoriaModel;
 use app\Models\EstadoProductoModel;
 use app\Utils\Validator;
+=======
+namespace App\Controllers;
+
+use App\Models\ProductoModel;
+use App\Models\ProductoIngredientesModel;
+use App\Models\CategoriaModel;
+use App\Models\EstadoProductoModel;
+use App\Utils\Validator;
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
 use PDO;
 use Exception;
 
@@ -21,8 +31,11 @@ class ProductoController
     private $categoriaModel;
     private $estadoProductoModel;
 
+<<<<<<< HEAD
     // --- Constructor ---
     // Inicializa los modelos y la conexión a la base de datos.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     public function __construct(PDO $db)
     {
         $this->db = $db;
@@ -88,8 +101,11 @@ class ProductoController
      * Crea un nuevo producto con ingredientes
      * POST /api/productos
      */
+<<<<<<< HEAD
     // --- Crear producto ---
     // Recibe los datos de un nuevo producto y lo guarda en la base de datos, junto con sus ingredientes.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     public function store(): void
     {
         try {
@@ -170,8 +186,11 @@ class ProductoController
      * Actualiza un producto existente
      * PUT /api/productos/{id}
      */
+<<<<<<< HEAD
     // --- Actualizar producto ---
     // Modifica los datos de un producto existente y actualiza sus ingredientes si es necesario.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     public function update(int $id): void
     {
         try {
@@ -245,8 +264,11 @@ class ProductoController
      * Obtiene productos agrupados por categoría (optimizado para menús)
      * GET /api/productos/by-category
      */
+<<<<<<< HEAD
     // --- Listar productos por categoría ---
     // Devuelve los productos agrupados por categoría para mostrar en menús.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     public function byCategory(): void
     {
         try {
@@ -265,6 +287,85 @@ class ProductoController
     /**
      * Busca productos por nombre
      * GET /api/productos/search?q={termino}&limit={limite}
+<<<<<<< HEAD
+=======
+     */
+    public function searchProducts(): void
+    {
+        try {
+            $query = $_GET['q'] ?? '';
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+            
+            if (empty($query)) {
+                throw new Exception("Se requiere un término de búsqueda.", 400);
+            }
+            
+            $productos = $this->productoModel->search($query, $limit);
+            
+            if ($productos === false) {
+                throw new Exception("Error en la búsqueda de productos.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error en la búsqueda: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Obtiene productos destacados
+     * GET /api/productos/featured?limit={limite}
+     */
+    public function featured(): void
+    {
+        try {
+            $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 6;
+            $productos = $this->productoModel->findFeatured($limit);
+            
+            if ($productos === false) {
+                throw new Exception("No se pudieron obtener los productos destacados.", 500);
+            }
+            
+            $this->sendResponse(200, $productos);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al obtener productos destacados: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Actualiza el estado de un producto
+     * PATCH /api/productos/{id}/status
+     */
+    public function updateProductStatus(int $id, array $data): void
+    {
+        try {
+            Validator::validate($data, ['estado' => 'required']);
+            
+            if (!$this->productoModel->updateStatus($id, $data['estado'])) {
+                throw new Exception("No se pudo actualizar el estado del producto.", 500);
+            }
+            
+            $this->sendResponse(200, ["mensaje" => "Estado del producto actualizado correctamente."]);
+        } catch (Exception $e) {
+            $this->sendError(500, "Error al actualizar estado: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Valida campos requeridos
+     */
+    private function validarCamposRequeridos(array $data, array $campos): void
+    {
+        foreach ($campos as $campo) {
+            if (!isset($data[$campo]) || $data[$campo] === '') {
+                throw new Exception("El campo '{$campo}' es obligatorio.", 400);
+            }
+        }
+    }
+
+    /**
+     * Envía respuesta JSON de éxito
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
      */
     // --- Buscar productos ---
     // Permite buscar productos por nombre y limitar la cantidad de resultados.
@@ -364,8 +465,11 @@ class ProductoController
     /**
      * Envía respuesta JSON de error
      */
+<<<<<<< HEAD
     // --- Enviar respuesta JSON de error ---
     // Envía una respuesta JSON al frontend cuando ocurre un error.
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     private function sendError(int $statusCode, string $message): void
     {
         http_response_code($statusCode);

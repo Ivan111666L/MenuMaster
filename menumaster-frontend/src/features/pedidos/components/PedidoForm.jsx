@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import Button from '@/components/Button';
 
+<<<<<<< HEAD
 function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActual }) {
+=======
+function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActual, enviarPedidoCocina, generarRecibo }) {
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   // Verificamos que pedidoActual exista, si no, usamos un objeto vacío con mesa_id como string vacío
   const pedido = pedidoActual || { mesa_id: '' };
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState('');
@@ -140,6 +144,14 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
             ))}
           </div>
         )}
+<<<<<<< HEAD
+=======
+        {/* Botones para acciones de mesero */}
+        <div className="form-group" style={{ marginTop: '2rem' }}>
+          <Button onClick={enviarPedidoCocina} color="primary">Enviar a Cocina</Button>
+          <Button onClick={generarRecibo} color="secondary" style={{ marginLeft: '1rem' }}>Generar Recibo de Facturación</Button>
+        </div>
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
       </div>
     </div>
   );

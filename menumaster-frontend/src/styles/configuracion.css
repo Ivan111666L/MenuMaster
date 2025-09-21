@@ -112,7 +112,87 @@
     border: 1px solid var(--color-border);
 }
 
-/* gestion usuarios */
+/* Estilos para la configuración de usuarios y mesas */
+.gestion-usuarios-container,
+.gestion-mesas-container {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.gestion-usuarios-title,
+.gestion-mesas-title {
+    color: #333;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+.acciones-container {
+    margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.buscador-usuarios,
+.buscador-mesas {
+    flex: 1;
+    max-width: 400px;
+}
+
+.tabla-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.usuarios-table,
+.mesas-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.usuarios-table th,
+.usuarios-table td,
+.mesas-table th,
+.mesas-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.usuarios-table th,
+.mesas-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.usuarios-table tr:hover,
+.mesas-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+.acciones {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.estado-select {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.error-message {
+    color: #dc3545;
+    padding: 1rem;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
 .gestion-usuarios-container {
     padding: 2rem;
     background-color: var(--color-surface);

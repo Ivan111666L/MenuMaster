@@ -16,6 +16,38 @@ export const getPedidos = async () => {
   } catch (error) {
     console.error('Error al obtener pedidos:', error);
     return []; // Devolvemos array vacío en caso de error para evitar errores en la UI
+<<<<<<< HEAD
+=======
+  }
+};
+
+export const exportarPedidoPDF = async (pedidoId) => {
+  try {
+    // Realizamos la petición al endpoint de exportación PDF
+    const response = await api.get(`/pedidos/${pedidoId}/pdf`, {
+      responseType: 'blob', // Importante: especificamos que esperamos un blob
+    });
+    
+    // Creamos un objeto URL para el blob
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const url = window.URL.createObjectURL(blob);
+    
+    // Creamos un enlace temporal y lo activamos para descargar
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `pedido-${pedidoId}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Limpiamos
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
+    return true;
+  } catch (error) {
+    console.error('Error al exportar pedido a PDF:', error);
+    throw error;
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
   }
 };
 
@@ -59,6 +91,7 @@ export const deletePedido = async (id) => {
   }
 };
 
+<<<<<<< HEAD
 export const cambiarEstadoPedido = async (id, nuevoEstado) => {
   try {
     const response = await api.put(`/pedidos/${id}/estado`, { estado: nuevoEstado });
@@ -68,3 +101,5 @@ export const cambiarEstadoPedido = async (id, nuevoEstado) => {
     throw error;
   }
 };
+=======
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a

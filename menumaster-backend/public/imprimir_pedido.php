@@ -161,7 +161,11 @@ try {
 
 function generateTicket($pedido, $items) {
     $ticket = "================================\n";
+<<<<<<< HEAD
     $ticket .= "         PEDIDO COMPLETO\n";
+=======
+    $ticket .= "        RECIBO DE FACTURACIÓN\n";
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     $ticket .= "================================\n";
     $ticket .= "Pedido #: " . $pedido['id'] . "\n";
     $ticket .= "Mesa: " . $pedido['mesa_numero'] . " (" . $pedido['mesa_ubicacion'] . ")\n";
@@ -169,7 +173,11 @@ function generateTicket($pedido, $items) {
     $ticket .= "Estado: " . strtoupper($pedido['estado_nombre']) . "\n";
     $ticket .= "Fecha: " . date('d/m/Y H:i', strtotime($pedido['fecha_creacion'])) . "\n";
     $ticket .= "--------------------------------\n";
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     $total = 0;
     foreach ($items as $item) {
         $ticket .= sprintf("%dx %-20s %8s\n", 
@@ -177,22 +185,48 @@ function generateTicket($pedido, $items) {
             substr($item['producto_nombre'], 0, 20),
             '$' . number_format($item['subtotal'], 2)
         );
+<<<<<<< HEAD
         $total += $item['subtotal'];
     }
     
     $ticket .= "--------------------------------\n";
     $ticket .= sprintf("TOTAL: %24s\n", '$' . number_format($total, 2));
     
+=======
+        if (!empty($item['notas'])) {
+            $ticket .= "   [Notas: " . $item['notas'] . "]\n";
+        }
+        // Extras/ingredientes
+        if (!empty($item['ingredientes'])) {
+            foreach ($item['ingredientes'] as $ing) {
+                $ticket .= "     - " . $ing['ingrediente_nombre'] . " (" . $ing['cantidad'] . " " . $ing['unidad_medida'] . ")\n";
+            }
+        }
+        $total += $item['subtotal'];
+    }
+
+    $ticket .= "--------------------------------\n";
+    $ticket .= sprintf("TOTAL: %24s\n", '$' . number_format($total, 2));
+
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     if ($pedido['notas']) {
         $ticket .= "--------------------------------\n";
         $ticket .= "NOTAS:\n";
         $ticket .= wordwrap($pedido['notas'], 32) . "\n";
     }
+<<<<<<< HEAD
     
     $ticket .= "================================\n";
     $ticket .= "    Gracias por su visita\n";
     $ticket .= "================================\n";
     
+=======
+
+    $ticket .= "================================\n";
+    $ticket .= "    Gracias por su visita\n";
+    $ticket .= "================================\n";
+
+>>>>>>> 08efd0c4780d33dc8d783703a7238e0d6b0d370a
     return $ticket;
 }
 
