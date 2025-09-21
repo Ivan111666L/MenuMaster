@@ -52,13 +52,14 @@ try {
             break;
 
         case 'POST':
-            // CORRECCIÓN: Se eliminó la lógica redundante '?:'.
-            $controller->store($data);
+            // Centraliza la gestión de estado usando EstadoGeneralModel
+            // El controlador debe recibir el estado como nombre y convertirlo a ID usando EstadoGeneralModel
+            $controller->store();
             break;
 
         case 'PUT':
             if (!$id) throw new Exception("Se requiere un ID de producto para actualizar.", 400);
-            $controller->update($id, $data);
+            $controller->update($id);
             break;
 
         case 'DELETE':

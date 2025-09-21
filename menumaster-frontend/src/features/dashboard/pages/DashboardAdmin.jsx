@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getDashboardMetrics, getReport } from '../services/dashboardService';
+import { getDashboardMetrics, getReport } from '@/services/dashboardService';
 import Button from '@/components/Button';
 
 function DashboardAdmin() {

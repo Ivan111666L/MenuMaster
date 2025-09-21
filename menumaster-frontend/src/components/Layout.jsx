@@ -7,6 +7,16 @@ import {
 import "@/styles/global.css";
 
 const Layout = () => {
+    // Estado para mostrar/ocultar el menú en móvil
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Detecta si es móvil
+    const isMobile = window.innerWidth <= 768;
+
+    // Cierra el menú al navegar (solo móvil)
+    const handleMenuClick = () => {
+        if (isMobile) setSidebarOpen(false);
+    };
     // Obtenemos el usuario y la función de logout directamente del contexto
     const { user, logout } = useAuth();
 
@@ -45,14 +55,20 @@ const Layout = () => {
 
     return (
         <div className="dashboard-container">
-            <div className="sidebar">
+            {/* Botón hamburguesa solo en móvil */}
+            {isMobile && (
+                <button className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                    ☰
+                </button>
+            )}
+            <div className={`sidebar${isMobile ? (sidebarOpen ? ' open' : ' closed') : ''}`}>
                 <div className="sidebar-header">
                     <h2>MenuMaster</h2>
                 </div>
                 <ul className="sidebar-menu">
                     {menuItems.map((item, index) => (
                         <li key={index}>
-                            <Link to={item.path}>
+                            <Link to={item.path} onClick={handleMenuClick}>
                                 <span className="sidebar-icon">{item.icon}</span> {item.label}
                             </Link>
                         </li>
@@ -62,15 +78,12 @@ const Layout = () => {
 
             <div className="content-wrapper">
                 <header className="top-bar">
-                    {/* La información se muestra solo si hay un usuario en el contexto */}
                     {user && (
                         <div className="user-info">
                             <div className="user-details">
-                                {/* BUG CORREGIDO: Usamos 'user.nombre' */}
                                 <span className="user-name">{user.nombre}</span>
                                 <span className="user-role">{user.rol}</span>
                             </div>
-                            {/* La función logout ahora viene del contexto */}
                             <button onClick={logout} className="logout-button" title="Cerrar Sesión">
                                 <FaSignOutAlt />
                             </button>
