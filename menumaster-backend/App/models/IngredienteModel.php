@@ -77,11 +77,19 @@ class IngredienteModel
      */
     public function create(array $data): int|false
     {
+        // Verifica si ya existe un ingrediente con el mismo nombre
+        $sqlCheck = "SELECT id FROM {$this->table_name} WHERE nombre = :nombre LIMIT 1";
+        $stmtCheck = $this->conn->prepare($sqlCheck);
+        $stmtCheck->bindParam(':nombre', $data['nombre']);
+        $stmtCheck->execute();
+        if ($stmtCheck->fetch()) {
+            // Ya existe, no crear duplicado
+            return false;
+        }
+
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
-        
         $sql = "INSERT INTO {$this->table_name} ({$columns}) VALUES ({$placeholders})";
-
         try {
             $stmt = $this->conn->prepare($sql);
             foreach ($data as $key => &$value) {

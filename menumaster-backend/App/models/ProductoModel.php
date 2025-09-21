@@ -96,10 +96,19 @@ class ProductoModel
      */
     public function create(array $data)
     {
+        // Verifica si ya existe un producto con el mismo nombre
+        $sqlCheck = "SELECT id FROM {$this->table} WHERE nombre = :nombre LIMIT 1";
+        $stmtCheck = $this->conn->prepare($sqlCheck);
+        $stmtCheck->bindParam(':nombre', $data['nombre']);
+        $stmtCheck->execute();
+        if ($stmtCheck->fetch()) {
+            // Ya existe, no crear duplicado
+            return false;
+        }
+
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
         $sql = "INSERT INTO {$this->table} ({$columns}) VALUES ({$placeholders})";
-
         try {
             $stmt = $this->conn->prepare($sql);
             foreach ($data as $key => &$value) {
