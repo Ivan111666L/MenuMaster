@@ -1,4 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext"; // <-- Importa nuestro hook personalizado
 import {
   FaHome, FaClipboardList, FaBoxes, FaFileInvoiceDollar,
