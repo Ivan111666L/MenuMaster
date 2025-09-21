@@ -12,17 +12,13 @@ use app\Utils\Validator;
 use PDO;
 use Exception;
 
-// Clase principal que gestiona los productos en el sistema.
-class ProductoController
-{
+class ProductoController {
     private $db;
     private $productoModel;
     private $productoIngredientesModel;
     private $categoriaModel;
     private $estadoProductoModel;
 
-    // --- Constructor ---
-    // Inicializa los modelos y la conexión a la base de datos.
     public function __construct(PDO $db)
     {
         $this->db = $db;
@@ -32,12 +28,22 @@ class ProductoController
         $this->estadoProductoModel = new EstadoProductoModel($this->db);
     }
 
-    /**
-     * Obtiene todos los productos
-     * GET /api/productos
-     */
-    // --- Listar productos ---
-    // Devuelve todos los productos registrados en la base de datos.
+    public function sendResponse(int $statusCode, $data): void
+    {
+        http_response_code($statusCode);
+        if ($statusCode !== 204) {
+            echo json_encode(['success' => true, 'data' => $data]);
+        }
+        exit;
+    }
+
+    public function sendError(int $statusCode, string $message): void
+    {
+        http_response_code($statusCode);
+        echo json_encode(['success' => false, 'error' => $message]);
+        exit;
+    }
+
     public function index(): void
     {
         try {
@@ -352,24 +358,12 @@ class ProductoController
      */
     // --- Enviar respuesta JSON de éxito ---
     // Envía una respuesta JSON al frontend cuando la operación fue exitosa.
-    private function sendResponse(int $statusCode, $data): void
-    {
-        http_response_code($statusCode);
-        if ($statusCode !== 204) {
-            echo json_encode(['success' => true, 'data' => $data]);
-        }
-        exit;
-    }
+   
 
-    /**
-     * Envía respuesta JSON de error
-     */
-    // --- Enviar respuesta JSON de error ---
-    // Envía una respuesta JSON al frontend cuando ocurre un error.
-    private function sendError(int $statusCode, string $message): void
-    {
-        http_response_code($statusCode);
-        echo json_encode(['success' => false, 'error' => $message]);
-        exit;
-    }
+
+
 }
+    
+
+    
+
