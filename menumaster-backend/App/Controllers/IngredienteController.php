@@ -1,6 +1,8 @@
 <?php
 namespace app\Controllers;
-
+// --- Controlador de Ingredientes ---
+// Este archivo gestiona toda la lógica relacionada con los ingredientes: crear, consultar, actualizar y eliminar.
+// Se conecta con los modelos y responde a las peticiones del backend.
 // Importamos los modelos que vamos a necesitar
 use app\Models\IngredienteModel;
 use app\Models\ProveedorModel;
@@ -8,6 +10,7 @@ use app\Models\EstadoGeneralModel;
 use PDO;
 use Exception;
 
+// Clase principal que gestiona los ingredientes en el sistema.
 class IngredienteController
 {
     private $db;
@@ -15,6 +18,8 @@ class IngredienteController
     private $proveedorModel;
     private $estadoGeneralModel;
 
+    // --- Constructor ---
+    // Inicializa los modelos y la conexión a la base de datos.
     public function __construct(PDO $db)
     {
         $this->db = $db;
@@ -27,6 +32,8 @@ class IngredienteController
      * Obtiene una lista de todos los ingredientes.
      * Corresponde a: GET /api/ingredientes
      */
+    // --- Listar ingredientes ---
+    // Devuelve todos los ingredientes registrados en la base de datos.
     public function index(): void
     {
         $ingredientes = $this->ingredienteModel->findAll();
@@ -40,6 +47,8 @@ class IngredienteController
      * Obtiene un único ingrediente por su ID.
      * Corresponde a: GET /api/ingredientes/{id}
      */
+    // --- Consultar ingrediente por ID ---
+    // Devuelve la información de un ingrediente específico.
     public function show(int $id): void
     {
         $ingrediente = $this->ingredienteModel->find($id);
@@ -53,6 +62,8 @@ class IngredienteController
      * Crea un nuevo ingrediente.
      * Corresponde a: POST /api/ingredientes
      */
+    // --- Crear ingrediente ---
+    // Recibe los datos de un nuevo ingrediente y lo guarda en la base de datos.
     public function store(array $data): void
     {
         $this->validarCampos($data, ['nombre', 'unidad_medida', 'stock_actual', 'stock_minimo']);
@@ -90,6 +101,8 @@ class IngredienteController
      * Actualiza un ingrediente existente.
      * Corresponde a: PUT /api/ingredientes/{id}
      */
+    // --- Actualizar ingrediente ---
+    // Modifica los datos de un ingrediente existente.
     public function update(int $id, array $data): void
     {
         if (empty($data)) {
@@ -128,6 +141,8 @@ class IngredienteController
      * Elimina un ingrediente.
      * Corresponde a: DELETE /api/ingredientes/{id}
      */
+    // --- Eliminar ingrediente ---
+    // Elimina un ingrediente de la base de datos.
     public function destroy(int $id): void
     {
         if (!$this->ingredienteModel->find($id)) {
@@ -140,6 +155,8 @@ class IngredienteController
     }
 
     // --- Métodos de Ayuda ---
+    // --- Validar campos requeridos ---
+    // Verifica que los datos obligatorios estén presentes antes de guardar o actualizar.
     private function validarCampos(array $data, array $camposRequeridos): void
     {
         foreach ($camposRequeridos as $campo) {
@@ -149,6 +166,8 @@ class IngredienteController
         }
     }
 
+    // --- Enviar respuesta JSON de éxito ---
+    // Envía una respuesta JSON al frontend cuando la operación fue exitosa.
     private function sendResponse(int $statusCode, $data): void
     {
         http_response_code($statusCode);

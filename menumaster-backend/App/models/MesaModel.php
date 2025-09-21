@@ -24,11 +24,11 @@ class MesaModel
     {
         $sql = "SELECT 
                     m.id, m.numero, m.capacidad, m.ubicacion,
-                    e.nombre AS estado
+                    em.nombre AS estado
                 FROM 
                     {$this->table} m
                 LEFT JOIN 
-                    estados_generales e ON m.estado_id = e.id
+                    estados_mesa em ON m.estado_id = em.id
                 ORDER BY 
                     m.numero ASC";
         
@@ -82,6 +82,33 @@ class MesaModel
             return (int)$this->db->lastInsertId();
         } catch (PDOException $e) {
             error_log('Error en MesaModel::create: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Obtiene todas las mesas disponibles.
+     */
+    public function findDisponibles(): array|false
+    {
+        $sql = "SELECT 
+                    m.id, m.numero, m.capacidad, m.ubicacion,
+                    em.nombre AS estado
+                FROM 
+                    {$this->table} m
+                LEFT JOIN 
+                    estados_mesa em ON m.estado_id = em.id
+                WHERE 
+                    em.nombre = 'disponible'
+                ORDER BY 
+                    m.numero ASC";
+        
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::findDisponibles: ' . $e->getMessage());
             return false;
         }
     }
@@ -143,6 +170,26 @@ class MesaModel
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log('Error en MesaModel::resetAll: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Cambia el estado de una mesa específica por nombre del estado.
+     */
+    public function cambiarEstado(int $mesaId, string $nombreEstado): bool
+    {
+        $sql = "UPDATE {$this->table} 
+                SET estado_id = (SELECT id FROM estados_mesa WHERE nombre = :nombre_estado)
+                WHERE id = :mesa_id";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':mesa_id', $mesaId, PDO::PARAM_INT);
+            $stmt->bindParam(':nombre_estado', $nombreEstado, PDO::PARAM_STR);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::cambiarEstado: ' . $e->getMessage());
             return false;
         }
     }

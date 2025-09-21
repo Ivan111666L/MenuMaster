@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Productos - MenuMaster</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .producto {
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .categoria {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        .precio {
+            font-weight: bold;
+            color: #2e7d32;
+            font-size: 1.2em;
+        }
+        .ingredientes {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .ingrediente {
+            display: inline-block;
+            background: #fff3e0;
+            padding: 2px 6px;
+            margin: 2px;
+            border-radius: 3px;
+            border: 1px solid #ffcc02;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .stats {
+            background: #e8f5e8;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de Integración de Productos - MenuMaster</h1>
+    <p>Esta página prueba que los productos del backend se puedan mostrar correctamente en el frontend.</p>
+    
+    <div id="stats" class="stats">
+        <strong>Estado:</strong> <span id="status">Cargando...</span>
+    </div>
+    
+    <div id="productos-container">
+        <div class="loading">Cargando productos...</div>
+    </div>
+
+    <script>
+        async function cargarProductos() {
+            try {
+                const response = await fetch('http://localhost/MenuMaster/menumaster-backend/public/simple_productos.php');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Error desconocido');
+                }
+                
+                mostrarProductos(data.data);
+                document.getElementById('status').textContent = `✅ ${data.data.length} productos cargados exitosamente`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('productos-container').innerHTML = 
+                    `<div class="error">Error al cargar productos: ${error.message}</div>`;
+                document.getElementById('status').textContent = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        function mostrarProductos(productos) {
+            const container = document.getElementById('productos-container');
+            
+            if (!productos || productos.length === 0) {
+                container.innerHTML = '<div class="error">No se encontraron productos</div>';
+                return;
+            }
+            
+            let html = '';
+            productos.forEach(producto => {
+                html += `
+                    <div class="producto">
+                        <div class="categoria">${producto.categoria_nombre || 'Sin categoría'}</div>
+                        <h3>${producto.nombre}</h3>
+                        <p>${producto.descripcion || ''}</p>
+                        <div class="precio">$${parseFloat(producto.precio).toFixed(2)}</div>
+                        ${producto.ingredientes && producto.ingredientes.length > 0 ? `
+                            <div class="ingredientes">
+                                <strong>Ingredientes:</strong><br>
+                                ${producto.ingredientes.map(ing => 
+                                    `<span class="ingrediente">${ing.ingrediente_nombre}: ${ing.cantidad} ${ing.unidad_medida}</span>`
+                                ).join('')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Cargar productos al cargar la página
+        cargarProductos();
+        
+        // Recargar cada 30 segundos para probar la conexión
+        setInterval(cargarProductos, 30000);
+    </script>
+</body>
+</html>

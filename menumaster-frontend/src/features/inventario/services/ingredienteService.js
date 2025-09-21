@@ -36,7 +36,7 @@ const getIngredientes = async () => {
  */
 const getIngredienteById = async (id) => {
   try {
-    const response = await api.get(`/ingredientes/${id}`);
+    const response = await api.get(`/api/ingredientes/${id}`);
     return response.data.data;
   } catch (error) {
     console.error(`Error al obtener el ingrediente ${id}:`, error);
@@ -52,9 +52,16 @@ const getIngredienteById = async (id) => {
 const crearIngrediente = async (ingredienteData) => {
   try {
     const response = await api.post('/ingredientes', ingredienteData);
-    return response.data.data;
+    if (response.data && response.data.success) {
+      return response.data.data;
+    } else {
+      throw new Error(response.data.error || 'Error al crear ingrediente');
+    }
   } catch (error) {
-    console.error("Error al crear ingrediente:", error);
+    if (error.response && typeof error.response.data === 'string' && error.response.data.startsWith('<')) {
+      throw new Error('El backend devolvió HTML en vez de JSON. Verifica la ruta y el proxy.');
+    }
+    console.error("Error al crear ingrediente:", error.response?.data?.error || error.message);
     throw error;
   }
 };
@@ -67,7 +74,7 @@ const crearIngrediente = async (ingredienteData) => {
  */
 const actualizarIngrediente = async (id, ingredienteData) => {
   try {
-    const response = await api.put(`/ingredientes/${id}`, ingredienteData);
+    const response = await api.put(`/api/ingredientes/${id}`, ingredienteData);
     return response.data.data;
   } catch (error) {
     console.error(`Error al actualizar el ingrediente ${id}:`, error);
@@ -81,7 +88,7 @@ const actualizarIngrediente = async (id, ingredienteData) => {
  */
 const eliminarIngrediente = async (id) => {
   try {
-    await api.delete(`/ingredientes/${id}`);
+    await api.delete(`/api/ingredientes/${id}`);
   } catch (error) {
     console.error(`Error al eliminar el ingrediente ${id}:`, error);
     throw error;
@@ -96,7 +103,7 @@ const eliminarIngrediente = async (id) => {
  */
 const cambiarCantidad = async (id, cantidad) => {
   try {
-    const response = await api.put(`/ingredientes/${id}/cantidad`, { cantidad });
+    const response = await api.put(`/api/ingredientes/${id}/cantidad`, { cantidad });
     return response.data.data;
   } catch (error) {
     console.error(`Error al cambiar cantidad del ingrediente ${id}:`, error);

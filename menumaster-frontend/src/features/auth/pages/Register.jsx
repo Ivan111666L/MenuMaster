@@ -7,6 +7,8 @@ import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+// Importamos el logo
+import MenuMasterLogo from '@/assets/menumaster-logo.svg';
 
 // Define el estado inicial para limpiar el formulario fácilmente
 const estadoInicialFormulario = {
@@ -72,6 +74,9 @@ function Register() {
     return (
         <div className='auth-container'>
             <div className="auth-form-container">
+                <div className="auth-logo-container">
+                    <img src={MenuMasterLogo} alt="MenuMaster" className="auth-logo" />
+                </div>
                 <h1 className='auth-title'>Crear una Cuenta</h1>
                 <form onSubmit={handleRegister} noValidate>
                     

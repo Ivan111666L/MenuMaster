@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import mesaService from '../services/mesaService'; // Nuestro servicio de API
+import mesaService from '@/features/mesas/services/mesaService'; // Servicio de API corregido
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import '@/styles/mesas.css'; // Nuestros estilos dedicados

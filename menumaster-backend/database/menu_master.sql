@@ -693,6 +693,99 @@ ALTER TABLE `usuarios`
   ADD CONSTRAINT `usuarios_ibfk_2` FOREIGN KEY (`estado_id`) REFERENCES `estados_generales` (`id`);
 COMMIT;
 
+-- DATOS SIMULADOS PARA USO COMPLETO DEL SOFTWARE
+
+-- Proveedores
+INSERT INTO proveedores (nombre, contacto, telefono, email) VALUES
+('Proveedor 1', 'Juan Perez', '123456789', 'proveedor1@email.com'),
+('Proveedor 2', 'Maria Lopez', '987654321', 'proveedor2@email.com');
+
+-- Ingredientes
+INSERT INTO ingredientes (nombre, descripcion, unidad_medida, stock_actual, stock_minimo, precio_compra, proveedor_id, estado_id)
+VALUES
+('Tomate', 'Tomate fresco', 'kg', 10, 2, 1.50, 1, 1),
+('Queso', 'Queso mozzarella', 'kg', 5, 1, 5.00, 2, 1),
+('Harina', 'Harina de trigo', 'kg', 20, 5, 0.80, 1, 1);
+
+-- Productos
+INSERT INTO productos (nombre, descripcion, precio, imagen_url, categoria_id, tiempo_preparacion_min, estado_id, destacado)
+VALUES
+('Pizza Margarita', 'Pizza con tomate y queso', 8.50, 'pizza.jpg', 2, 15, 1, 1),
+('Ensalada Mixta', 'Ensalada de tomate y lechuga', 5.00, 'ensalada.jpg', 1, 10, 1, 0);
+
+-- Relación productos-ingredientes
+INSERT INTO productos_ingredientes (producto_id, ingrediente_id, cantidad)
+VALUES
+(1, 1, 0.2),
+(1, 2, 0.3),
+(1, 3, 0.25),
+(2, 1, 0.1);
+
+-- Mesas
+INSERT INTO mesas (numero, capacidad, ubicacion, estado_id) VALUES
+('M1', 2, 'Interior', 1),
+('M2', 4, 'Terraza', 1);
+
+-- Usuarios
+INSERT INTO usuarios (nombre, email, password, rol_id, estado_id) VALUES
+('Admin', 'admin@email.com', 'adminpass', 1, 1),
+('Mesero', 'mesero@email.com', 'meseropass', 2, 1);
+
+-- Pedidos
+INSERT INTO pedidos (mesa_id, usuario_id, estado_id, notas)
+VALUES
+(1, 1, 1, 'Sin sal en la ensalada');
+
+-- Detalles del pedido
+INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, notas)
+VALUES
+(1, 1, 2, 8.50, 'Sin orégano'),
+(1, 2, 1, 5.00, 'Sin cebolla');
+
+-- Pagos
+INSERT INTO pagos (pedido_id, monto, metodo_pago_id, usuario_id)
+VALUES
+(1, 22.00, 1, 1);
+
+-- Datos de ejemplo para pruebas del aplicativo MenuMaster
+
+-- Ingredientes
+INSERT INTO ingredientes (nombre, descripcion, unidad_medida, stock_actual, stock_minimo, precio_compra, proveedor_id, estado_id)
+VALUES
+('Tomate', 'Tomate fresco', 'kg', 10, 2, 1.50, 1, 1),
+('Queso', 'Queso mozzarella', 'kg', 5, 1, 5.00, 1, 1),
+('Harina', 'Harina de trigo', 'kg', 20, 5, 0.80, 1, 1);
+
+-- Productos
+INSERT INTO productos (nombre, descripcion, precio, imagen_url, categoria_id, tiempo_preparacion_min, estado_id, destacado)
+VALUES
+('Pizza Margarita', 'Pizza con tomate y queso', 8.50, 'pizza.jpg', 2, 15, 1, 1),
+('Ensalada Mixta', 'Ensalada de tomate y lechuga', 5.00, 'ensalada.jpg', 1, 10, 1, 0);
+
+-- Relación productos-ingredientes
+INSERT INTO productos_ingredientes (producto_id, ingrediente_id, cantidad)
+VALUES
+(1, 1, 0.2), -- Pizza Margarita lleva 0.2kg de tomate
+(1, 2, 0.3), -- Pizza Margarita lleva 0.3kg de queso
+(1, 3, 0.25), -- Pizza Margarita lleva 0.25kg de harina
+(2, 1, 0.1); -- Ensalada Mixta lleva 0.1kg de tomate
+
+-- Pedidos
+INSERT INTO pedidos (mesa_id, usuario_id, estado_id, notas)
+VALUES
+(1, 1, 1, 'Sin sal en la ensalada');
+
+-- Detalles del pedido
+INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, notas)
+VALUES
+(1, 1, 2, 8.50, 'Sin orégano'),
+(1, 2, 1, 5.00, 'Sin cebolla');
+
+-- Pagos
+INSERT INTO pagos (pedido_id, monto, metodo_pago_id, usuario_id)
+VALUES
+(1, 22.00, 1, 1);
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

@@ -1,3 +1,190 @@
+/* Selector de Ingredientes */
+.selector-ingredientes {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-background-card);
+}
+
+.selector-ingredientes h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+}
+
+.selector-ingredientes h4 {
+    color: var(--color-text-secondary);
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+}
+
+.selector-ingredientes-loading,
+.selector-ingredientes-error {
+    padding: 1rem;
+    text-align: center;
+    border-radius: var(--border-radius);
+}
+
+.selector-ingredientes-loading {
+    background-color: var(--color-background-light);
+    color: var(--color-text-secondary);
+}
+
+.selector-ingredientes-error {
+    background-color: var(--color-error-light);
+    color: var(--color-error);
+}
+
+.ingredientes-busqueda {
+    margin-bottom: 1rem;
+}
+
+.ingredientes-busqueda input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+}
+
+.ingredientes-disponibles {
+    margin-bottom: 1.5rem;
+}
+
+.ingredientes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius);
+}
+
+.ingrediente-card {
+    position: relative;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-background-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.ingrediente-card:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ingrediente-card.seleccionado {
+    border-color: var(--color-primary);
+    background-color: var(--color-primary-light);
+}
+
+.ingrediente-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.ingrediente-nombre {
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.ingrediente-stock {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+.ingrediente-seleccionado-badge {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.ingredientes-seleccionados {
+    border-top: 1px solid var(--color-border);
+    padding-top: 1rem;
+}
+
+.ingredientes-seleccionados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ingrediente-seleccionado {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background-color: var(--color-background-light);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+}
+
+.ingrediente-seleccionado .ingrediente-nombre {
+    flex: 1;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.ingrediente-cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ingrediente-cantidad-control label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.cantidad-input {
+    width: 80px;
+    padding: 0.25rem 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+}
+
+.ingrediente-cantidad-control .unidad {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ingredientes-grid {
+        grid-template-columns: 1fr;
+        max-height: 200px;
+    }
+    
+    .ingrediente-seleccionado {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .ingrediente-cantidad-control {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
 /*productosNuevos.css*/
 /* --- Contenedor principal de la aplicación --- */
 .app-container {

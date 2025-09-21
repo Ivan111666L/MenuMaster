@@ -6,7 +6,10 @@ export const getProductos = async () => {
     const response = await api.get('/productos?todos=true');
     
     // Aseguramos que todos los productos estén disponibles
-    if (response.data && Array.isArray(response.data)) {
+    if (response.data && response.data.data && Array.isArray(response.data.data)) {
+      console.log(`Productos cargados: ${response.data.data.length}`);
+      return response.data.data;
+    } else if (response.data && Array.isArray(response.data)) {
       console.log(`Productos cargados: ${response.data.length}`);
       return response.data;
     } else {
@@ -36,6 +39,26 @@ export const getProductosByCategoria = async (categoriaId) => {
     return response.data;
   } catch (error) {
     console.error(`Error al obtener productos de la categoría ${categoriaId}:`, error);
+    throw error;
+  }
+};
+
+export const getCategorias = async () => {
+  try {
+    const response = await api.get('/categorias');
+    return response.data.data;
+  } catch (error) {
+    console.error("Error al obtener categorías:", error);
+    return [];
+  }
+};
+
+export const cambiarCantidad = async (id, cantidad) => {
+  try {
+    const response = await api.put(`/api/productos/${id}/cantidad`, { cantidad });
+    return response.data.data;
+  } catch (error) {
+    console.error(`Error al cambiar cantidad del producto ${id}:`, error);
     throw error;
   }
 };

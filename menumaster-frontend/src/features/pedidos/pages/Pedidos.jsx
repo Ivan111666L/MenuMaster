@@ -1,9 +1,15 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { usePedido } from '@/features/pedidos/hooks/usePedido';
 import PedidoForm from '@/features/pedidos/components/PedidoForm';
 import PedidoResumen from '@/features/pedidos/components/PedidoResumen';
+import PedidoTicket from '@/features/pedidos/components/PedidoTicket';
+import ListaPedidos from '@/features/pedidos/components/ListaPedidos';
+import pedidoService from '@/features/pedidos/services/pedidoService';
 import Spinner from '@/components/Spinner';
 import '@/styles/pedidos.css';
+
+
 
 function Pedidos() {
   // Utilizamos el hook personalizado que creamos
@@ -18,10 +24,29 @@ function Pedidos() {
     addProducto, 
     removeProducto, 
     updateCantidad, 
-    savePedido 
+    savePedido,
+    ticketHtml,
+    ticketOpen,
+    setTicketOpen
   } = usePedido();
 
-  if (loading) return <Spinner />;
+  // Estado para la lista de pedidos creados
+  const [pedidosCreados, setPedidosCreados] = useState([]);
+  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
+  const [loadingPedidos, setLoadingPedidos] = useState(true);
+
+  useEffect(() => {
+    const fetchPedidos = async () => {
+      setLoadingPedidos(true);
+      const pedidos = await pedidoService.getPedidos();
+      setPedidosCreados(pedidos);
+      setLoadingPedidos(false);
+    };
+    fetchPedidos();
+  }, []);
+
+
+  if (loading || loadingPedidos) return <Spinner />;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
@@ -51,6 +76,16 @@ function Pedidos() {
           enviarPedido={savePedido}
         />
       </div>
+      {/* Mostrar la lista de pedidos creados */}
+      <div style={{marginTop: '2em'}}>
+        <ListaPedidos
+          pedidos={pedidosCreados}
+          pedidoSeleccionado={pedidoSeleccionado}
+          seleccionarPedido={setPedidoSeleccionado}
+        />
+      </div>
+      {/* Mostrar el ticket en un modal si está disponible */}
+      <PedidoTicket html={ticketHtml} open={ticketOpen} onClose={() => setTicketOpen(false)} />
     </div>
   );
 }

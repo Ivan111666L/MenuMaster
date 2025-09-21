@@ -3,7 +3,7 @@ import mesaService from '@/features/mesas/services/mesaService';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import './ConfiguracionMesas.css'; // Asegúrate de tener este archivo de estilos
+import '@/styles/configuracion.css'; // Asegúrate de tener este archivo de estilos
 
 const estadoInicialNuevaMesa = {
   numero: '',

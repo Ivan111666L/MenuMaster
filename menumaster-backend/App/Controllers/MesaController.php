@@ -127,6 +127,19 @@ class MesaController
     }
 
     /**
+     * Obtiene todas las mesas disponibles.
+     * Corresponde a: GET /api/mesas/disponibles
+     */
+    public function disponibles(): void
+    {
+        $mesas = $this->mesaModel->findDisponibles();
+        if ($mesas === false) {
+            throw new Exception("No se pudieron obtener las mesas disponibles.", 500);
+        }
+        $this->sendResponse(200, ['success' => true, 'data' => $mesas]);
+    }
+
+    /**
      * Resetea el estado de todas las mesas a 'disponible'.
      * Corresponde a: POST /api/mesas/reset
      */

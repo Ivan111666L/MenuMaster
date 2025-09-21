@@ -1,13 +1,21 @@
+// --- Componente para mostrar el resumen del pedido ---
+// Muestra los productos seleccionados, el total y las acciones para enviar o limpiar el pedido.
 import React from 'react';
 import Button from '@/components/Button';
 
+// --- Componente principal ---
+// Gestiona la visualización y acciones del resumen del pedido.
 function PedidoResumen({ pedidoActual, eliminarItem, limpiarPedido, enviarPedido }) {
-  const total = pedidoActual.items.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
+  // Verificamos que pedidoActual exista, si no, usamos un objeto con items como array vacío
+  const pedido = pedidoActual || { items: [] };
+  const total = pedido.items.reduce((sum, item) => sum + (item.cantidad * item.precio), 0);
 
+  // --- Renderizado del resumen ---
+  // Muestra la tabla de productos, el total y los botones de acción.
   return (
     <div className="pedido-resumen">
       <h2>2. Resumen del Pedido</h2>
-      {pedidoActual.items.length === 0 ? (
+      {pedido.items.length === 0 ? (
         <p className="resumen-vacio">Añade productos desde el panel de la izquierda.</p>
       ) : (
         <>
@@ -21,7 +29,7 @@ function PedidoResumen({ pedidoActual, eliminarItem, limpiarPedido, enviarPedido
               </tr>
             </thead>
             <tbody>
-              {pedidoActual.items.map(item => (
+              {pedido.items.map(item => (
                 <tr key={item.producto_id}>
                   <td>{item.nombre}</td>
                   <td>{item.cantidad}</td>

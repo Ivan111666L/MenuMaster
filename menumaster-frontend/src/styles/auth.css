@@ -5,29 +5,43 @@
     align-items: center;
     min-height: 100vh;
     padding: 1.5rem;
+    background: linear-gradient(135deg, var(--primary-navy) 0%, var(--primary-teal) 100%);
 }
 
 .auth-form-container {
-    background-color: var(--color-surface);
-    padding: 2.5rem;
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
+    background-color: var(--white);
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
     width: 100%;
     max-width: 420px;
+    border: 1px solid var(--border-light);
+}
+
+/* Logo en páginas de autenticación */
+.auth-logo-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.auth-logo {
+    max-width: 120px;
+    height: auto;
 }
 
 .auth-title {
     text-align: center;
-    font-size: 1.875rem;
+    font-size: 2rem;
     font-weight: 700;
-    color: var(--color-text-primary);
+    color: var(--primary-navy);
     margin-bottom: 0.75rem;
 }
 
 .auth-subtitle {
     text-align: center;
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
     margin-bottom: 2rem;
+    font-size: 1rem;
 }
 
 /* --- Formulario --- */
@@ -38,6 +52,24 @@
 .password-input-wrapper {
     position: relative;
     margin-bottom: 1.25rem;
+}
+
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--gray);
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: color 0.3s ease;
+}
+
+.password-toggle-btn:hover {
+    color: var(--primary-teal);
 }
 
 /* 🔒 Fix: compatibilidad de user-select */
@@ -56,17 +88,35 @@
 }
 
 .auth-error-message {
-    background-color: var(--color-error-bg);
-    color: var(--color-error);
-    border-radius: var(--border-radius-small);
-    padding: 0.75rem;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--danger);
+    border-radius: 8px;
+    padding: 1rem;
     margin-bottom: 1.25rem;
     text-align: center;
     font-size: 0.9rem;
+    border-left: 4px solid var(--danger);
 }
 
 .auth-form .w-full {
     width: 100%;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+.auth-links a {
+    color: var(--primary-teal);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.auth-links a:hover {
+    color: var(--primary-navy);
+    text-decoration: underline;
 }
 
 /* --- Enlaces (Olvidé contraseña, Crear cuenta) --- */

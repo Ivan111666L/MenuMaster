@@ -2,6 +2,7 @@
 namespace app\Controllers;
 
 use app\Models\PedidoModel;
+use app\Models\MesaModel;
 use app\Middleware\AuthMiddleware;
 use app\Controllers\AuthController;
 use app\Utils\Validator;
@@ -11,12 +12,14 @@ use Exception;
 class PedidoController
 {
     private $pedidoModel;
+    private $mesaModel;
     private $db;
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
         $this->pedidoModel = new PedidoModel($this->db);
+        $this->mesaModel = new MesaModel($this->db);
     }
 
     /**
@@ -86,6 +89,11 @@ class PedidoController
             throw new Exception("Error al crear el pedido. Verifique el stock o los datos del producto.", 500);
         }
         
+        // Cambiar el estado de la mesa a 'ocupada' después de crear el pedido
+        if (!$this->mesaModel->cambiarEstado($data['mesa_id'], 'ocupada')) {
+            error_log("Advertencia: No se pudo cambiar el estado de la mesa {$data['mesa_id']} a ocupada");
+        }
+        
         $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
         $this->sendResponse(201, $nuevoPedido);
     }
@@ -97,8 +105,23 @@ class PedidoController
     {
         Validator::validate($data, ['estado' => 'required']);
         
+        // Obtener información del pedido antes de actualizar el estado
+        $pedido = $this->pedidoModel->getPedidoWithDetails($id);
+        if (!$pedido) {
+            throw new Exception("Pedido no encontrado.", 404);
+        }
+        
         if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
             throw new Exception("Error al actualizar el estado del pedido.", 500);
+        }
+        
+        // Si el pedido se marca como entregado o completado, liberar la mesa
+        $estadosQueLiberanMesa = ['entregado', 'completado', 'finalizado'];
+        if (in_array(strtolower($data['estado']), $estadosQueLiberanMesa)) {
+            $mesaId = $pedido['mesa_id'] ?? null;
+            if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+                error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
+            }
         }
         
         $this->sendResponse(200, ["mensaje" => "Estado del pedido actualizado."]);
@@ -109,9 +132,21 @@ class PedidoController
      */
     public function facturar(int $id, array $data): void
     {
+        // Obtener la información del pedido antes de facturarlo para saber qué mesa liberar
+        $pedido = $this->pedidoModel->getPedidoWithDetails($id);
+        if (!$pedido) {
+            throw new Exception("Pedido no encontrado.", 404);
+        }
+        
         // En una implementación real, aquí se validaría $data['metodo_pago'], etc.
         if (!$this->pedidoModel->facturarPedido($id)) {
             throw new Exception("No se pudo facturar el pedido. Verifique el ID.", 500);
+        }
+        
+        // Cambiar el estado de la mesa a 'disponible' después de facturar el pedido
+        $mesaId = $pedido['mesa_id'] ?? null;
+        if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+            error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
         }
         
         $this->sendResponse(200, ["mensaje" => "Pedido facturado con éxito."]);

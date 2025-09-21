@@ -4,13 +4,11 @@ import { toast } from 'react-toastify'; // Importamos la librería de notificaci
 import facturacionService from '@/features/facturacion/services/facturacionService';
 
 // --- Función de ayuda para la impresión ---
-const imprimirContenido = (contenido) => {
-    const ventanaImpresion = window.open('', '_blank');
-    ventanaImpresion.document.write(`<pre style="font-family: monospace; font-size: 12px;">${contenido}</pre>`);
-    ventanaImpresion.document.close();
-    ventanaImpresion.focus();
-    ventanaImpresion.print();
-    ventanaImpresion.close();
+const imprimirTicket = (contenido) => {
+  const win = window.open('', '_blank');
+  win.document.write(contenido);
+  win.print();
+  win.close();
 };
 
 export const useFacturacion = () => {
@@ -93,7 +91,7 @@ export const useFacturacion = () => {
             facturaTexto += "========================================\n";
         }
 
-        imprimirContenido(facturaTexto);
+        imprimirTicket(facturaTexto);
         // Marcamos el pedido como facturado en el backend después de imprimir
         facturarYRecargar(pedidoSeleccionado.id, 'Impreso');
     };

@@ -41,14 +41,16 @@ export const usePedido = () => {
     const [pedidoActual, setPedidoActual] = useState({ mesa_id: '', items: [], notas: '' });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [ticketHtml, setTicketHtml] = useState(null);
+    const [ticketOpen, setTicketOpen] = useState(false);
 
     // --- Carga de Datos ---
     const fetchData = useCallback(async () => {
         try {
             const data = await pedidoService.getTomaPedidoData();
-            // Filtramos solo las mesas que están disponibles
+            // Las mesas ya vienen filtradas como disponibles desde el backend
             setProductos(data.productos || []);
-            setMesas(data.mesas.filter(mesa => mesa.estado === 'disponible') || []);
+            setMesas(data.mesas || []);
         } catch (err) {
             setError('No se pudieron cargar los datos para tomar pedidos.');
         } finally {
@@ -61,28 +63,73 @@ export const usePedido = () => {
     }, [fetchData]);
 
     // --- Acciones ---
-    const seleccionarMesa = (mesaId) => {
+    const handleChangeMesa = (mesaId) => {
         setPedidoActual(prev => ({ ...prev, mesa_id: mesaId }));
     };
 
-    const agregarItem = (producto) => {
+    const handleChangeCliente = (cliente) => {
+        setPedidoActual(prev => ({ ...prev, cliente }));
+    };
+
+    const addProducto = (producto) => {
         setPedidoActual(prev => {
             const items = [...prev.items];
             const itemExistente = items.find(item => item.producto_id === producto.id);
             if (itemExistente) {
                 itemExistente.cantidad += 1;
             } else {
-                items.push({ producto_id: producto.id, nombre: producto.nombre, cantidad: 1, precio: producto.precio });
+                items.push({ 
+                    producto_id: producto.id, 
+                    nombre: producto.nombre, 
+                    cantidad: 1, 
+                    precio: producto.precio 
+                });
             }
             return { ...prev, items };
         });
     };
-    
-    const eliminarItem = (productoId) => {
+
+    const removeProducto = (productoId) => {
         setPedidoActual(prev => ({
             ...prev,
             items: prev.items.filter(item => item.producto_id !== productoId)
         }));
+    };
+
+    const updateCantidad = (productoId, cantidad) => {
+        setPedidoActual(prev => ({
+            ...prev,
+            items: prev.items.map(item => 
+                item.producto_id === productoId 
+                    ? { ...item, cantidad: Math.max(1, cantidad) }
+                    : item
+            )
+        }));
+    };
+
+    const savePedido = async () => {
+        if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
+            toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
+            return;
+        }
+        try {
+            setLoading(true);
+            const pedidoCreado = await pedidoService.createPedido(pedidoActual);
+            // Obtener el ticket HTML desde el backend
+            const ticketData = await pedidoService.getPedidoTicket(pedidoCreado.id);
+            setTicketHtml(ticketData.html);
+            setTicketOpen(true);
+            toast.success('¡Pedido enviado a cocina exitosamente!');
+            setPedidoActual({ mesa_id: '', items: [], notas: '' });
+        } catch (err) {
+            toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    const eliminarItem = (productoId) => {
+        removeProducto(productoId);
     };
 
     const limpiarPedido = () => {
@@ -90,32 +137,31 @@ export const usePedido = () => {
     };
 
     const enviarPedido = async () => {
-        if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
-            // CORRECCIÓN: Se usa toast en lugar de alert
-            toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
-            return;
-        }
-        try {
-            setLoading(true);
-            const pedidoCreado = await pedidoService.createPedido(pedidoActual);
-            
-            // Se conserva la lógica de impresión
-            generarTicketCocina(pedidoCreado);
-            
-            // CORRECCIÓN: Se usa toast en lugar de alert
-            toast.success('¡Pedido enviado a cocina exitosamente!');
-            limpiarPedido();
-        } catch (err) {
-            // CORRECCIÓN: Se usa toast en lugar de alert, mostrando el error de la API
-            toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
-        } finally {
-            setLoading(false);
-        }
+        await savePedido();
     };
     
     // Devolvemos todo lo que los componentes necesitan
     return {
-        loading, error, productos, mesas, pedidoActual,
-        seleccionarMesa, agregarItem, eliminarItem, limpiarPedido, enviarPedido
+        pedido: pedidoActual,
+        loading, 
+        error, 
+        productos, 
+        mesas, 
+        handleChangeMesa, 
+        handleChangeCliente, 
+        addProducto, 
+        removeProducto, 
+        updateCantidad, 
+        savePedido,
+        // Mantenemos compatibilidad con nombres antiguos
+        pedidoActual,
+        seleccionarMesa: handleChangeMesa,
+        agregarItem: addProducto,
+        eliminarItem,
+        limpiarPedido,
+        enviarPedido,
+        ticketHtml,
+        ticketOpen,
+        setTicketOpen
     };
 };

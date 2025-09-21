@@ -4,7 +4,7 @@ import api from '@/services/api'; // Tu instancia central de Axios
  * Obtiene todas las mesas desde el backend.
  */
 const getMesas = async () => {
-    // Llama a: GET /api/mesas
+    // Llama a: GET /mesas
     const response = await api.get('/mesas');
     return response.data.data;
 };
@@ -14,7 +14,7 @@ const getMesas = async () => {
  * @param {object} mesaData - Datos de la nueva mesa.
  */
 const createMesa = async (mesaData) => {
-    // Llama a: POST /api/mesas
+    // Llama a: POST /mesas
     const response = await api.post('/mesas', mesaData);
     return response.data.data;
 };
@@ -26,7 +26,7 @@ const createMesa = async (mesaData) => {
  */
 const updateMesa = async (id, mesaData) => {
     // Llama a: PUT /api/mesas/{id}
-    const response = await api.put(`/mesas/${id}`, mesaData);
+    const response = await api.put(`/api/mesas/${id}`, mesaData);
     return response.data.data;
 };
 
@@ -35,8 +35,7 @@ const updateMesa = async (id, mesaData) => {
  * @param {number} id - ID de la mesa a eliminar.
  */
 const deleteMesa = async (id) => {
-    // Llama a: DELETE /api/mesas/{id}
-    await api.delete(`/mesas/${id}`);
+  await api.delete(`/api/mesas/${id}`);
 };
 
 /**
@@ -44,7 +43,7 @@ const deleteMesa = async (id) => {
  * @returns {Promise<any>}
  */
 const resetAllMesas = async () => {
-    // Llama a: POST /api/mesas/reset
+    // Llama a: POST /mesas/reset
     const response = await api.post('/mesas/reset');
     return response.data;
 };
