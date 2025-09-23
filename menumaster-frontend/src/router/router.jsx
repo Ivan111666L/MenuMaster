@@ -33,6 +33,9 @@ import ProductoNuevo from '@/features/productos/pages/ProductoNuevos.jsx';
 import ConfiguracionUsuarios from '@/features/configuracion/pages/ConfiguracionUsuarios.jsx';
 import ConfiguracionMesas from '@/features/configuracion/pages/ConfiguracionMesas.jsx';
 
+// Módulo de Análisis Avanzado
+import AnalisisModule from '@/features/analisis';
+
 
 const router = createBrowserRouter([
   {
@@ -154,6 +157,14 @@ const router = createBrowserRouter([
                 ),
               },
             ],
+          },
+          {
+            path: 'analisis/*',
+            element: (
+              <PrivateRoute roles={['administrador', 'gerente']}>
+                <AnalisisModule />
+              </PrivateRoute>
+            ),
           },
         ],
       },

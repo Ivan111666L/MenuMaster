@@ -44,4 +44,4 @@ if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
 
 // --- Carga del Enrutador Principal ---
 // Se delega el manejo de todas las peticiones al enrutador.
-require_once BASE_PATH . '/routes/router.php';
+require_once BASE_PATH . '/App/routes/router.php';

@@ -11,6 +11,7 @@ final class ConexionDb { // <-- CORREGIDO: ConexionDb con mayúsculas
 
     private function __construct() {}
     private function __clone() {}
+    
 
     /**
      * Obtiene la única instancia de la conexión a la base de datos (Patrón Singleton).
@@ -48,5 +49,9 @@ final class ConexionDb { // <-- CORREGIDO: ConexionDb con mayúsculas
         }
 
         return self::$conn;
+    }
+    public static function getInstance(): self
+    {
+        return new self();
     }
 }

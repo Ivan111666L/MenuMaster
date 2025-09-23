@@ -39,7 +39,6 @@ CREATE TABLE `categorias` (
 --
 -- Volcado de datos para la tabla `categorias`
 --
-
 INSERT INTO `categorias` (`id`, `nombre`, `descripcion`, `estado_id`, `fecha_creacion`, `fecha_actualizacion`) VALUES
 (1, 'Entradas', 'Platos para comenzar la comida', 1, '2025-09-15 02:07:13', '2025-09-15 02:07:13'),
 (2, 'Platos Principales', 'Platos fuertes y principales', 1, '2025-09-15 02:07:13', '2025-09-15 02:07:13'),
@@ -360,10 +359,6 @@ CREATE TABLE `usuarios` (
 --
 -- Volcado de datos para la tabla `usuarios`
 --
-
-INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol_id`, `estado_id`, `fecha_creacion`, `fecha_actualizacion`, `reset_token`, `reset_token_expires_at`) VALUES
-(1, 'Michael', 'michaelripoll9@gmail.com', '112233', 1, 1, '2025-09-15 02:07:13', '2025-09-15 02:07:13', NULL, NULL);
-
 --
 -- Índices para tablas volcadas
 --

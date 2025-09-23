@@ -1,3 +1,4 @@
+
 // src/context/AuthContext.jsx
 import React, {
   createContext,
@@ -12,16 +13,16 @@ import authService from '@/features/auth/services/authService';
 
 const AuthContext = createContext(null);
 
-const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutos
+const INACTIVITY_LIMIT_MS = 15 * 60 * 1000; // 15 minutes
 const LOCAL_STORAGE_KEY = 'auth_session';
-const TOKEN_EXPIRATION_BUFFER_S = 30; // margen de seguridad
+const TOKEN_EXPIRATION_BUFFER_S = 30; // security margin
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Cargar sesión desde localStorage
+  // Load session from localStorage
   useEffect(() => {
     try {
       const savedSession = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
@@ -34,14 +35,14 @@ export function AuthProvider({ children }) {
         }
       }
     } catch (error) {
-      console.error("Error al cargar la sesión:", error);
+      console.error("Error loading session:", error);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  // Logout
+  // Logout handler
   const logout = useCallback(() => {
     authService.logout();
     setSession(null);
@@ -49,14 +50,14 @@ export function AuthProvider({ children }) {
     navigate('/login', { replace: true });
   }, [navigate]);
 
-  // Login
+  // Login handler
   const login = useCallback(async (credentials) => {
     try {
       const sessionData = await authService.login(credentials);
 
       if (!sessionData?.user || !sessionData?.token || !sessionData?.expiraEn) {
-        console.error("Datos de sesión incompletos:", sessionData);
-        throw new Error("La respuesta del servidor no contiene los datos necesarios.");
+        console.error("Incomplete session data:", sessionData);
+        throw new Error("Server response missing required data");
       }
 
       const newSession = {
@@ -79,14 +80,14 @@ export function AuthProvider({ children }) {
 
       return newSession;
     } catch (error) {
-      console.error("Fallo el login en AuthContext:", error);
+      console.error("Login failed in AuthContext:", error);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
       setSession(null);
       throw error;
     }
   }, [navigate]);
 
-  // Sincronización entre pestañas
+  // Tab synchronization
   useEffect(() => {
     const handleStorageChange = (event) => {
       if (event.key === LOCAL_STORAGE_KEY) {
@@ -101,7 +102,7 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Expiración automática e inactividad
+  // Auto expiration and inactivity handling
   useEffect(() => {
     if (!session) return;
 
@@ -152,7 +153,7 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === null) {
-    throw new Error('useAuth debe ser usado dentro de un AuthProvider');
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

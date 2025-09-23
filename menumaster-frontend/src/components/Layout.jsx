@@ -29,13 +29,23 @@ const Layout = () => {
         // Menús base para cada rol. Así es más fácil de mantener.
         const baseMenus = {
             administrador: [
-                { path: "/dashboard", label: "Dashboard", icon: <FaBoxes /> },
+                { path: "/dashboard", label: "Dashboard", icon: <FaChartBar /> },
                 { path: "/productos", label: "Productos", icon: <FaHome /> },
                 { path: "/inventario", label: "Inventario", icon: <FaClipboardList /> },
-                { path: "/facturacion", label: "Facturación", icon: <FaChartBar /> },
+                { path: "/facturacion", label: "Facturación", icon: <FaFileInvoiceDollar /> },
                 { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
                 { path: "/mesas", label: "Mesas", icon: <FaFileInvoiceDollar /> },
+                { path: "/analisis", label: "Análisis Avanzado", icon: <FaChartBar /> },
                 { path: "/configuracion", label: "Configuracion", icon: <FaCog /> }, // Ruta para gestionar usuarios
+            ],
+            gerente: [
+                { path: "/dashboard", label: "Dashboard", icon: <FaChartBar /> },
+                { path: "/productos", label: "Productos", icon: <FaHome /> },
+                { path: "/inventario", label: "Inventario", icon: <FaClipboardList /> },
+                { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
+                { path: "/facturacion", label: "Facturación", icon: <FaFileInvoiceDollar /> },
+                { path: "/mesas", label: "Mesas", icon: <FaFileInvoiceDollar /> },
+                { path: "/analisis", label: "Análisis Avanzado", icon: <FaChartBar /> }
             ],
             mesero: [
                 { path: "/mesas", label: "Mesas", icon: <FaFileInvoiceDollar /> },

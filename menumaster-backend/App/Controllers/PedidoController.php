@@ -1,11 +1,11 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\PedidoModel;
-use app\Models\MesaModel;
-use app\Middleware\AuthMiddleware;
-use app\Controllers\AuthController;
-use app\Utils\Validator;
+use App\Models\PedidoModel;
+use App\Models\MesaModel;
+use App\Middleware\AuthMiddleware;
+use App\Controllers\AuthController;
+use App\Utils\Validator;
 use PDO;
 use Exception;
 
@@ -84,6 +84,9 @@ class PedidoController
         
         $notas = $data['notas'] ?? null;
         
+        // Verificar stock de productos en el menú del día antes de crear el pedido
+        $this->verificarStockProductos($data['items']);
+        
         $pedidoId = $this->pedidoModel->createPedido($data['mesa_id'], $usuarioId, $data['items'], $notas);
         if (!$pedidoId) {
             throw new Exception("Error al crear el pedido. Verifique el stock o los datos del producto.", 500);
@@ -96,6 +99,73 @@ class PedidoController
         
         $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
         $this->sendResponse(201, $nuevoPedido);
+    }
+    
+    /**
+     * Verifica el stock disponible de los productos en el menú del día
+     */
+    private function verificarStockProductos(array $items): void
+    {
+        $productosAVerificar = [];
+        
+        // Recopilar todos los productos individuales y de combos
+        foreach ($items as $item) {
+            // Si es un producto individual
+            if (!isset($item['es_combo']) || !$item['es_combo']) {
+                if (isset($item['producto_id'])) {
+                    $productoId = $item['producto_id'];
+                    $cantidad = $item['cantidad'] ?? 1;
+                    
+                    if (!isset($productosAVerificar[$productoId])) {
+                        $productosAVerificar[$productoId] = 0;
+                    }
+                    $productosAVerificar[$productoId] += $cantidad;
+                }
+            }
+            // Si es un combo, verificar cada elemento
+            else if (isset($item['elementos']) && is_array($item['elementos'])) {
+                foreach ($item['elementos'] as $elemento) {
+                    if (isset($elemento['producto_id'])) {
+                        $productoId = $elemento['producto_id'];
+                        $cantidad = $elemento['cantidad'] ?? 1;
+                        
+                        if (!isset($productosAVerificar[$productoId])) {
+                            $productosAVerificar[$productoId] = 0;
+                        }
+                        $productosAVerificar[$productoId] += $cantidad;
+                    }
+                }
+            }
+        }
+        
+        // Verificar stock para cada producto
+        if (!empty($productosAVerificar)) {
+            $placeholders = implode(',', array_fill(0, count($productosAVerificar), '?'));
+            $query = "SELECT m.producto_id, m.stock_actual, m.stock_limite, p.nombre 
+                     FROM menu_del_dia m 
+                     JOIN productos p ON m.producto_id = p.id
+                     WHERE m.producto_id IN ($placeholders) 
+                     AND m.stock_limite IS NOT NULL";
+            
+            $stmt = $this->db->prepare($query);
+            $i = 1;
+            foreach (array_keys($productosAVerificar) as $productoId) {
+                $stmt->bindValue($i++, $productoId, PDO::PARAM_INT);
+            }
+            $stmt->execute();
+            
+            $productosConStock = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Verificar si hay suficiente stock para cada producto
+            foreach ($productosConStock as $producto) {
+                $productoId = $producto['producto_id'];
+                $cantidadSolicitada = $productosAVerificar[$productoId] ?? 0;
+                
+                if ($cantidadSolicitada > $producto['stock_actual']) {
+                    throw new Exception("Stock insuficiente para el producto '{$producto['nombre']}'. Disponible: {$producto['stock_actual']}, Solicitado: {$cantidadSolicitada}", 400);
+                }
+            }
+        }
     }
     
     /**
@@ -149,8 +219,59 @@ class PedidoController
             error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
         }
         
+        // Imprimir recibo
+        $this->imprimirRecibo($pedido);
+        
         $this->sendResponse(200, ["mensaje" => "Pedido facturado con éxito."]);
     }
+    
+    /**
+     * Imprime un recibo para el pedido
+     */
+    private function imprimirRecibo(array $pedido): void
+    {
+        try {
+            // Cargar el gestor de impresión
+            $printerManager = new \App\Utils\PrinterManager();
+            
+            // Imprimir recibo
+            $printerManager->printReceipt($pedido);
+        } catch (Exception $e) {
+            error_log("Error al imprimir recibo: " . $e->getMessage());
+            // No lanzamos excepción para no interrumpir el flujo principal
+        }
+    }
+    
+    /**
+     * POST /api/pedidos/{id}/imprimir
+     * Imprime un pedido para la cocina
+     */
+    public function imprimirPedido(int $id): void
+    {
+        try {
+            // Obtener detalles del pedido
+            $pedido = $this->pedidoModel->getPedidoWithDetails($id);
+            if (!$pedido) {
+                throw new Exception("Pedido no encontrado.", 404);
+            }
+            
+            // Cargar el gestor de impresión
+            $printerManager = new \App\Utils\PrinterManager();
+            
+            // Imprimir pedido
+            $resultado = $printerManager->printOrder($pedido);
+            
+            if ($resultado) {
+                $this->sendResponse(200, ["mensaje" => "Pedido enviado a impresión correctamente."]);
+            } else {
+                throw new Exception("No se pudo imprimir el pedido. Verifique la configuración de la impresora.", 500);
+            }
+        } catch (Exception $e) {
+            $this->sendResponse(500, ["error" => $e->getMessage()]);
+        }
+    }
+
+
 
     /**
      * DELETE /api/pedidos/{id}

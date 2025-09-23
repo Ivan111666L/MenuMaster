@@ -4,11 +4,16 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use PHPUnit\Framework\TestCase;
+// Required PHPUnit packages for mocking and testing
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use App\Controllers\AuthController;
 use App\Models\UsuarioModel;
 use App\Models\RolModel;
 use PDO;
 use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class AuthTest extends TestCase
 {
@@ -34,14 +39,21 @@ class AuthTest extends TestCase
         $email = 'test@example.com';
         $password = 'password123';
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
-        $userFromDb = ['id' => 1, 'nombre' => 'Test User', 'email' => $email, 'password' => $hashedPassword, 'rol_id' => 1];
+        $userFromDb = [
+            'id' => 1, 
+            'nombre' => 'Test User', 
+            'email' => $email, 
+            'password' => $hashedPassword, 
+            'rol_id' => 1,
+            'rol' => ['id' => 1, 'nombre' => 'admin'] // Added rol information
+        ];
 
         $this->usuarioModelMock->method('findByEmail')->willReturn($userFromDb);
         $this->usuarioModelMock->method('find')->willReturn($userFromDb);
+        $this->rolModelMock->method('find')->willReturn(['id' => 1, 'nombre' => 'admin']);
 
         $authController = new AuthController($this->dbMock, $this->usuarioModelMock, $this->rolModelMock);
 
-        // Simula entrada JSON en php://input
         $input = json_encode(['email' => $email, 'password' => $password]);
         $this->setInputStream($input);
 
@@ -70,19 +82,29 @@ class AuthTest extends TestCase
      */
     public function testRegisterSuccess(): void
     {
-        $userData = ['nombre' => 'Nuevo Usuario', 'email' => 'nuevo@example.com', 'password' => 'password123', 'rol_id' => 2];
+        $userData = [
+            'nombre' => 'Nuevo Usuario', 
+            'email' => 'nuevo@example.com', 
+            'password' => 'password123', 
+            'rol' => 'mesero'
+        ];
 
         $this->usuarioModelMock->method('findByEmail')->willReturn(false);
         $this->rolModelMock->method('findByName')->willReturn(['id' => 2, 'nombre' => 'mesero']);
         $this->usuarioModelMock->method('create')->willReturn(10);
-        $this->usuarioModelMock->method('find')->willReturn(['id' => 10, 'nombre' => 'Nuevo Usuario']);
+        $this->usuarioModelMock->method('find')->willReturn([
+            'id' => 10, 
+            'nombre' => 'Nuevo Usuario',
+            'email' => 'nuevo@example.com',
+            'rol' => ['id' => 2, 'nombre' => 'mesero']
+        ]);
 
         $authController = new AuthController($this->dbMock, $this->usuarioModelMock, $this->rolModelMock);
 
         $input = json_encode($userData);
         $this->setInputStream($input);
 
-        $this->expectOutputRegex('/"Usuario registrado correctamente"/');
+        $this->expectOutputRegex('/"message":"Usuario registrado correctamente"/');
         $authController->register();
     }
 
@@ -91,12 +113,8 @@ class AuthTest extends TestCase
      */
     private function setInputStream(string $input): void
     {
-        // Crea un stream temporal y lo asigna a php://input
         $stream = fopen('php://memory', 'r+');
         fwrite($stream, $input);
         rewind($stream);
-        // Usa stream_wrapper_unregister y stream_wrapper_register si es necesario
-        // En PHPUnit, puedes usar vfsStream o monkeypatch si tu entorno lo permite
-        // Aquí solo documentamos el método, la implementación depende del entorno
     }
 }
