@@ -1,7 +1,7 @@
 <?php
 // routes/proveedores_api.php
 require_once BASE_PATH . '/app/Controllers/ProveedorController.php';
-use app\Controllers\ProveedorController;
+use App\Controllers\ProveedorController;
 
 try {
     $controller = new ProveedorController($db);

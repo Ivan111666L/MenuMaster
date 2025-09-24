@@ -1,35 +1,103 @@
-# Pruebas del Sistema MenuMaster
+# Tests para MenuMaster
 
-Este directorio contiene las pruebas para el sistema MenuMaster.
+Este directorio contiene todos los tests del sistema MenuMaster, organizados de manera estructurada para facilitar el mantenimiento y la ejecución.
 
-## Estructura
+## Estructura de Tests
 
-- `unit/` - Pruebas unitarias para componentes individuales
-- `integration/` - Pruebas de integración entre componentes
-
-## Archivos de prueba existentes
-
-Los siguientes archivos de prueba se encuentran en la raíz del proyecto y pueden ser movidos a esta estructura:
-
-- `test_connection.php` - Prueba de conexión a la base de datos
-- `test_dashboard.php` - Prueba del dashboard
-- `test_dashboard_controller.php` - Prueba del controlador de dashboard
-- `test_db.php` - Prueba de la base de datos
-- `test_ingredient.php` - Prueba de ingredientes
-- `test_products.php` - Prueba de productos
-- `test_products_api.php` - Prueba de API de productos
-- `test_sistema_completo.php` - Prueba del sistema completo
-
-## Cómo ejecutar las pruebas
-
-Para ejecutar todas las pruebas:
-
-```bash
-php test_sistema_completo.php
+```
+tests/
+├── README.md           # Este archivo
+├── TestRunner.php      # Script para ejecutar todos los tests
+└── unit/              # Tests unitarios
+    ├── AuthTest.php           # Tests de autenticación
+    ├── DatabaseConnectionTest.php  # Tests de conexión a BD
+    ├── IngredientTest.php     # Tests de ingredientes
+    ├── PermisosTest.php       # Tests de permisos
+    ├── ProductTest.php        # Tests de productos
+    └── README.md              # Documentación de tests unitarios
 ```
 
-Para ejecutar pruebas específicas:
+## Cómo Ejecutar los Tests
 
+### Ejecutar Todos los Tests
 ```bash
-php tests/unit/[nombre_del_archivo].php
+php TestRunner.php
 ```
+
+### Ejecutar un Test Específico
+```bash
+php TestRunner.php DatabaseConnectionTest
+php TestRunner.php IngredientTest
+php TestRunner.php PermisosTest
+php TestRunner.php ProductTest
+```
+
+## Descripción de Tests
+
+### DatabaseConnectionTest.php
+- Verifica la conexión a la base de datos
+- Prueba la creación de AuthMiddleware
+- Ejecuta consultas básicas de permisos
+
+### IngredientTest.php
+- Prueba la creación de ingredientes
+- Verifica el modelo IngredienteModel
+- Tests de CRUD básico para ingredientes
+
+### PermisosTest.php
+- Prueba el sistema de permisos
+- Verifica PermisosController
+- Tests de autenticación y autorización
+
+### ProductTest.php
+- Prueba la funcionalidad de productos
+- Verifica productos con ingredientes
+- Tests de ProductoModel y ProductoIngredientesModel
+
+## Requisitos
+
+- PHP 7.4 o superior
+- Composer instalado
+- Base de datos MySQL configurada
+- Variables de entorno configuradas en .env
+
+## Configuración
+
+Antes de ejecutar los tests, asegúrate de que:
+
+1. Las dependencias estén instaladas: `composer install`
+2. El archivo `.env` esté configurado correctamente
+3. La base de datos esté accesible
+4. Los permisos de archivos sean correctos
+
+## Interpretación de Resultados
+
+- ✅ Test exitoso
+- ❌ Test fallido
+- El TestRunner muestra un resumen con estadísticas
+- Los tests fallidos muestran detalles del error
+
+## Agregar Nuevos Tests
+
+Para agregar un nuevo test:
+
+1. Crea un archivo en `unit/` con el nombre `NombreTest.php`
+2. Sigue la estructura de los tests existentes
+3. Incluye las dependencias necesarias con rutas relativas
+4. El TestRunner lo detectará automáticamente
+
+## Solución de Problemas
+
+### Error de Conexión a BD
+- Verifica las credenciales en `.env`
+- Asegúrate de que MySQL esté ejecutándose
+- Comprueba que la base de datos exista
+
+### Errores de Rutas
+- Los tests usan rutas relativas desde `tests/unit/`
+- Verifica que los archivos existan en las rutas especificadas
+- Asegúrate de que los namespaces sean correctos (App\ no app\)
+
+### Errores de Permisos
+- Algunos tests requieren tokens de autenticación válidos
+- Verifica que los roles y permisos estén configurados en la BD

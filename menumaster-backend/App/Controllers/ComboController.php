@@ -8,8 +8,8 @@ use App\Utils\ResponseUtil;
 class ComboController {
     private $comboModel;
     
-    public function __construct() {
-        $this->comboModel = new ComboModel();
+    public function __construct($db = null) {
+        $this->comboModel = new ComboModel($db);
     }
     
     /**

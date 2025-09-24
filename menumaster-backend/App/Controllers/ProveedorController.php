@@ -1,7 +1,7 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\ProveedorModel;
+use App\Models\ProveedorModel;
 use PDO;
 use Exception;
 

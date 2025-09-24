@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { toast } from 'react-toastify'; // Importamos la librería de notificaciones
+import { useNotifications } from '@/hooks/useNotifications';
 import pedidoService from '@/features/pedidos/services/pedidoService';
 
 // --- Funciones de Ayuda para la Impresión (se mantienen intactas) ---

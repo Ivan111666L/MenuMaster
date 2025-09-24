@@ -6,9 +6,9 @@ require_once BASE_PATH . '/app/Controllers/MesaController.php';
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
-use app\Controllers\MesaController;
-use app\Middleware\AuthMiddleware;
-use app\Controllers\AuthController;
+use App\Controllers\MesaController;
+use App\Middleware\AuthMiddleware;
+use App\Controllers\AuthController;
 
 // --- Lógica del Enrutador ---
 try {

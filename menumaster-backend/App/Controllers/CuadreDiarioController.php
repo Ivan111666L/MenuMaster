@@ -1,9 +1,9 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\CuadreDiarioModel;
-use app\Models\ProductoIngredienteModel;
-use app\Models\ProveedorModel;
+use App\Models\CuadreDiarioModel;
+use App\Models\ProductoIngredienteModel;
+use App\Models\ProveedorModel;
 use PDO;
 use Exception;
 
@@ -223,11 +223,7 @@ class CuadreDiarioController {
                 'data' => $inventario
             ];
         } catch (Exception $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
+            return ['success' => false, 'error' => $e->getMessage()];
         }
     }
 }
-?>

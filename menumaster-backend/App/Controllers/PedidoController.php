@@ -27,42 +27,49 @@ class PedidoController
      * GET /api/pedidos?estado=pendiente,en preparacion
      */
     public function index()
-{
-    // Obtener parámetro 'estado' desde query string (forma segura)
-    $estado = isset($_GET['estado']) ? trim($_GET['estado']) : null;
+    {
+        // Obtener parámetro 'estado' desde query string (forma segura)
+        $estado = isset($_GET['estado']) ? trim($_GET['estado']) : null;
 
-    try {
-        if ($estado) {
-            // Buscar pedidos filtrados por estado
-            $pedidos = $this->pedidoModel->findAll($estado);
-        } else {
-            // Obtener todos los pedidos
-            $pedidos = $this->pedidoModel->findAll();
+        try {
+            if ($estado) {
+                // Buscar pedidos filtrados por estado
+                $pedidos = $this->pedidoModel->findAll($estado);
+            } else {
+                // Obtener todos los pedidos
+                $pedidos = $this->pedidoModel->findAll();
+            }
+
+            if ($pedidos === false) {
+                throw new Exception("Error al obtener los pedidos.");
+            }
+
+            // Enviar respuesta exitosa
+            $this->sendResponse(200, "Pedidos obtenidos correctamente", null, $pedidos);
+
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::index: " . $e->getMessage());
+            // Enviar error con código 500
+            $this->sendResponse(500, null, $e->getMessage());
         }
-
-        if ($pedidos === false) {
-            throw new Exception("Error al obtener los pedidos.");
-        }
-
-        // Enviar respuesta exitosa
-        $this->sendResponse(200, $pedidos);
-
-    } catch (Exception $e) {
-        // Enviar error con código 500
-        $this->sendResponse(500, ['error' => $e->getMessage()]);
     }
-}
 
     /**
      * GET /api/pedidos/{id}
      */
     public function show(int $id): void
     {
-        $detalles = $this->pedidoModel->getPedidoWithDetails($id);
-        if (!$detalles) {
-            throw new Exception("Pedido no encontrado.", 404);
+        try {
+            $detalles = $this->pedidoModel->getPedidoWithDetails($id);
+            if (!$detalles) {
+                $this->sendResponse(404, null, "Pedido no encontrado");
+                return;
+            }
+            $this->sendResponse(200, "Detalles del pedido obtenidos correctamente", null, $detalles);
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::show: " . $e->getMessage());
+            $this->sendResponse(500, null, "Error interno del servidor");
         }
-        $this->sendResponse(200, $detalles);
     }
 
     /**
@@ -70,35 +77,48 @@ class PedidoController
      */
     public function store(array $data): void
     {
-        Validator::validate($data, [
-            'mesa_id' => 'required',
-            'items' => 'required'
-        ]);
+        try {
+            Validator::validate($data, [
+                'mesa_id' => 'required',
+                'items' => 'required'
+            ]);
 
-        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-        if (!$token) throw new Exception("Token no encontrado.", 401);
-        
-        $payload = AuthController::decodeTokenData($token);
-        $usuarioId = $payload['id'] ?? null;
-        if (!$usuarioId) throw new Exception("Token inválido.", 401);
-        
-        $notas = $data['notas'] ?? null;
-        
-        // Verificar stock de productos en el menú del día antes de crear el pedido
-        $this->verificarStockProductos($data['items']);
-        
-        $pedidoId = $this->pedidoModel->createPedido($data['mesa_id'], $usuarioId, $data['items'], $notas);
-        if (!$pedidoId) {
-            throw new Exception("Error al crear el pedido. Verifique el stock o los datos del producto.", 500);
+            $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+            if (!$token) {
+                $this->sendResponse(401, null, "Token no encontrado");
+                return;
+            }
+            
+            $payload = AuthController::decodeTokenData($token);
+            $usuarioId = $payload['id'] ?? null;
+            if (!$usuarioId) {
+                $this->sendResponse(401, null, "Token inválido");
+                return;
+            }
+            
+            $notas = $data['notas'] ?? null;
+            
+            // Verificar stock de productos en el menú del día antes de crear el pedido
+            $this->verificarStockProductos($data['items']);
+            
+            $pedidoId = $this->pedidoModel->createPedido($data['mesa_id'], $usuarioId, $data['items'], $notas);
+            if (!$pedidoId) {
+                $this->sendResponse(500, null, "Error al crear el pedido. Verifique el stock o los datos del producto");
+                return;
+            }
+            
+            // Cambiar el estado de la mesa a 'ocupada' después de crear el pedido
+            if (!$this->mesaModel->cambiarEstado($data['mesa_id'], 'ocupada')) {
+                error_log("Advertencia: No se pudo cambiar el estado de la mesa {$data['mesa_id']} a ocupada");
+            }
+            
+            $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
+            $this->sendResponse(201, "Pedido creado exitosamente", null, $nuevoPedido);
+            
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::store: " . $e->getMessage());
+            $this->sendResponse(500, null, $e->getMessage());
         }
-        
-        // Cambiar el estado de la mesa a 'ocupada' después de crear el pedido
-        if (!$this->mesaModel->cambiarEstado($data['mesa_id'], 'ocupada')) {
-            error_log("Advertencia: No se pudo cambiar el estado de la mesa {$data['mesa_id']} a ocupada");
-        }
-        
-        $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
-        $this->sendResponse(201, $nuevoPedido);
     }
     
     /**
@@ -173,28 +193,36 @@ class PedidoController
      */
     public function updateStatus(int $id, array $data): void
     {
-        Validator::validate($data, ['estado' => 'required']);
-        
-        // Obtener información del pedido antes de actualizar el estado
-        $pedido = $this->pedidoModel->getPedidoWithDetails($id);
-        if (!$pedido) {
-            throw new Exception("Pedido no encontrado.", 404);
-        }
-        
-        if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
-            throw new Exception("Error al actualizar el estado del pedido.", 500);
-        }
-        
-        // Si el pedido se marca como entregado o completado, liberar la mesa
-        $estadosQueLiberanMesa = ['entregado', 'completado', 'finalizado'];
-        if (in_array(strtolower($data['estado']), $estadosQueLiberanMesa)) {
-            $mesaId = $pedido['mesa_id'] ?? null;
-            if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
-                error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
+        try {
+            Validator::validate($data, ['estado' => 'required']);
+            
+            // Obtener información del pedido antes de actualizar el estado
+            $pedido = $this->pedidoModel->getPedidoWithDetails($id);
+            if (!$pedido) {
+                $this->sendResponse(404, null, "Pedido no encontrado");
+                return;
             }
+            
+            if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
+                $this->sendResponse(500, null, "Error al actualizar el estado del pedido");
+                return;
+            }
+            
+            // Si el pedido se marca como entregado o completado, liberar la mesa
+            $estadosQueLiberanMesa = ['entregado', 'completado', 'finalizado'];
+            if (in_array(strtolower($data['estado']), $estadosQueLiberanMesa)) {
+                $mesaId = $pedido['mesa_id'] ?? null;
+                if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+                    error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
+                }
+            }
+            
+            $this->sendResponse(200, "Estado del pedido actualizado correctamente");
+            
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::updateStatus: " . $e->getMessage());
+            $this->sendResponse(500, null, $e->getMessage());
         }
-        
-        $this->sendResponse(200, ["mensaje" => "Estado del pedido actualizado."]);
     }
     
     /**
@@ -202,27 +230,35 @@ class PedidoController
      */
     public function facturar(int $id, array $data): void
     {
-        // Obtener la información del pedido antes de facturarlo para saber qué mesa liberar
-        $pedido = $this->pedidoModel->getPedidoWithDetails($id);
-        if (!$pedido) {
-            throw new Exception("Pedido no encontrado.", 404);
+        try {
+            // Obtener la información del pedido antes de facturarlo para saber qué mesa liberar
+            $pedido = $this->pedidoModel->getPedidoWithDetails($id);
+            if (!$pedido) {
+                $this->sendResponse(404, null, "Pedido no encontrado");
+                return;
+            }
+            
+            // En una implementación real, aquí se validaría $data['metodo_pago'], etc.
+            if (!$this->pedidoModel->facturarPedido($id)) {
+                $this->sendResponse(500, null, "No se pudo facturar el pedido. Verifique el ID");
+                return;
+            }
+            
+            // Cambiar el estado de la mesa a 'disponible' después de facturar el pedido
+            $mesaId = $pedido['mesa_id'] ?? null;
+            if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+                error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
+            }
+            
+            // Imprimir recibo
+            $this->imprimirRecibo($pedido);
+            
+            $this->sendResponse(200, "Pedido facturado con éxito");
+            
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::facturar: " . $e->getMessage());
+            $this->sendResponse(500, null, $e->getMessage());
         }
-        
-        // En una implementación real, aquí se validaría $data['metodo_pago'], etc.
-        if (!$this->pedidoModel->facturarPedido($id)) {
-            throw new Exception("No se pudo facturar el pedido. Verifique el ID.", 500);
-        }
-        
-        // Cambiar el estado de la mesa a 'disponible' después de facturar el pedido
-        $mesaId = $pedido['mesa_id'] ?? null;
-        if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
-            error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
-        }
-        
-        // Imprimir recibo
-        $this->imprimirRecibo($pedido);
-        
-        $this->sendResponse(200, ["mensaje" => "Pedido facturado con éxito."]);
     }
     
     /**
@@ -252,7 +288,8 @@ class PedidoController
             // Obtener detalles del pedido
             $pedido = $this->pedidoModel->getPedidoWithDetails($id);
             if (!$pedido) {
-                throw new Exception("Pedido no encontrado.", 404);
+                $this->sendResponse(404, null, "Pedido no encontrado");
+                return;
             }
             
             // Cargar el gestor de impresión
@@ -262,12 +299,13 @@ class PedidoController
             $resultado = $printerManager->printOrder($pedido);
             
             if ($resultado) {
-                $this->sendResponse(200, ["mensaje" => "Pedido enviado a impresión correctamente."]);
+                $this->sendResponse(200, "Pedido enviado a impresión correctamente");
             } else {
-                throw new Exception("No se pudo imprimir el pedido. Verifique la configuración de la impresora.", 500);
+                $this->sendResponse(500, null, "No se pudo imprimir el pedido. Verifique la configuración de la impresora");
             }
         } catch (Exception $e) {
-            $this->sendResponse(500, ["error" => $e->getMessage()]);
+            error_log("Error en PedidoController::imprimirPedido: " . $e->getMessage());
+            $this->sendResponse(500, null, $e->getMessage());
         }
     }
 
@@ -278,24 +316,54 @@ class PedidoController
      */
     public function destroy(int $id): void
     {
-        // MEJORA: Se añade una verificación para asegurar que el pedido existe antes de intentar borrarlo.
-        if (!$this->pedidoModel->getPedidoWithDetails($id)) {
-            throw new Exception("Pedido no encontrado.", 404);
-        }
+        try {
+            // MEJORA: Se añade una verificación para asegurar que el pedido existe antes de intentar borrarlo.
+            if (!$this->pedidoModel->getPedidoWithDetails($id)) {
+                $this->sendResponse(404, null, "Pedido no encontrado");
+                return;
+            }
 
-        if (!$this->pedidoModel->eliminarPedido($id)) {
-            throw new Exception("Error al eliminar el pedido.", 500);
+            if (!$this->pedidoModel->eliminarPedido($id)) {
+                $this->sendResponse(500, null, "Error al eliminar el pedido");
+                return;
+            }
+            
+            $this->sendResponse(204);
+            
+        } catch (Exception $e) {
+            error_log("Error en PedidoController::destroy: " . $e->getMessage());
+            $this->sendResponse(500, null, $e->getMessage());
         }
-        $this->sendResponse(204, null);
     }
     
     // --- Helper para enviar respuestas ---
-    private function sendResponse(int $statusCode, $data): void
+    private function sendResponse(int $statusCode, $message = null, $error = null, $data = null): void
     {
         http_response_code($statusCode);
-        if ($statusCode !== 204) {
-            echo json_encode(['success' => true, 'data' => $data]);
+        
+        if ($statusCode === 204) {
+            exit;
         }
+        
+        $response = [
+            'success' => $statusCode < 400,
+            'timestamp' => date('Y-m-d H:i:s')
+        ];
+        
+        if ($message) {
+            $response['message'] = $message;
+        }
+        
+        if ($error) {
+            $response['error'] = $error;
+        }
+        
+        if ($data !== null) {
+            $response['data'] = $data;
+        }
+        
+        header('Content-Type: application/json');
+        echo json_encode($response, JSON_UNESCAPED_UNICODE);
         exit;
     }
 }

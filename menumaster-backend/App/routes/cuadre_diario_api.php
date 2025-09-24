@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../config/config.php';
 require_once __DIR__ . '/../controllers/CuadreDiarioController.php';
 
-use app\Controllers\CuadreDiarioController;
+use App\Controllers\CuadreDiarioController;
 
 // Verificar si el usuario está autenticado
 session_start();
@@ -80,4 +80,3 @@ switch ($route) {
         echo json_encode(['status' => 'error', 'message' => 'Ruta no encontrada']);
         break;
 }
-?>

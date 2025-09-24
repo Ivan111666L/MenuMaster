@@ -2,13 +2,13 @@
 // routes/auth.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/AuthController.php';
-require_once BASE_PATH . '/app/Models/UsuarioModel.php';
-require_once BASE_PATH . '/app/Models/RolModel.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Models/UsuarioModel.php';
+require_once BASE_PATH . '/App/Models/RolModel.php';
 
-use app\Controllers\AuthController;
-use app\Models\UsuarioModel;
-use app\Models\RolModel;
+use App\Controllers\AuthController;
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
 
 try {
     // CORRECCIÓN: Instanciamos los modelos primero...
@@ -30,19 +30,19 @@ try {
         switch ($action) {
             case 'register':
                 // CORRECCIÓN: El controlador ahora maneja la respuesta. Solo lo llamamos.
-                $controller->register($data);
+                $controller->register();
                 break;
 
             case 'login':
-                $controller->login($data);
+                $controller->login();
                 break;
             
             case 'forgot-password':
-                $controller->forgotPassword($data);
+                $controller->forgotPassword();
                 break;
 
             case 'reset-password':
-                $controller->resetPassword($data);
+                $controller->resetPassword();
                 break;
 
             default:

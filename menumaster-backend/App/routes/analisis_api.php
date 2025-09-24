@@ -5,8 +5,8 @@
 require_once BASE_PATH . '/app/Controllers/AnalisisController.php';
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 
-use app\Controllers\AnalisisController;
-use app\Middleware\AuthMiddleware;
+use App\Controllers\AnalisisController;
+use App\Middleware\AuthMiddleware;
 
 // --- Lógica del Enrutador ---
 try {
@@ -54,10 +54,8 @@ try {
     }
 
 } catch (Exception $e) {
-    // 5. Capturador de Errores Centralizado
-    $code = $e->getCode() ?: 400;
-    http_response_code($code);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    http_response_code(500);
+    echo json_encode(['error' => 'Error interno del servidor']);
 }
 
 /**

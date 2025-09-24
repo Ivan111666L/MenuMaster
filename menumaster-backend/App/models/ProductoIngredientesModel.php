@@ -1,5 +1,5 @@
 <?php
-namespace app\Models;
+namespace App\Models;
 
 use PDO;
 use PDOException;
@@ -107,4 +107,3 @@ class ProductoIngredientesModel
         }
     }
 }
-?>

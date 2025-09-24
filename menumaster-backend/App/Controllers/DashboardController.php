@@ -1,7 +1,7 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\DashboardModel;
+use App\Models\DashboardModel;
 use PDO;
 use Exception;
 

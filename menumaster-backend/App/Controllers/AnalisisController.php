@@ -1,7 +1,7 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 
-use app\Models\PedidoModel;
+use App\Models\PedidoModel;
 use PDO;
 use Exception;
 

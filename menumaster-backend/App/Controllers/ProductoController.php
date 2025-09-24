@@ -1,14 +1,14 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 // --- Controlador de Productos ---
 // Este archivo gestiona toda la lógica relacionada con los productos: crear, consultar, actualizar y eliminar.
 // Se conecta con los modelos y responde a las peticiones del backend.
 
-use app\Models\ProductoModel;
-use app\Models\ProductoIngredientesModel;
-use app\Models\CategoriaModel;
-use app\Models\EstadoProductoModel;
-use app\Utils\Validator;
+use App\Models\ProductoModel;
+use App\Models\ProductoIngredientesModel;
+use App\Models\CategoriaModel;
+use App\Models\EstadoProductoModel;
+use App\Utils\Validator;
 use PDO;
 use Exception;
 

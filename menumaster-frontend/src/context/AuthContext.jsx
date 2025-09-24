@@ -158,4 +158,5 @@ export function useAuth() {
   return context;
 }
 
+export { AuthContext };
 export default AuthProvider;

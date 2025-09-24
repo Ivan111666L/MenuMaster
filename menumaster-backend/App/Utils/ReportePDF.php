@@ -1,11 +1,10 @@
 <?php
-namespace app\Utils;
+namespace App\Utils;
 
 require_once BASE_PATH . '/vendor/autoload.php';
+require_once BASE_PATH . '/vendor/setasign/fpdf/fpdf.php';
 
-use FPDF;
-
-class ReportePDF extends FPDF {
+class ReportePDF extends \FPDF {
     private $titulo;
     private $fechaInicio;
     private $fechaFin;
@@ -197,6 +196,6 @@ class ReportePDF extends FPDF {
                 $this->Cell(40, 6, '$' . number_format($dia['ventas'], 2), 1, 1, 'R');
             }
         }
+        $this->Output();
     }
 }
-?>

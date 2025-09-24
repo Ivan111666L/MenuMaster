@@ -8,13 +8,17 @@ use App\Config\ConexionDb;
 class ComboModel {
     private $db;
 
-    public function __construct() {
-try {
-    $this->db = ConexionDb::getInstance()->getConnection();
-} catch (\Exception $e) {
-    // Handle database connection error
-    throw new \Exception("Database connection failed: " . $e->getMessage());
-}
+    public function __construct($db = null) {
+        if ($db) {
+            $this->db = $db;
+        } else {
+            try {
+                $this->db = ConexionDb::getInstance()->getConnection();
+            } catch (\Exception $e) {
+                // Handle database connection error
+                throw new \Exception("Database connection failed: " . $e->getMessage());
+            }
+        }
     }
 
     /**

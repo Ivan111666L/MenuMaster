@@ -1,12 +1,12 @@
 <?php
-namespace app\Controllers;
+namespace App\Controllers;
 // --- Controlador de Ingredientes ---
 // Este archivo gestiona toda la lógica relacionada con los ingredientes: crear, consultar, actualizar y eliminar.
 // Se conecta con los modelos y responde a las peticiones del backend.
 // Importamos los modelos que vamos a necesitar
-use app\Models\IngredienteModel;
-use app\Models\ProveedorModel;
-use app\Models\EstadoGeneralModel;
+use App\Models\IngredienteModel;
+use App\Models\ProveedorModel;
+use App\Models\EstadoGeneralModel;
 use PDO;
 use Exception;
 

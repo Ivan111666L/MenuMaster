@@ -1,25 +1,35 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-import { ToastContainer } from 'react-toastify'; // Importar el contenedor
-import 'react-toastify/dist/ReactToastify.css'; // Importar los estilos
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import './styles/notifications.css'; // Estilos personalizados para notificaciones
 
 function App() {
   return (
     <AuthProvider>
       <Outlet />
-      {/* Añade el ToastContainer aquí */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar={false}
-        newestOnTop={false}
+        newestOnTop={true}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="colored"
+        limit={5}
+        toastClassName="custom-toast"
+        bodyClassName="custom-toast-body"
+        progressClassName="custom-toast-progress"
+        closeButton={true}
+        icon={true}
+        style={{
+          fontSize: '14px',
+          fontFamily: 'inherit'
+        }}
       />
     </AuthProvider>
   );

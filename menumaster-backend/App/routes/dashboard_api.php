@@ -5,8 +5,8 @@ require_once BASE_PATH . '/app/Controllers/DashboardController.php';
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
-use app\Controllers\DashboardController;
-use app\Middleware\AuthMiddleware;
+use App\Controllers\DashboardController;
+use App\Middleware\AuthMiddleware;
 
 try {
     $controller = new DashboardController($db);

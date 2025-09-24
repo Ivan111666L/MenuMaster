@@ -1,6 +1,6 @@
 <?php
-use app\config\ConexionDb;
-use app\Controllers\AuthController;
+use App\Config\ConexionDb;
+use App\Controllers\AuthController;
 
 require_once BASE_PATH . '/app/Utils/Validator.php';
 require_once BASE_PATH . '/app/config/ConexionDb.php';
@@ -96,9 +96,14 @@ try {
 // Incluir rutas para combos
 require_once BASE_PATH . '/routes/combos_api.php';
             break;
+        case 'roles':
+            require_once BASE_PATH . '/App/routes/roles_api.php';
+            break;
+        case 'permisos':
+            require_once BASE_PATH . '/App/routes/permisos_api.php';
+            break;
 
         
-           
         // ...otros recursos
         default:
             throw new Exception("Recurso '{$resource}' no válido.", 404);

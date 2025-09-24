@@ -11,9 +11,9 @@ require_once BASE_PATH . '/app/Controllers/UsuarioController.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
 
 // Usar alias para las clases
-use app\Controllers\UsuarioController;
-use app\Controllers\AuthController;
-use app\Middleware\AuthMiddleware;
+use App\Controllers\UsuarioController;
+use App\Controllers\AuthController;
+use App\Middleware\AuthMiddleware;
 
 // --- Lógica del Enrutador ---
 try {

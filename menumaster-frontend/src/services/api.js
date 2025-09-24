@@ -3,7 +3,7 @@ import axios from 'axios';
 import { getAuthToken, clearAuthSession } from '@/utils/auth.js';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost/MenuMaster/menumaster-backend/public/api',
   headers: {
     'Content-Type': 'application/json',
   },

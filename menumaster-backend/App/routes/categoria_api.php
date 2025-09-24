@@ -4,8 +4,8 @@
 require_once BASE_PATH . '/app/Controllers/CategoriaController.php';
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 
-use app\Controllers\CategoriaController;
-use app\Middleware\AuthMiddleware;
+use App\Controllers\CategoriaController;
+use App\Middleware\AuthMiddleware;
 
 try {
     // 1. Se instancian las clases necesarias

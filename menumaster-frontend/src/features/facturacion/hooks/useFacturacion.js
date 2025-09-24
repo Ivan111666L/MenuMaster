@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import QRCode from 'qrcode'; // Asegúrate de haber instalado: npm install qrcode
-import { toast } from 'react-toastify'; // Importamos la librería de notificaciones
+import { useNotifications } from '@/hooks/useNotifications';
 import facturacionService from '@/features/facturacion/services/facturacionService';
 
 // --- Función de ayuda para la impresión ---
@@ -12,6 +12,9 @@ const imprimirTicket = (contenido) => {
 };
 
 export const useFacturacion = () => {
+    // Hook de notificaciones
+    const { showSuccess, showError } = useNotifications();
+    
     // --- Estados del Hook ---
     const [pedidos, setPedidos] = useState([]);
     const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
@@ -49,11 +52,11 @@ export const useFacturacion = () => {
         try {
             const datosPago = { metodo_pago: metodoPago, dividir: numeroPersonas > 1, personas: numeroPersonas };
             await facturacionService.facturarPedido(pedidoId, datosPago);
-            toast.success(`Pedido #${pedidoId} facturado con ${metodoPago}.`);
+            showSuccess(`Pedido #${pedidoId} facturado con ${metodoPago}.`);
             setPedidoSeleccionado(null);
             await cargarPedidos();
         } catch (err) {
-            toast.error('Error al facturar el pedido.');
+            showError('Error al facturar el pedido.');
         }
     };
 
@@ -111,7 +114,7 @@ export const useFacturacion = () => {
             // Opcional: podrías marcarlo como facturado aquí también
             // await facturarYRecargar(pedidoSeleccionado.id, 'QR');
         } catch (err) {
-            toast.error("Hubo un error al generar el código QR.");
+            showError("Hubo un error al generar el código QR.");
         }
     };
 

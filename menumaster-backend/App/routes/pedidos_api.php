@@ -6,9 +6,9 @@ require_once BASE_PATH . '/app/Controllers/PedidoController.php';
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php'; // Necesario para requireAdmin
 
-use app\Controllers\PedidoController;
-use app\Middleware\AuthMiddleware;
-use app\Controllers\AuthController;
+use App\Controllers\PedidoController;
+use App\Middleware\AuthMiddleware;
+use App\Controllers\AuthController;
 
 // --- Lógica del Enrutador ---
 try {
