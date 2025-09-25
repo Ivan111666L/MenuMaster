@@ -1,22 +1,33 @@
 <?php
 use App\Config\ConexionDb;
 use App\Controllers\AuthController;
+use App\Models\UsuarioModel;
+use App\Models\RolModel;
 
 require_once BASE_PATH . '/app/Utils/Validator.php';
 require_once BASE_PATH . '/app/config/ConexionDb.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Models/UsuarioModel.php';
+require_once BASE_PATH . '/App/Models/RolModel.php';
+require_once BASE_PATH . '/App/Utils/AuthHelpers.php';
 
 try {
     // Conexión BD
     $db = ConexionDb::getConnection();
-    $authController = new AuthController($db);
+    
+    // Instanciar modelos requeridos
+    $usuarioModel = new UsuarioModel($db);
+    $rolModel = new RolModel($db);
+    
+    // Instanciar controlador con dependencias
+    $authController = new AuthController($db, $usuarioModel, $rolModel);
 
     // Método HTTP
-    $requestMethod = $_SERVER['REQUEST_METHOD'];
+    $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
     // Partes de la ruta
     $basePath   = dirname($_SERVER['SCRIPT_NAME']);
-    $requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
     $route = $requestUri;
     if (strpos($requestUri, $basePath) === 0) {
@@ -47,11 +58,11 @@ try {
                         $authController->login();
                     }
                     break;
-                // case 'verify':
-                //     if ($requestMethod === 'GET') {
-                //         $authController->verifyToken();
-                //     }
-                    // break;
+                case 'verify':
+                    if ($requestMethod === 'GET') {
+                        $authController->verifyToken();
+                    }
+                    break;
                 default:
                     throw new Exception("Acción '{$action}' no válida para auth.", 404);
             }
@@ -92,15 +103,15 @@ try {
             break;
         case 'proveedores':
             require_once BASE_PATH . '/routes/proveedores_api.php';
-
-// Incluir rutas para combos
-require_once BASE_PATH . '/routes/combos_api.php';
+            break;
+        case 'combos':
+            require_once BASE_PATH . '/routes/combos_api.php';
             break;
         case 'roles':
-            require_once BASE_PATH . '/App/routes/roles_api.php';
+            require_once BASE_PATH . '/routes/roles_api.php';
             break;
         case 'permisos':
-            require_once BASE_PATH . '/App/routes/permisos_api.php';
+            require_once BASE_PATH . '/routes/permisos_api.php';
             break;
 
         

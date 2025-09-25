@@ -170,6 +170,7 @@ class AuthController
     public function verifyToken(): void
     {
         try {
+            // Obtener token del header Authorization
             $token = $this->extractTokenFromHeader();
             
             if (!$token) {
@@ -177,24 +178,26 @@ class AuthController
                 return;
             }
 
-            $decoded = $this->decodeTokenData($token);
+            // Validar token usando AuthMiddleware
+            $authMiddleware = new \App\Middleware\AuthMiddleware();
+            $usuario = $authMiddleware->validateToken($token);
             
-            // Verificar que el usuario aún existe y está activo
-            $usuario = $this->getUserById($decoded['data']['id']);
-            
-            if (!$usuario || $usuario['estado_id'] != 1) {
-                $this->sendResponse(401, "Usuario no válido o inactivo");
+            if (!$usuario) {
+                $this->sendResponse(401, "Token inválido o expirado");
                 return;
             }
 
+            // Token válido, devolver información del usuario
             $this->sendResponse(200, "Token válido", null, [
-                'user_id' => $usuario['id'],
+                'id' => $usuario['id'],
+                'nombre' => $usuario['nombre'],
                 'email' => $usuario['email'],
-                'rol' => $usuario['rol'],
-                'expires_at' => $decoded['exp']
+                'rol' => $usuario['rol'] ?? null,
+                'rol_id' => $usuario['rol_id'] ?? null
             ]);
 
         } catch (Exception $e) {
+            error_log("Error en verify token: " . $e->getMessage());
             $this->sendResponse(401, "Token inválido o expirado");
         }
     }
@@ -604,13 +607,9 @@ class AuthController
 
     private function extractTokenFromHeader(): ?string
     {
-        $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        
-        if (preg_match('/Bearer\s+(.*)$/i', $authHeader, $matches)) {
-            return $matches[1];
-        }
-        
-        return null;
+        // Usar el método más robusto de AuthMiddleware
+        $authMiddleware = new \App\Middleware\AuthMiddleware();
+        return $authMiddleware->getBearerToken();
     }
 
     private function isAccountLocked(string $email): bool

@@ -3,9 +3,10 @@
 # Enable URL Rewriting
 RewriteEngine On
 
-# Handle API Routes
+# Handle API Routes - but allow direct PHP file access
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !\.php$
 RewriteRule ^(.*)$ index.php [QSA,L]
 
 # Security Headers
@@ -24,96 +25,31 @@ RewriteRule ^(.*)$ index.php [QSA,L]
     
     # Content Security Policy
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' https:; connect-src 'self' https://menumaster.site"
-    
-    # CORS Headers for API
-    Header always set Access-Control-Allow-Origin "https://menumaster.site"
-    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With, Accept, Origin"
-    Header always set Access-Control-Allow-Credentials "true"
-    Header always set Access-Control-Max-Age "86400"
 </IfModule>
 
 # Handle OPTIONS requests for CORS preflight
 RewriteCond %{REQUEST_METHOD} OPTIONS
 RewriteRule ^(.*)$ index.php [QSA,L]
 
-# Protect sensitive files and directories
+# Protect sensitive files
 <Files ".env">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </Files>
 
 <Files "composer.json">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </Files>
 
 <Files "composer.lock">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </Files>
-
-# Deny access to vendor directory
-<Directory "vendor">
-    Order allow,deny
-    Deny from all
-</Directory>
-
-# Deny access to app directory
-<Directory "app">
-    Order allow,deny
-    Deny from all
-</Directory>
-
-# Deny access to database directory
-<Directory "database">
-    Order allow,deny
-    Deny from all
-</Directory>
-
-# Deny access to tests directory
-<Directory "tests">
-    Order allow,deny
-    Deny from all
-</Directory>
 
 # Deny access to config files
 <FilesMatch "\.(json|lock|md|txt|log)$">
-    Order allow,deny
-    Deny from all
+    Require all denied
 </FilesMatch>
 
 # Allow specific file types
 <FilesMatch "\.(php|css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot)$">
-    Order allow,deny
-    Allow from all
+    Require all granted
 </FilesMatch>
-
-# Compression
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/json
-</IfModule>
-
-# Cache Control
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType image/jpg "access plus 1 month"
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/gif "access plus 1 month"
-    ExpiresByType image/svg+xml "access plus 1 month"
-    ExpiresByType application/pdf "access plus 1 month"
-    ExpiresByType application/font-woff "access plus 1 month"
-    ExpiresByType application/font-woff2 "access plus 1 month"
-</IfModule>

@@ -89,6 +89,7 @@ function Register() {
                         onChange={handleInputChange}
                         error={errors.nombre}
                         disabled={isLoading}
+                        autoComplete="name"
                     />
 
                     <Input
@@ -100,6 +101,7 @@ function Register() {
                         onChange={handleInputChange}
                         error={errors.email}
                         disabled={isLoading}
+                        autoComplete="email"
                     />
 
                     {/* MEJORA: Se añade un selector de rol */}
@@ -129,6 +131,7 @@ function Register() {
                             onChange={handleInputChange}
                             error={errors.password}
                             disabled={isLoading}
+                            autoComplete="new-password"
                         />
                         <span onClick={() => setShowPassword(!showPassword)} className="password-toggle-icon">
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -145,6 +148,7 @@ function Register() {
                             onChange={handleInputChange}
                             error={errors.passwordConfirm}
                             disabled={isLoading}
+                            autoComplete="new-password"
                         />
                     </div>
                     

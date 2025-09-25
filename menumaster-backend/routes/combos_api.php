@@ -4,14 +4,17 @@
 // --- Dependencias ---
 require_once BASE_PATH . '/App/Controllers/ComboController.php';
 require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Middleware/RolMiddleware.php';
 
 use App\Controllers\ComboController;
 use App\Middleware\AuthMiddleware;
+use App\Middleware\RolMiddleware;
 
 try {
     // Instanciar el controlador y middleware
     $comboController = new ComboController($db);
     $authMiddleware = new AuthMiddleware();
+    $rolMiddleware = new RolMiddleware();
     
     // Analizar la petición
     $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -41,7 +44,7 @@ try {
         case 'POST':
             // Verificar autenticación y permisos de administrador/gerente
             $authMiddleware->requireAuth();
-            if (!$authMiddleware->checkAnyRole(['administrador', 'gerente'])) {
+            if (!$rolMiddleware->checkAnyRole(['administrador', 'gerente'])) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'No tienes permisos para crear combos']);
                 exit;
@@ -59,7 +62,7 @@ try {
         case 'PUT':
             // Verificar autenticación y permisos de administrador/gerente
             $authMiddleware->requireAuth();
-            if (!$authMiddleware->checkAnyRole(['administrador', 'gerente'])) {
+            if (!$rolMiddleware->checkAnyRole(['administrador', 'gerente'])) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'No tienes permisos para actualizar combos']);
                 exit;
@@ -77,7 +80,7 @@ try {
         case 'PATCH':
             // Verificar autenticación y permisos de administrador/gerente
             $authMiddleware->requireAuth();
-            if (!$authMiddleware->checkAnyRole(['administrador', 'gerente'])) {
+            if (!$rolMiddleware->checkAnyRole(['administrador', 'gerente'])) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'No tienes permisos para cambiar estado de combos']);
                 exit;
@@ -95,7 +98,7 @@ try {
         case 'DELETE':
             // Verificar autenticación y permisos de administrador/gerente
             $authMiddleware->requireAuth();
-            if (!$authMiddleware->checkAnyRole(['administrador', 'gerente'])) {
+            if (!$rolMiddleware->checkAnyRole(['administrador', 'gerente'])) {
                 http_response_code(403);
                 echo json_encode(['success' => false, 'error' => 'No tienes permisos para eliminar combos']);
                 exit;

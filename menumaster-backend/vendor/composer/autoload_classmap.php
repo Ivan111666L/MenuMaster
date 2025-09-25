@@ -24,6 +24,8 @@ return array(
     'App\\Controllers\\RolesController' => $baseDir . '/App/Controllers/RolesController.php',
     'App\\Controllers\\UsuarioController' => $baseDir . '/App/Controllers/UsuarioController.php',
     'App\\Middleware\\AuthMiddleware' => $baseDir . '/App/Middleware/AuthMiddleware.php',
+    'App\\Middleware\\RolMiddleware' => $baseDir . '/App/Middleware/RolMiddleware.php',
+    'App\\Utils\\AuthHelpers' => $baseDir . '/App/Utils/AuthHelpers.php',
     'App\\Utils\\PrinterManager' => $baseDir . '/App/Utils/PrinterManager.php',
     'App\\Utils\\ReportePDF' => $baseDir . '/App/Utils/ReportePDF.php',
     'App\\Utils\\ResponseUtil' => $baseDir . '/App/Utils/ResponseUtil.php',

@@ -144,7 +144,7 @@ class UsuarioController
         }
 
         $payload = AuthController::decodeTokenData($token);
-        $usuarioId = $payload['id'] ?? null;
+        $usuarioId = $payload['data']['id'] ?? null;
         if (!$usuarioId) {
             throw new Exception("Token inválido: ID de usuario no encontrado.", 401);
         }

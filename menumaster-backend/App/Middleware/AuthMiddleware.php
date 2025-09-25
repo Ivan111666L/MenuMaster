@@ -3,7 +3,6 @@ namespace App\Middleware;
 
 use App\Config\Config;
 use App\Models\UsuarioModel;
-use App\Models\RolModel;
 use App\Config\ConexionDb;
 use Exception;
 use Firebase\JWT\JWT;
@@ -11,17 +10,19 @@ use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\SignatureInvalidException;
 
+/**
+ * AuthMiddleware - Maneja únicamente la autenticación JWT
+ * La autorización basada en roles se maneja en RolMiddleware
+ */
 class AuthMiddleware
 {
     private $db;
     private $usuarioModel;
-    private $rolModel;
 
     public function __construct()
     {
         $this->db = ConexionDb::getConnection();
         $this->usuarioModel = new UsuarioModel($this->db);
-        $this->rolModel = new RolModel($this->db);
     }
 
     /**
@@ -123,89 +124,6 @@ class AuthMiddleware
     }
 
     /**
-     * Verificar permisos específicos
-     */
-    public function checkPermission(string $permiso): bool
-    {
-        $usuario = $this->authenticate();
-        
-        if (!$usuario) {
-            return false;
-        }
-
-        // Verificar si el usuario tiene el permiso específico
-        $stmt = $this->db->prepare("
-            SELECT COUNT(*) as count
-            FROM rol_permisos rp
-            INNER JOIN permisos p ON rp.permiso_id = p.id
-            WHERE rp.rol_id = :rol_id 
-            AND p.nombre = :permiso 
-            AND p.estado_id = 1
-        ");
-        
-        $stmt->execute([
-            ':rol_id' => $usuario['rol_id'],
-            ':permiso' => $permiso
-        ]);
-        
-        $result = $stmt->fetch();
-        return $result['count'] > 0;
-    }
-
-    /**
-     * Verificar múltiples permisos (OR)
-     */
-    public function checkAnyPermission(array $permisos): bool
-    {
-        foreach ($permisos as $permiso) {
-            if ($this->checkPermission($permiso)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Verificar múltiples permisos (AND)
-     */
-    public function checkAllPermissions(array $permisos): bool
-    {
-        foreach ($permisos as $permiso) {
-            if (!$this->checkPermission($permiso)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Verificar rol específico
-     */
-    public function checkRole(string $rolNombre): bool
-    {
-        $usuario = $this->authenticate();
-        
-        if (!$usuario) {
-            return false;
-        }
-
-        return strtolower($usuario['rol']) === strtolower($rolNombre);
-    }
-
-    /**
-     * Verificar múltiples roles
-     */
-    public function checkAnyRole(array $roles): bool
-    {
-        foreach ($roles as $rol) {
-            if ($this->checkRole($rol)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Middleware para rutas que requieren autenticación
      */
     public function requireAuth(): void
@@ -217,57 +135,11 @@ class AuthMiddleware
     }
 
     /**
-     * Middleware para rutas que requieren permisos específicos
-     */
-    public function requirePermission(string $permiso): void
-    {
-        if (!$this->checkPermission($permiso)) {
-            $this->sendForbiddenResponse("No tienes permisos para realizar esta acción");
-            exit;
-        }
-    }
-
-    /**
-     * Middleware para rutas que requieren roles específicos
-     */
-    public function requireRole(string $rol): void
-    {
-        if (!$this->checkRole($rol)) {
-            $this->sendForbiddenResponse("No tienes el rol necesario para acceder a este recurso");
-            exit;
-        }
-    }
-
-    /**
      * Obtener información del usuario actual
      */
     public function getCurrentUser(): ?array
     {
         return $this->authenticate();
-    }
-
-    /**
-     * Obtener permisos del usuario actual
-     */
-    public function getCurrentUserPermissions(): array
-    {
-        $usuario = $this->authenticate();
-        
-        if (!$usuario) {
-            return [];
-        }
-
-        $stmt = $this->db->prepare("
-            SELECT p.nombre, p.descripcion, p.modulo, p.accion
-            FROM rol_permisos rp
-            INNER JOIN permisos p ON rp.permiso_id = p.id
-            WHERE rp.rol_id = :rol_id 
-            AND p.estado_id = 1
-            ORDER BY p.modulo, p.nombre
-        ");
-        
-        $stmt->execute([':rol_id' => $usuario['rol_id']]);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -324,49 +196,6 @@ class AuthMiddleware
         return $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
     }
 
-    private function sendUnauthorizedResponse(string $message): void
-    {
-        http_response_code(401);
-        header('Content-Type: application/json; charset=utf-8');
-        
-        echo json_encode([
-            "success" => false,
-            "message" => $message,
-            "error_code" => "UNAUTHORIZED",
-            "timestamp" => date('c')
-        ], JSON_UNESCAPED_UNICODE);
-    }
-
-    private function sendForbiddenResponse(string $message): void
-    {
-        http_response_code(403);
-        header('Content-Type: application/json; charset=utf-8');
-        
-        echo json_encode([
-            "success" => false,
-            "message" => $message,
-            "error_code" => "FORBIDDEN",
-            "timestamp" => date('c')
-        ], JSON_UNESCAPED_UNICODE);
-    }
-    /**
-     * Obtener permisos del usuario por rol (método público)
-     */
-    public function getUserPermissions(int $rolId): array
-    {
-        $stmt = $this->db->prepare("
-            SELECT p.nombre, p.descripcion, p.modulo, p.accion
-            FROM rol_permisos rp
-            INNER JOIN permisos p ON rp.permiso_id = p.id
-            WHERE rp.rol_id = :rol_id 
-            AND p.estado_id = 1
-            ORDER BY p.modulo, p.nombre
-        ");
-        
-        $stmt->execute([':rol_id' => $rolId]);
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
     /**
      * Validar token JWT y obtener datos del usuario
      */
@@ -388,6 +217,32 @@ class AuthMiddleware
         } catch (Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * Obtener datos del usuario desde el token JWT
+     */
+    public function getUserFromToken(): ?array
+    {
+        $token = $this->getBearerToken();
+        if (!$token) {
+            return null;
+        }
+
+        return $this->validateToken($token);
+    }
+
+    private function sendUnauthorizedResponse(string $message): void
+    {
+        http_response_code(401);
+        header('Content-Type: application/json; charset=utf-8');
+        
+        echo json_encode([
+            "success" => false,
+            "message" => $message,
+            "error_code" => "UNAUTHORIZED",
+            "timestamp" => date('c')
+        ], JSON_UNESCAPED_UNICODE);
     }
 
     /**

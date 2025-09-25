@@ -26,7 +26,7 @@ class Config {
 
     public static function getJwtConfig() {
         return [
-            "secret" => "clave_secreta_super_segura", // cámbiala en producción
+            "secret" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MenuMaster2024!", // Secure JWT secret key
             "algorithm" => "HS256",
             "expiration" => 3600 // 1 hora
         ];

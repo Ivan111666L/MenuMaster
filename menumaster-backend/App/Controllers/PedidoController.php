@@ -90,7 +90,7 @@ class PedidoController
             }
             
             $payload = AuthController::decodeTokenData($token);
-            $usuarioId = $payload['id'] ?? null;
+            $usuarioId = $payload['data']['id'] ?? null;
             if (!$usuarioId) {
                 $this->sendResponse(401, null, "Token inválido");
                 return;

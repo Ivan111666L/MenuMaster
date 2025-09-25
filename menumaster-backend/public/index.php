@@ -1,4 +1,6 @@
 <?php
+// Start output buffering to prevent headers already sent errors
+ob_start();
 
 // ===== INICIO DEL CÓDIGO CORS =====
 // Permitir solicitudes desde tu frontend (ajusta el puerto si es diferente)
@@ -9,9 +11,10 @@ header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 
 // Manejar la solicitud de pre-vuelo (preflight) del navegador
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
     // No es necesario procesar nada más, solo enviar las cabeceras y salir.
     http_response_code(204); // 204 No Content
+    ob_end_clean();
     exit;
 }
 // ===== FIN DEL CÓDIGO CORS =====
@@ -44,4 +47,4 @@ if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
 
 // --- Carga del Enrutador Principal ---
 // Se delega el manejo de todas las peticiones al enrutador.
-require_once BASE_PATH . '/App/routes/router.php';
+require_once BASE_PATH . '/routes/router.php';

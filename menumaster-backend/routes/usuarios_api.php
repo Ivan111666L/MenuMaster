@@ -9,6 +9,7 @@
 require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
 require_once BASE_PATH . '/app/Controllers/UsuarioController.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Utils/AuthHelpers.php';
 
 // Usar alias para las clases
 use App\Controllers\UsuarioController;
@@ -101,7 +102,7 @@ if (!function_exists('requireAdmin')) {
             throw new Exception("Token no encontrado para verificación de rol.", 401);
         }
         $payload = AuthController::decodeTokenData($token);
-        if (($payload['rol_id'] ?? null) !== 1) { // 1 = administrador
+        if (($payload['data']['rol_id'] ?? null) !== 1) { // 1 = administrador
             throw new Exception("No tienes permisos para realizar esta acción.", 403);
         }
     }

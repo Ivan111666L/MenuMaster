@@ -11,7 +11,7 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
 // 3. ¡Ahora sí puedes usar tus clases!
-use app\config\ConexionDb;
+use App\Config\ConexionDb;
 use PDOException;
 
 echo "Intentando conectar a la base de datos...<br>";

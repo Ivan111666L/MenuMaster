@@ -62,7 +62,7 @@ class MovimientoInventarioController
         if (!$token) throw new Exception("Token de autorización no encontrado.", 401);
         
         $payload = AuthController::decodeTokenData($token);
-        $usuarioId = $payload['id'] ?? null;
+        $usuarioId = $payload['data']['id'] ?? null;
         if (!$usuarioId) throw new Exception("Token inválido: ID de usuario no encontrado.", 401);
 
         try {

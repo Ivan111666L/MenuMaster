@@ -115,6 +115,8 @@ class ComposerStaticInit20fad51902f91e7fd3039e016a6556b5
         'App\\Controllers\\RolesController' => __DIR__ . '/../..' . '/App/Controllers/RolesController.php',
         'App\\Controllers\\UsuarioController' => __DIR__ . '/../..' . '/App/Controllers/UsuarioController.php',
         'App\\Middleware\\AuthMiddleware' => __DIR__ . '/../..' . '/App/Middleware/AuthMiddleware.php',
+        'App\\Middleware\\RolMiddleware' => __DIR__ . '/../..' . '/App/Middleware/RolMiddleware.php',
+        'App\\Utils\\AuthHelpers' => __DIR__ . '/../..' . '/App/Utils/AuthHelpers.php',
         'App\\Utils\\PrinterManager' => __DIR__ . '/../..' . '/App/Utils/PrinterManager.php',
         'App\\Utils\\ReportePDF' => __DIR__ . '/../..' . '/App/Utils/ReportePDF.php',
         'App\\Utils\\ResponseUtil' => __DIR__ . '/../..' . '/App/Utils/ResponseUtil.php',
