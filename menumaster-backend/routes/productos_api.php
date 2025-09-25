@@ -14,6 +14,23 @@ use App\Controllers\ProductoController;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
 
+/**
+ * Función de Ayuda para la AUTORIZACIÓN
+ */
+if (!function_exists('requireAdmin')) {
+    function requireAdmin(): void {
+        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+        if (!$token) {
+            throw new Exception("Token no encontrado para verificación de rol.", 401);
+        }
+        $payload = AuthController::decodeTokenData($token);
+        
+        if (($payload['data']->rol_id ?? null) !== 1) { // 1 = administrador
+            throw new Exception("No tienes permisos para realizar esta acción.", 403);
+        }
+    }
+}
+
 // --- Lógica del Enrutador ---
 try {
     // 1. Instanciamos las clases necesarias
@@ -79,20 +96,4 @@ try {
     $code = $e->getCode() ?: 400;
     http_response_code($code);
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-}
-
-/**
- * Función de Ayuda para la AUTORIZACIÓN
- */
-if (!function_exists('requireAdmin')) {
-    function requireAdmin(): void {
-        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-        if (!$token) {
-            throw new Exception("Token no encontrado para verificación de rol.", 401);
-        }
-        $payload = AuthController::decodeTokenData($token);
-        if (($payload['rol_id'] ?? null) !== 1) { // 1 = administrador
-            throw new Exception("No tienes permisos para realizar esta acción.", 403);
-        }
-    }
 }

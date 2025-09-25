@@ -1,5 +1,6 @@
 <?php
 // Set environment variables for database connection
+
 $_ENV['DB_HOST'] = 'localhost';
 $_ENV['DB_NAME'] = 'menu_master';
 $_ENV['DB_USER'] = 'root';

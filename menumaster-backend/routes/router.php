@@ -1,26 +1,16 @@
 <?php
 use App\Config\ConexionDb;
 use App\Controllers\AuthController;
-use App\Models\UsuarioModel;
-use App\Models\RolModel;
 
 require_once BASE_PATH . '/app/Utils/Validator.php';
 require_once BASE_PATH . '/app/config/ConexionDb.php';
 require_once BASE_PATH . '/app/Controllers/AuthController.php';
-require_once BASE_PATH . '/App/Models/UsuarioModel.php';
-require_once BASE_PATH . '/App/Models/RolModel.php';
 require_once BASE_PATH . '/App/Utils/AuthHelpers.php';
 
 try {
     // Conexión BD
     $db = ConexionDb::getConnection();
-    
-    // Instanciar modelos requeridos
-    $usuarioModel = new UsuarioModel($db);
-    $rolModel = new RolModel($db);
-    
-    // Instanciar controlador con dependencias
-    $authController = new AuthController($db, $usuarioModel, $rolModel);
+    $authController = new AuthController($db);
 
     // Método HTTP
     $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
@@ -58,11 +48,11 @@ try {
                         $authController->login();
                     }
                     break;
-                case 'verify':
-                    if ($requestMethod === 'GET') {
-                        $authController->verifyToken();
-                    }
-                    break;
+                // case 'verify':
+                //     if ($requestMethod === 'GET') {
+                //         $authController->verifyToken();
+                //     }
+                    // break;
                 default:
                     throw new Exception("Acción '{$action}' no válida para auth.", 404);
             }

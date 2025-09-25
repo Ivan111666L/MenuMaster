@@ -35,16 +35,39 @@ function Register() {
         }));
     };
 
-    // La función de validación del lado del cliente está muy bien, la conservamos.
+    // Validación mejorada que coincide con los requisitos del backend
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.nombre.trim()) newErrors.nombre = 'El nombre es obligatorio.';
-        if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'El formato del email no es válido.';
-        if (formData.password.length < 8) newErrors.password = 'La contraseña debe tener al menos 8 caracteres.';
-        if (formData.password !== formData.passwordConfirm) newErrors.passwordConfirm = 'Las contraseñas no coinciden.';
+        
+        if (!formData.nombre.trim()) {
+            newErrors.nombre = 'El nombre es obligatorio.';
+        } else if (formData.nombre.trim().length < 2) {
+            newErrors.nombre = 'El nombre debe tener al menos 2 caracteres.';
+        }
+        
+        if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'El formato del email no es válido.';
+        }
+        
+        // Validación de contraseña que coincide con el backend
+        if (!isValidPassword(formData.password)) {
+            newErrors.password = 'La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas y números.';
+        }
+        
+        if (formData.password !== formData.passwordConfirm) {
+            newErrors.passwordConfirm = 'Las contraseñas no coinciden.';
+        }
         
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
+    };
+
+    // Función de validación de contraseña que coincide exactamente con el backend
+    const isValidPassword = (password) => {
+        return password.length >= 8 &&
+               /[A-Z]/.test(password) &&  // Al menos una mayúscula
+               /[a-z]/.test(password) &&  // Al menos una minúscula
+               /[0-9]/.test(password);    // Al menos un número
     };
 
     const handleRegister = async (e) => {
@@ -63,8 +86,17 @@ function Register() {
             navigate('/login');
 
         } catch (error) {
-            // CORRECCIÓN: Se mejora la captura del mensaje de error específico del backend.
-            const errorMessage = error.response?.data?.error || error.message || 'Error de conexión. Inténtalo de nuevo.';
+            // Mejor manejo de errores del backend
+            let errorMessage = 'Error de conexión. Inténtalo de nuevo.';
+            
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.response?.data?.error) {
+                errorMessage = error.response.data.error;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
             setApiError(errorMessage);
         } finally {
             setIsLoading(false);
@@ -126,7 +158,7 @@ function Register() {
                             id="password"
                             label="Contraseña"
                             type={showPassword ? 'text' : 'password'}
-                            placeholder='Mínimo 8 caracteres'
+                            placeholder='Ej: MiClave123'
                             value={formData.password}
                             onChange={handleInputChange}
                             error={errors.password}
@@ -136,6 +168,25 @@ function Register() {
                         <span onClick={() => setShowPassword(!showPassword)} className="password-toggle-icon">
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </span>
+                    </div>
+
+                    {/* Indicadores de requisitos de contraseña */}
+                    <div className="password-requirements">
+                        <p className="password-requirements-title">La contraseña debe contener:</p>
+                        <ul className="password-requirements-list">
+                            <li className={formData.password.length >= 8 ? 'requirement-met' : 'requirement-unmet'}>
+                                ✓ Al menos 8 caracteres
+                            </li>
+                            <li className={/[A-Z]/.test(formData.password) ? 'requirement-met' : 'requirement-unmet'}>
+                                ✓ Una letra mayúscula (A-Z)
+                            </li>
+                            <li className={/[a-z]/.test(formData.password) ? 'requirement-met' : 'requirement-unmet'}>
+                                ✓ Una letra minúscula (a-z)
+                            </li>
+                            <li className={/[0-9]/.test(formData.password) ? 'requirement-met' : 'requirement-unmet'}>
+                                ✓ Un número (0-9)
+                            </li>
+                        </ul>
                     </div>
 
                     <div className="password-input-wrapper">

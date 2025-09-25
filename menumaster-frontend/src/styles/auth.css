@@ -136,6 +136,71 @@
     text-decoration: underline;
 }
 
+/* --- Password Requirements --- */
+.password-requirements {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
+
+.password-requirements h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.password-requirements ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.password-requirements li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+    color: var(--text-secondary);
+}
+
+.password-requirements li:last-child {
+    margin-bottom: 0;
+}
+
+.password-requirements .requirement-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.password-requirements .requirement-icon.valid {
+    background-color: var(--success);
+    color: var(--white);
+}
+
+.password-requirements .requirement-icon.invalid {
+    background-color: var(--danger);
+    color: var(--white);
+}
+
+.password-requirements .requirement-text.valid {
+    color: var(--success);
+}
+
+.password-requirements .requirement-text.invalid {
+    color: var(--danger);
+}
+
 /* --- Enlaces (Olvidé contraseña, Crear cuenta) --- */
 .auth-links-container {
     display: flex;

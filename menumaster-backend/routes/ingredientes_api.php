@@ -10,6 +10,33 @@ use App\Controllers\IngredienteController;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
 
+/**
+ * Función de Ayuda para la AUTORIZACIÓN (debe estar disponible para los routers que la necesiten)
+ */
+if (!function_exists('requireAdmin')) {
+    function requireAdmin(): void {
+        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+        if (!$token) {
+            throw new Exception("Token no encontrado para verificación de rol.", 401);
+        }
+        $payload = AuthController::decodeTokenData($token);
+        
+        // Handle both array and object formats for the data property
+        $rolId = null;
+        if (isset($payload['data'])) {
+            if (is_array($payload['data'])) {
+                $rolId = $payload['data']['rol_id'] ?? null;
+            } elseif (is_object($payload['data'])) {
+                $rolId = $payload['data']->rol_id ?? null;
+            }
+        }
+        
+        if ($rolId !== 1) { // 1 = administrador
+            throw new Exception("No tienes permisos para realizar esta acción.", 403);
+        }
+    }
+}
+
 // --- Lógica del Enrutador ---
 try {
     // 1. Instanciamos las clases necesarias
@@ -71,24 +98,14 @@ try {
     }
 
 } catch (Exception $e) {
-    // 5. Capturador de Errores Centralizado
-    $code = $e->getCode() ?: 400;
-    http_response_code($code);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
-}
-
-/**
- * Función de Ayuda para la AUTORIZACIÓN (debe estar disponible para los routers que la necesiten)
- */
-if (!function_exists('requireAdmin')) {
-    function requireAdmin(): void {
-        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-        if (!$token) {
-            throw new Exception("Token no encontrado para verificación de rol.", 401);
-        }
-        $payload = AuthController::decodeTokenData($token);
-        if (($payload['rol_id'] ?? null) !== 1) { // 1 = administrador
-            throw new Exception("No tienes permisos para realizar esta acción.", 403);
-        }
+    $code = $e->getCode() ?: 500;
+    // Ensure the code is an integer
+    if (!is_int($code)) {
+        $code = 500;
     }
+    http_response_code($code);
+    echo json_encode([
+        'success' => false,
+        'error' => $e->getMessage()
+    ]);
 }

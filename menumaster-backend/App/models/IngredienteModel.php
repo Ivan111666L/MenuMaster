@@ -73,33 +73,26 @@ class IngredienteModel
     /**
      * Crea un nuevo ingrediente a partir de un array de datos.
      * @param array $data Datos del ingrediente.
-     * @return int|false El ID del nuevo ingrediente o false si falla.
+     * @return int El ID del nuevo ingrediente.
      */
-    public function create(array $data): int|false
+    public function create(array $data): int
     {
-        // Verifica si ya existe un ingrediente con el mismo nombre
-        $sqlCheck = "SELECT id FROM {$this->table_name} WHERE nombre = :nombre LIMIT 1";
-        $stmtCheck = $this->conn->prepare($sqlCheck);
-        $stmtCheck->bindParam(':nombre', $data['nombre']);
-        $stmtCheck->execute();
-        if ($stmtCheck->fetch()) {
-            // Ya existe, no crear duplicado
-            return false;
-        }
-
         $columns = implode(', ', array_keys($data));
         $placeholders = ':' . implode(', :', array_keys($data));
-        $sql = "INSERT INTO {$this->table_name} ({$columns}) VALUES ({$placeholders})";
+        
+        $query = "INSERT INTO " . $this->table_name . " ({$columns}) VALUES ({$placeholders})";
+        
         try {
-            $stmt = $this->conn->prepare($sql);
-            foreach ($data as $key => &$value) {
-                $stmt->bindParam(':' . $key, $value);
+            $stmt = $this->conn->prepare($query);
+            
+            foreach ($data as $key => $value) {
+                $stmt->bindValue(":$key", $value);
             }
+            
             $stmt->execute();
-            return (int)$this->conn->lastInsertId();
+            return $this->conn->lastInsertId();
         } catch (PDOException $e) {
-            error_log('Error en IngredienteModel::create: ' . $e->getMessage());
-            return false;
+            throw new Exception("Error al crear ingrediente: " . $e->getMessage(), 500);
         }
     }
 

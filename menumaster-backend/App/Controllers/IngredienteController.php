@@ -71,24 +71,26 @@ class IngredienteController
         $datosParaCrear = [
             'nombre' => $data['nombre'],
             'unidad_medida' => $data['unidad_medida'],
-            'stock_actual' => ($data['stock_actual'] === '' ? null : $data['stock_actual']),
-            'stock_minimo' => ($data['stock_minimo'] === '' ? null : $data['stock_minimo']),
-            'descripcion' => (isset($data['descripcion']) && $data['descripcion'] === '' ? null : ($data['descripcion'] ?? null)),
-            'precio_compra' => (isset($data['precio_compra']) && $data['precio_compra'] === '' ? null : ($data['precio_compra'] ?? null)),
-            // Si no se envía proveedor, se guarda como null
-            'proveedor_id' => null,
+            'stock_actual' => $data['stock_actual'],
+            'stock_minimo' => $data['stock_minimo'],
+            'descripcion' => $data['descripcion'] ?? null,
+            'precio_compra' => $data['precio_compra'] ?? null
         ];
 
-        // Si se envía proveedor_nombre, buscar el id
-        if (!empty($data['proveedor_nombre'])) {
+        // Manejar proveedor si se proporciona
+        if (isset($data['proveedor_nombre']) && !empty($data['proveedor_nombre'])) {
             $proveedor = $this->proveedorModel->findByName($data['proveedor_nombre']);
             if (!$proveedor) throw new Exception("El proveedor '{$data['proveedor_nombre']}' no existe.", 400);
             $datosParaCrear['proveedor_id'] = $proveedor['id'];
+        } else {
+            $datosParaCrear['proveedor_id'] = null;
         }
 
         $estadoActivo = $this->estadoGeneralModel->findByName('activo');
         if (!$estadoActivo) throw new Exception("El estado 'activo' no está configurado.", 500);
-        $datosParaCrear['estado_id'] = $estadoActivo['id'];
+        
+        $estadoResult = $estadoActivo->fetch(PDO::FETCH_ASSOC);
+        $datosParaCrear['estado_id'] = $estadoResult['id'];
 
         try {
             $nuevoId = $this->ingredienteModel->create($datosParaCrear);
@@ -182,7 +184,10 @@ class IngredienteController
     {
         http_response_code($statusCode);
         if ($statusCode !== 204) {
-            echo json_encode($data);
+            echo json_encode([
+                'success' => true,
+                'data' => $data
+            ]);
         }
         exit;
     }

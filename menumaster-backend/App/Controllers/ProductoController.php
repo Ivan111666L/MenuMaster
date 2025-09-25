@@ -117,7 +117,7 @@ class ProductoController {
                 'categoria_id' => intval($data['categoria_id']),
                 'imagen_url' => $data['imagen_url'] ?? null,
                 'tiempo_preparacion_min' => $data['tiempo_preparacion_min'] ?? null,
-                'destacado' => isset($data['destacado']) ? (bool)$data['destacado'] : false
+                'destacado' => isset($data['destacado']) ? (int)(bool)$data['destacado'] : 0
             ];
 
             // Buscar estado 'disponible' por nombre

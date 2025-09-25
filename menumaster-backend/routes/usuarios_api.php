@@ -102,7 +102,7 @@ if (!function_exists('requireAdmin')) {
             throw new Exception("Token no encontrado para verificación de rol.", 401);
         }
         $payload = AuthController::decodeTokenData($token);
-        if (($payload['data']['rol_id'] ?? null) !== 1) { // 1 = administrador
+        if (($payload['rol_id'] ?? null) !== 1) { // 1 = administrador
             throw new Exception("No tienes permisos para realizar esta acción.", 403);
         }
     }

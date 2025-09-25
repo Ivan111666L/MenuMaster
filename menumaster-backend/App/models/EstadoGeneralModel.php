@@ -22,7 +22,7 @@ class EstadoGeneralModel {
     }
 
     public function findByName(string $name) {
-        $query = "SELECT id, nombre, tipo FROM " . $this->table_name . " WHERE nombre = ? LIMIT 0,1";
+        $query = "SELECT id, nombre FROM " . $this->table_name . " WHERE nombre = ? LIMIT 0,1";
         $stmt = $this->conn->prepare($query);
         $stmt->bindParam(1, $name);
         $stmt->execute();
