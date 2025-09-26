@@ -1,6 +1,5 @@
 <?php
 
-
 // check_table_structure.php - Check full table structure
 
 require_once __DIR__ . '/vendor/autoload.php';

@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext"; // <-- Importa nuestro hook personalizado
+import permisosService from "@/services/permisosService.js";
 import {
   FaHome, FaClipboardList, FaBoxes, FaFileInvoiceDollar,
   FaChartBar, FaCog, FaSignOutAlt, FaUtensils, FaTable,
@@ -14,7 +15,36 @@ const Layout = () => {
     // Estado para mostrar/ocultar el menú en móvil
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [userPermissions, setUserPermissions] = useState({});
+    const [loading, setLoading] = useState(true);
     const location = useLocation();
+
+    // Obtenemos el usuario y la función de logout directamente del contexto
+    const { user, logout } = useAuth();
+
+    // BUG CORREGIDO: Usamos 'user.rol' en lugar de 'user.role' para coincidir con la API
+    const rol = user?.rol;
+
+    // Cargar permisos del usuario al montar el componente
+    useEffect(() => {
+        const loadUserPermissions = async () => {
+            if (user) {
+                try {
+                    const permissions = await permisosService.getPermissionsByModule();
+                    setUserPermissions(permissions);
+                } catch (error) {
+                    console.error('Error al cargar permisos:', error);
+                    setUserPermissions({});
+                } finally {
+                    setLoading(false);
+                }
+            } else {
+                setLoading(false);
+            }
+        };
+
+        loadUserPermissions();
+    }, [user]);
 
     // Detectar cambios en el tamaño de pantalla
     useEffect(() => {
@@ -41,53 +71,130 @@ const Layout = () => {
             setSidebarOpen(false);
         }
     };
-    // Obtenemos el usuario y la función de logout directamente del contexto
-    const { user, logout } = useAuth();
 
-    // BUG CORREGIDO: Usamos 'user.rol' en lugar de 'user.role' para coincidir con la API
-    const rol = user?.rol;
+    // Función para verificar si el usuario tiene permisos para un módulo
+    const hasModulePermission = (modulo, accion = 'ver') => {
+        if (!userPermissions[modulo]) return false;
+        return userPermissions[modulo].some(p => p.accion === accion);
+    };
 
     // --- LÓGICA DE MENÚS MEJORADA Y MÁS CLARA ---
     const getMenuItems = () => {
-        // Menús base para cada rol. Así es más fácil de mantener.
-        const baseMenus = {
-            administrador: [
-                { path: "/dashboard", label: "Dashboard", icon: <FaChartBar /> },
-                { path: "/productos", label: "Productos", icon: <FaUtensils /> },
-                { path: "/inventario", label: "Inventario", icon: <FaBoxes /> },
-                { path: "/facturacion", label: "Facturación", icon: <FaFileInvoiceDollar /> },
-                { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
-                { path: "/mesas", label: "Mesas", icon: <FaTable /> },
-                { path: "/cocina", label: "Cocina", icon: <FaUtensils /> },
-                { path: "/analisis", label: "Análisis Avanzado", icon: <FaChartBar /> },
-                { path: "/configuracion", label: "Configuración", icon: <FaCog /> },
-            ],
-            gerente: [
-                { path: "/dashboard", label: "Dashboard", icon: <FaChartBar /> },
-                { path: "/productos", label: "Productos", icon: <FaUtensils /> },
-                { path: "/inventario", label: "Inventario", icon: <FaBoxes /> },
-                { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
-                { path: "/facturacion", label: "Facturación", icon: <FaFileInvoiceDollar /> },
-                { path: "/mesas", label: "Mesas", icon: <FaTable /> },
-                { path: "/cocina", label: "Cocina", icon: <FaUtensils /> },
-                { path: "/analisis", label: "Análisis Avanzado", icon: <FaChartBar /> }
-            ],
-            mesero: [
-                { path: "/mesas", label: "Mesas", icon: <FaTable /> },
-                { path: "/pedidos", label: "Pedidos", icon: <FaClipboardList /> },
-                { path: "/facturacion", label: "Facturación", icon: <FaFileInvoiceDollar /> },
-            ],
-            cocinero: [
-                { path: "/cocina", label: "Cocina", icon: <FaUtensils /> },
-                { path: "/inventario", label: "Inventario", icon: <FaBoxes /> },
-                { path: "/cocina/menudia", label: "Menú del Día", icon: <FaHome /> }
-            ],
-        };
-        // Devolvemos el menú correspondiente al rol, o un array vacío si no hay rol.
-        return baseMenus[rol] || [];
+        // Definición completa de menús con permisos requeridos
+        const allMenuItems = [
+            { 
+                path: "/dashboard", 
+                label: "Dashboard", 
+                icon: <FaChartBar />, 
+                module: "dashboard", 
+                action: "ver",
+                roles: ["administrador", "mesero", "cocinero", "cajero"]
+            },
+            { 
+                path: "/productos", 
+                label: "Productos", 
+                icon: <FaUtensils />, 
+                module: "productos", 
+                action: "ver",
+                roles: ["administrador", "cocinero"]
+            },
+            { 
+                path: "/inventario", 
+                label: "Inventario", 
+                icon: <FaBoxes />, 
+                module: "inventario", 
+                action: "ver",
+                roles: ["administrador", "cocinero"]
+            },
+            { 
+                path: "/facturacion", 
+                label: "Facturación", 
+                icon: <FaFileInvoiceDollar />, 
+                module: "facturacion", 
+                action: "ver",
+                roles: ["administrador", "mesero", "cajero"]
+            },
+            { 
+                path: "/pedidos", 
+                label: "Pedidos", 
+                icon: <FaClipboardList />, 
+                module: "pedidos", 
+                action: "ver",
+                roles: ["administrador", "mesero", "cocinero"]
+            },
+            { 
+                path: "/mesas", 
+                label: "Mesas", 
+                icon: <FaTable />, 
+                module: "mesas", 
+                action: "ver",
+                roles: ["administrador", "mesero"]
+            },
+            { 
+                path: "/cocina", 
+                label: "Cocina", 
+                icon: <FaUtensils />, 
+                module: "cocina", 
+                action: "ver",
+                roles: ["administrador", "cocinero"]
+            },
+            { 
+                path: "/analisis", 
+                label: "Análisis Avanzado", 
+                icon: <FaChartBar />, 
+                module: "reportes", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/configuracion", 
+                label: "Configuración", 
+                icon: <FaCog />, 
+                module: "configuracion", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/usuarios", 
+                label: "Usuarios", 
+                icon: <FaUsers />, 
+                module: "usuarios", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/cocina/menudia", 
+                label: "Menú del Día", 
+                icon: <FaHome />, 
+                module: "cocina", 
+                action: "gestionar",
+                roles: ["cocinero"]
+            }
+        ];
+
+        // Filtrar menús basado en rol y permisos
+        return allMenuItems.filter(item => {
+            // Verificar si el rol tiene acceso básico
+            if (!item.roles.includes(rol)) return false;
+            
+            // Verificar permisos específicos del usuario
+            return hasModulePermission(item.module, item.action);
+        });
     };
 
     const menuItems = getMenuItems();
+
+    // Mostrar loading mientras se cargan los permisos
+    if (loading) {
+        return (
+            <div className="dashboard-container">
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                    <p>Cargando permisos...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-container">

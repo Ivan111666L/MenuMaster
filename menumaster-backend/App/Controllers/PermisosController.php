@@ -2,19 +2,22 @@
 namespace App\Controllers;
 
 use App\Middleware\AuthMiddleware;
+use App\Middleware\RolMiddleware;
 use App\Config\conexionDb;
 use PDO;
 use Exception;
 
-class PermisosController
+class PermisosController extends Controller
 {
-    private $db;
     private $authMiddleware;
+    private $rolMiddleware;
 
     public function __construct()
     {
-        $this->db = conexionDb::getConnection();
+        $db = conexionDb::getConnection();
+        parent::__construct($db);
         $this->authMiddleware = new AuthMiddleware();
+        $this->rolMiddleware = new RolMiddleware();
     }
 
     /**
@@ -24,7 +27,7 @@ class PermisosController
     {
         try {
             // Verificar autenticación y permisos
-            if (!$this->authMiddleware->checkPermission('roles.leer')) {
+            if (!$this->rolMiddleware->checkPermission('roles.leer')) {
                 $this->sendResponse(403, "No tienes permisos para ver los permisos del sistema");
                 return;
             }
@@ -230,7 +233,7 @@ class PermisosController
     public function getMisPermisos(): void
     {
         try {
-            $permisos = $this->authMiddleware->getCurrentUserPermissions();
+            $permisos = $this->rolMiddleware->getCurrentUserPermissions();
             $usuario = $this->authMiddleware->getCurrentUser();
 
             $this->sendResponse(200, "Permisos del usuario obtenidos correctamente", null, [
@@ -292,7 +295,7 @@ class PermisosController
 
     // Métodos privados de validación y utilidad
 
-    private function getJsonInput(): array
+    protected function getJsonInput(): array
     {
         $input = file_get_contents("php://input");
         $data = json_decode($input, true);
@@ -367,24 +370,20 @@ class PermisosController
         }
     }
 
-    private function sendResponse(
+    protected function sendResponse(
         int $statusCode,
-        string $message,
+        ?string $message = null,
         ?string $token = null,
         ?array $data = null
     ): void {
-        header('Content-Type: application/json; charset=utf-8');
-        header('X-Content-Type-Options: nosniff');
-        header('X-Frame-Options: DENY');
-        header('X-XSS-Protection: 1; mode=block');
-        
-        http_response_code($statusCode);
-
         $response = [
             "success" => $statusCode >= 200 && $statusCode < 300,
-            "message" => $message,
             "timestamp" => date('c')
         ];
+
+        if ($message !== null) {
+            $response["message"] = $message;
+        }
 
         if ($token !== null) {
             $response["token"] = $token;
@@ -394,7 +393,6 @@ class PermisosController
             $response["data"] = $data;
         }
 
-        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-        exit;
+        $this->jsonResponse($response, $statusCode);
     }
 }

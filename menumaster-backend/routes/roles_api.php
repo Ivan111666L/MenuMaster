@@ -2,8 +2,8 @@
 // routes/roles_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/RolesController.php';
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/RolesController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
 
 use App\Controllers\RolesController;
 use App\Middleware\AuthMiddleware;

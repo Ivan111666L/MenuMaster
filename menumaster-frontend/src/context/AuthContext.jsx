@@ -70,10 +70,14 @@ export function AuthProvider({ children }) {
       setSession(newSession);
 
       const roleRedirects = {
-        administrador: '/dashboard',
-        cajero: '/facturacion',
-        cocinero: '/cocina',
-        mesero: '/mesas'
+        'Administrador': '/dashboard',
+        'administrador': '/dashboard',
+        'Cajero': '/facturacion',
+        'cajero': '/facturacion',
+        'Cocinero': '/cocina',
+        'cocinero': '/cocina',
+        'Mesero': '/mesas',
+        'mesero': '/mesas'
       };
       const path = roleRedirects[sessionData.user.rol] || '/dashboard';
       navigate(path);

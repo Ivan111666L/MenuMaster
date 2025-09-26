@@ -2,9 +2,9 @@
 // routes/ingredientes_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/IngredienteController.php';
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Controllers/IngredienteController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
 
 use App\Controllers\IngredienteController;
 use App\Middleware\AuthMiddleware;

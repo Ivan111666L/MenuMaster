@@ -2,12 +2,44 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import dashboardService from '@/features/dashboard/services/dashboardService';
 import Spinner from '@/components/Spinner';
+import WaiterDashboard from './WaiterDashboard';
+import CookDashboard from './CookDashboard';
 
 // Importamos los estilos desde su propio archivo
 import '@/styles/dashboard.css';
 
 function Dashboard() {
     const { user } = useAuth(); // Obtenemos al usuario logueado del contexto
+    
+    // Renderizar dashboard específico según el rol del usuario
+    const renderRoleSpecificDashboard = () => {
+        const userRole = user?.rol?.toLowerCase();
+        
+        switch (userRole) {
+            case 'mesero':
+                return <WaiterDashboard />;
+            case 'cocinero':
+                return <CookDashboard />;
+            case 'administrador':
+            case 'admin':
+            default:
+                // Para administradores y roles no especificados, mostrar dashboard completo
+                return <AdminDashboard />;
+        }
+    };
+
+    // Si no hay usuario, mostrar spinner
+    if (!user) {
+        return <Spinner />;
+    }
+
+    // Renderizar el dashboard apropiado
+    return renderRoleSpecificDashboard();
+}
+
+// Componente del dashboard de administrador (dashboard original)
+function AdminDashboard() {
+    const { user } = useAuth();
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -175,6 +207,6 @@ function Dashboard() {
             </div>
         </div>
     );
-};
+}
 
 export default Dashboard;

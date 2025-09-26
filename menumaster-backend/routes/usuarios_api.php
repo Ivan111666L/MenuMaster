@@ -6,9 +6,9 @@
  */
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/app/Controllers/UsuarioController.php';
-require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/UsuarioController.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
 require_once BASE_PATH . '/App/Utils/AuthHelpers.php';
 
 // Usar alias para las clases

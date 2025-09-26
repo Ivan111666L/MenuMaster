@@ -79,6 +79,42 @@ class UsuarioModel {
         }
     }
 
+    public function getUsuarioPorEmail(string $email): array|false {
+        $sql = "SELECT 
+                    u.id, u.nombre, u.email, u.password, u.rol_id, u.estado_id,
+                    r.nombre AS rol
+                FROM {$this->table} u
+                LEFT JOIN roles r ON u.rol_id = r.id
+                WHERE u.email = :email";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':email', $email);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log('Error en UsuarioModel::getUsuarioPorEmail: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
+    public function actualizarPassword(int $id, string $password_hash): bool {
+        $sql = "UPDATE {$this->table} 
+                SET password = :password 
+                WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':password', $password_hash);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en UsuarioModel::actualizarPassword: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+
+
     /**
      * Obtiene todos los usuarios.
      */

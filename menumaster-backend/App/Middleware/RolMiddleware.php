@@ -63,7 +63,7 @@ class RolMiddleware
     }
 
     /**
-     * Verificar permisos específicos
+     * Verificar permisos específicos por nombre
      */
     public function checkPermission(string $permiso): bool
     {
@@ -79,8 +79,7 @@ class RolMiddleware
             FROM rol_permisos rp
             INNER JOIN permisos p ON rp.permiso_id = p.id
             WHERE rp.rol_id = :rol_id 
-            AND p.nombre = :permiso 
-            AND p.estado_id = 1
+            AND p.nombre = :permiso
         ");
         
         $stmt->execute([
@@ -90,6 +89,80 @@ class RolMiddleware
         
         $result = $stmt->fetch();
         return $result['count'] > 0;
+    }
+
+    /**
+     * Verificar permisos específicos por módulo y acción
+     */
+    public function checkModulePermission(string $modulo, string $accion): bool
+    {
+        $usuario = $this->authMiddleware->getCurrentUser();
+        
+        if (!$usuario) {
+            return false;
+        }
+
+        // Verificar si el usuario tiene el permiso específico por módulo y acción
+        $stmt = $this->db->prepare("
+            SELECT COUNT(*) as count
+            FROM rol_permisos rp
+            INNER JOIN permisos p ON rp.permiso_id = p.id
+            WHERE rp.rol_id = :rol_id 
+            AND p.modulo = :modulo 
+            AND p.accion = :accion
+        ");
+        
+        $stmt->execute([
+            ':rol_id' => $usuario['rol_id'],
+            ':modulo' => $modulo,
+            ':accion' => $accion
+        ]);
+        
+        $result = $stmt->fetch();
+        return $result['count'] > 0;
+    }
+
+    /**
+     * Obtener todos los permisos del usuario actual
+     */
+    public function getUserPermissions(): array
+    {
+        $usuario = $this->authMiddleware->getCurrentUser();
+        
+        if (!$usuario) {
+            return [];
+        }
+
+        $stmt = $this->db->prepare("
+            SELECT p.id, p.nombre, p.descripcion, p.modulo, p.accion
+            FROM rol_permisos rp
+            INNER JOIN permisos p ON rp.permiso_id = p.id
+            WHERE rp.rol_id = :rol_id
+            ORDER BY p.modulo, p.accion
+        ");
+        
+        $stmt->execute([':rol_id' => $usuario['rol_id']]);
+        
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtener permisos agrupados por módulo
+     */
+    public function getUserPermissionsByModule(): array
+    {
+        $permisos = $this->getUserPermissions();
+        $grouped = [];
+        
+        foreach ($permisos as $permiso) {
+            $modulo = $permiso['modulo'];
+            if (!isset($grouped[$modulo])) {
+                $grouped[$modulo] = [];
+            }
+            $grouped[$modulo][] = $permiso;
+        }
+        
+        return $grouped;
     }
 
     /**
@@ -236,9 +309,9 @@ class RolMiddleware
     }
 
     /**
-     * Obtener permisos del usuario por rol
+     * Obtener permisos del usuario por rol específico
      */
-    public function getUserPermissions(int $rolId): array
+    public function getUserPermissionsByRolId(int $rolId): array
     {
         $stmt = $this->db->prepare("
             SELECT p.nombre, p.descripcion, p.modulo, p.accion
@@ -269,8 +342,7 @@ class RolMiddleware
             FROM rol_permisos rp
             INNER JOIN permisos p ON rp.permiso_id = p.id
             WHERE rp.rol_id = :rol_id 
-            AND p.modulo = :modulo 
-            AND p.estado_id = 1
+            AND p.modulo = :modulo
         ");
         
         $stmt->execute([

@@ -1,7 +1,7 @@
 import api from '@/services/api';
 
 const getProveedores = async () => {
-  const response = await api.get('/api/proveedores');
+  const response = await api.get('/proveedores');
   return response.data.data;
 };
 
@@ -11,7 +11,7 @@ const getProveedorById = async (id) => {
 };
 
 const createProveedor = async (data) => {
-  const response = await api.post('/api/proveedores', data);
+  const response = await api.post('/proveedores', data);
   return response.data.data;
 };
 

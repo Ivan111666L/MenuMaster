@@ -9,15 +9,13 @@ const api = axios.create({
   },
 });
 
-// Interceptor de peticiones: añade el token y lo loggea
+// Interceptor de peticiones: añade el token
 api.interceptors.request.use(
   (config) => {
     const token = getAuthToken();
-    console.log('[API] Request interceptor — token:', token);
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('[API] Request interceptor — headers:', config.headers);
     }
 
     return config;

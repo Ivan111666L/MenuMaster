@@ -2,9 +2,9 @@
 // routes/mesas_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/MesaController.php';
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Controllers/MesaController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
 
 use App\Controllers\MesaController;
 use App\Middleware\AuthMiddleware;

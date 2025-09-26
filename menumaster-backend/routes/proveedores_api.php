@@ -1,6 +1,6 @@
 <?php
 // routes/proveedores_api.php
-require_once BASE_PATH . '/app/Controllers/ProveedorController.php';
+require_once BASE_PATH . '/App/Controllers/ProveedorController.php';
 use App\Controllers\ProveedorController;
 
 try {

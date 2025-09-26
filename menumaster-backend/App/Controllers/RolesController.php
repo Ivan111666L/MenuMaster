@@ -2,21 +2,24 @@
 namespace App\Controllers;
 
 use App\Middleware\AuthMiddleware;
+use App\Middleware\RolMiddleware;
 use App\Models\RolModel;
 use App\Config\conexionDb;
 use PDO;
 use Exception;
 
-class RolesController
+class RolesController extends Controller
 {
-    private $db;
     private $authMiddleware;
+    private $rolMiddleware;
     private $rolModel;
 
     public function __construct()
     {
-        $this->db = conexionDb::getConnection();
+        $db = conexionDb::getConnection();
+        parent::__construct($db);
         $this->authMiddleware = new AuthMiddleware();
+        $this->rolMiddleware = new RolMiddleware();
         $this->rolModel = new RolModel($this->db);
     }
 
@@ -27,7 +30,7 @@ class RolesController
     {
         try {
             // Verificar autenticación y permisos
-            if (!$this->authMiddleware->checkPermission('roles.leer')) {
+            if (!$this->rolMiddleware->checkPermission('roles.leer')) {
                 $this->sendResponse(403, "No tienes permisos para ver los roles del sistema");
                 return;
             }
@@ -57,7 +60,7 @@ class RolesController
     public function getRolById(): void
     {
         try {
-            if (!$this->authMiddleware->checkPermission('roles.leer')) {
+            if (!$this->rolMiddleware->checkPermission('roles.leer')) {
                 $this->sendResponse(403, "No tienes permisos para ver roles");
                 return;
             }
@@ -93,7 +96,7 @@ class RolesController
     public function crearRol(): void
     {
         try {
-            if (!$this->authMiddleware->checkPermission('roles.crear')) {
+            if (!$this->rolMiddleware->checkPermission('roles.crear')) {
                 $this->sendResponse(403, "No tienes permisos para crear roles");
                 return;
             }
@@ -140,7 +143,7 @@ class RolesController
     public function actualizarRol(): void
     {
         try {
-            if (!$this->authMiddleware->checkPermission('roles.actualizar')) {
+            if (!$this->rolMiddleware->checkPermission('roles.actualizar')) {
                 $this->sendResponse(403, "No tienes permisos para actualizar roles");
                 return;
             }
@@ -198,7 +201,7 @@ class RolesController
     public function eliminarRol(): void
     {
         try {
-            if (!$this->authMiddleware->checkPermission('roles.eliminar')) {
+            if (!$this->rolMiddleware->checkPermission('roles.eliminar')) {
                 $this->sendResponse(403, "No tienes permisos para eliminar roles");
                 return;
             }
@@ -301,9 +304,13 @@ class RolesController
     /**
      * Obtener datos JSON de la petición
      */
-    private function getJsonInput(): array
+    protected function getJsonInput(): array
     {
-        return json_decode(file_get_contents("php://input"), true) ?? [];
+        $raw = file_get_contents("php://input");
+        $decoded = json_decode($raw, true);
+
+        // Si el JSON es inválido o está vacío, devolver array vacío
+        return (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : [];
     }
 
     /**
@@ -377,24 +384,32 @@ class RolesController
     /**
      * Enviar respuesta JSON
      */
-    private function sendResponse(int $code, string $message, ?string $error = null, ?array $data = null): void
-    {
-        http_response_code($code);
-        
+    protected function sendResponse(
+        int $statusCode,
+        ?string $message = null,
+        ?string $token = null,
+        ?array $data = null
+    ): void {
         $response = [
-            'success' => $code >= 200 && $code < 300,
-            'message' => $message,
-            'timestamp' => date('c')
+            "success" => $statusCode >= 200 && $statusCode < 300,
+            "timestamp" => date('c')
         ];
 
-        if ($error) {
-            $response['error'] = $error;
+        if ($message !== null) {
+            $response["message"] = $message;
         }
 
-        if ($data) {
-            $response['data'] = $data;
+        if ($token !== null) {
+            $response["token"] = $token;
         }
 
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        if ($data !== null) {
+            $response["data"] = $data;
+        }
+
+        http_response_code($statusCode);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
     }
 }

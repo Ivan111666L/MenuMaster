@@ -2,7 +2,7 @@ import api from '@/services/api'; // Importar la instancia central de Axios
 
 const getAllIngredientes = async () => {
   try {
-    const response = await api.get('/api/ingredientes');
+    const response = await api.get('/ingredientes');
     return response.data.data;
   } catch (error) {
     console.error('Error al obtener todos los ingredientes:', error);
@@ -23,7 +23,7 @@ const getIngredienteById = async (id) => {
 
 const crearIngrediente = async (ingredienteData) => {
   try {
-    const response = await api.post('/api/ingredientes', ingredienteData);
+    const response = await api.post('/ingredientes', ingredienteData);
     return response.data.data;
   } catch (error) {
     console.error("Error al crear ingrediente:", error);

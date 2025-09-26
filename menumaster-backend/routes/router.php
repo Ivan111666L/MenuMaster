@@ -2,9 +2,9 @@
 use App\Config\ConexionDb;
 use App\Controllers\AuthController;
 
-require_once BASE_PATH . '/app/Utils/Validator.php';
-require_once BASE_PATH . '/app/config/ConexionDb.php';
-require_once BASE_PATH . '/app/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Utils/Validator.php';
+require_once BASE_PATH . '/App/config/ConexionDb.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
 require_once BASE_PATH . '/App/Utils/AuthHelpers.php';
 
 try {
@@ -15,13 +15,18 @@ try {
     // Método HTTP
     $requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-    // Partes de la ruta
+    // Partes de la ruta - usar PATH_INFO si está disponible
     $basePath   = dirname($_SERVER['SCRIPT_NAME']);
     $requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
 
-    $route = $requestUri;
-    if (strpos($requestUri, $basePath) === 0) {
-        $route = substr($requestUri, strlen($basePath));
+    // Usar PATH_INFO si está disponible (para rutas como index.php/api/...)
+    if (isset($_SERVER['PATH_INFO'])) {
+        $route = $_SERVER['PATH_INFO'];
+    } else {
+        $route = $requestUri;
+        if (strpos($requestUri, $basePath) === 0) {
+            $route = substr($requestUri, strlen($basePath));
+        }
     }
 
     $route_parts = explode('/', trim($route, '/'));
@@ -77,10 +82,15 @@ try {
             require_once BASE_PATH . '/routes/inventario_api.php';
             break;
         case 'menudeldia':
+        case 'menu-del-dia':
             require_once BASE_PATH . '/routes/menudeldia_api.php';
             break;
         case 'movimientosinventario':
-            require_once BASE_PATH . '/routes/movimientosinventario_api.php';
+        case 'movimientos-inventario':
+            require_once BASE_PATH . '/routes/movimientos_inventario_api.php';
+            break;
+        case 'cuadre-diario':
+            require_once BASE_PATH . '/routes/cuadre_diario_api.php';
             break;
         case 'usuarios':
             require_once BASE_PATH . '/routes/usuarios_api.php';
@@ -102,6 +112,15 @@ try {
             break;
         case 'permisos':
             require_once BASE_PATH . '/routes/permisos_api.php';
+            break;
+        case 'historial':
+            require_once BASE_PATH . '/routes/historial_api.php';
+            break;
+        case 'security':
+            require_once BASE_PATH . '/routes/security_api.php';
+            break;
+        case 'compras':
+            require_once BASE_PATH . '/routes/compras_api.php';
             break;
 
         

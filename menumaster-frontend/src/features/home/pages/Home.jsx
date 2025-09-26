@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import Button from '@/components/Button';
+import logo from '@/assets/logo.png';
 import { 
   FaUtensils, 
   FaTable, 
@@ -150,7 +151,6 @@ const Home = () => {
       description: 'Administración completa del equipo con roles, permisos y seguimiento de desempeño.',
       details: [
         'Gestión de roles y permisos',
-        'Control de horarios y asistencia',
         'Seguimiento de ventas por empleado',
         'Sistema de comisiones y bonos',
         'Evaluación de desempeño'
@@ -237,10 +237,9 @@ const Home = () => {
             </div>
             
             <h1 className="hero-title">
-              Gestiona tu restaurante con{' '}
-              <span className="hero-highlight">MenuMaster</span>
+              Gestiona tu restaurante con
             </h1>
-            
+            <img src={logo} alt="MenuMaster" className="hero-logo" />
             <p className="hero-description">
               La solución completa para restaurantes modernos. Controla inventario, 
               gestiona pedidos, administra personal y maximiza tus ganancias con 
@@ -249,7 +248,7 @@ const Home = () => {
 
             <div className="hero-stats">
               <div className="stat">
-                <span className="stat-number">500+</span>
+                <span className="stat-number">2+</span>
                 <span className="stat-label">Restaurantes</span>
               </div>
               <div className="stat">

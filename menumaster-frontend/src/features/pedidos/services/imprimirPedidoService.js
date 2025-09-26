@@ -8,6 +8,6 @@ export const getPedidoTicket = async (pedidoId) => {
 
 // Genera el ticket HTML para impresión
 export const generarTicketHTML = async (pedidoId) => {
-  const response = await api.post('/api/imprimir_pedido.php', { id: pedidoId });
+  const response = await api.post('/imprimir_pedido.php', { id: pedidoId });
   return response.data.html;
 };

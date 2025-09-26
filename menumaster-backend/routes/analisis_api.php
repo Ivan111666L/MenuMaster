@@ -2,11 +2,39 @@
 // routes/analisis_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/AnalisisController.php';
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/AnalisisController.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
 
 use App\Controllers\AnalisisController;
+use App\Controllers\AuthController;
 use App\Middleware\AuthMiddleware;
+
+/**
+ * Función de Ayuda para la AUTORIZACIÓN
+ */
+if (!function_exists('requireAdmin')) {
+    function requireAdmin() {
+        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+        if (!$token) throw new Exception("Token no encontrado.", 401);
+        
+        $payload = AuthController::decodeTokenData($token);
+        
+        // Handle both array and object formats for the data property
+        $rolId = null;
+        if (isset($payload['data'])) {
+            if (is_array($payload['data'])) {
+                $rolId = $payload['data']['rol_id'] ?? null;
+            } elseif (is_object($payload['data'])) {
+                $rolId = $payload['data']->rol_id ?? null;
+            }
+        }
+        
+        if ($rolId !== 1) { // 1 = administrador
+            throw new Exception("Acceso denegado. Se requiere rol de administrador.", 403);
+        }
+    }
+}
 
 // --- Lógica del Enrutador ---
 try {
@@ -54,24 +82,10 @@ try {
     }
 
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error interno del servidor']);
-}
-
-/**
- * Función de Ayuda para la AUTORIZACIÓN
- */
-if (!function_exists('requireAdmin')) {
-    function requireAdmin() {
-        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-        if (!$token) throw new Exception("Token no encontrado.", 401);
-        
-        $payload = app\Controllers\AuthController::decodeTokenData($token);
-        $rol = $payload['rol'] ?? null;
-        
-        if ($rol !== 'administrador') {
-            throw new Exception("Acceso denegado. Se requiere rol de administrador.", 403);
-        }
-    }
+    http_response_code($e->getCode() ?: 500);
+    echo json_encode([
+        'success' => false,
+        'error'   => $e->getMessage()
+    ]);
 }
 ?>

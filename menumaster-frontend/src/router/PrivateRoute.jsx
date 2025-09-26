@@ -11,8 +11,14 @@ function PrivateRoute({ roles, children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (roles && !roles.includes(rol)) {
-    return <Navigate to="/unauthorized" replace />;
+  // Normalizar roles para comparación (tanto mayúscula como minúscula)
+  if (roles && roles.length > 0) {
+    const normalizedRoles = roles.map(r => r.toLowerCase());
+    const userRol = rol ? rol.toLowerCase() : '';
+    
+    if (!normalizedRoles.includes(userRol)) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   return children || <Outlet />;

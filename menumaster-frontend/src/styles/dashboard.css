@@ -585,10 +585,380 @@
   background-color: #f8f9fa;
 }
 
-/* === Contenido de la Página (Outlet) === */
-.main-content {
-  flex-grow: 1;
-  padding: 30px;
-  overflow-y: auto;
-  background-color: #f8f9fa; /* Fondo a juego con el contenedor principal */
+/* === ESTILOS ESPECÍFICOS PARA DASHBOARDS DE ROLES === */
+
+/* Estilos para el Dashboard del Mesero */
+.waiter-dashboard .dashboard-widgets {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.waiter-dashboard .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.waiter-dashboard .product-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.waiter-dashboard .product-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.waiter-dashboard .product-card.unavailable {
+    opacity: 0.6;
+    background-color: #f7fafc;
+}
+
+.waiter-dashboard .product-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.waiter-dashboard .product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #38a169;
+}
+
+.waiter-dashboard .product-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+}
+
+.waiter-dashboard .product-status.available {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.waiter-dashboard .product-status.unavailable {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.waiter-dashboard .menu-item {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #4299e1;
+}
+
+.waiter-dashboard .menu-item-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.waiter-dashboard .menu-item-description {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.waiter-dashboard .menu-item-price {
+    font-weight: 700;
+    color: #38a169;
+}
+
+.waiter-dashboard .menu-item-category {
+    display: inline-block;
+    background-color: #edf2f7;
+    color: #4a5568;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.waiter-dashboard .ranking-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.waiter-dashboard .ranking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.waiter-dashboard .ranking-item:hover {
+    background-color: #f7fafc;
+}
+
+.waiter-dashboard .ranking-item:first-child {
+    border-left: 4px solid #ffd700;
+}
+
+.waiter-dashboard .ranking-item:nth-child(2) {
+    border-left: 4px solid #c0c0c0;
+}
+
+.waiter-dashboard .ranking-item:nth-child(3) {
+    border-left: 4px solid #cd7f32;
+}
+
+.waiter-dashboard .ranking-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.waiter-dashboard .ranking-stats {
+    text-align: right;
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+/* Estilos para el Dashboard del Cocinero */
+.cook-dashboard .dashboard-widgets {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.cook-dashboard .widget.critical .widget-value {
+    color: #e53e3e;
+}
+
+.cook-dashboard .stock-alert {
+    background: #fed7d7;
+    border: 1px solid #feb2b2;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #e53e3e;
+}
+
+.cook-dashboard .stock-alert-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.cook-dashboard .stock-item-name {
+    font-weight: 600;
+    color: #742a2a;
+}
+
+.cook-dashboard .stock-quantity {
+    font-size: 0.9rem;
+    color: #c53030;
+    font-weight: 600;
+}
+
+.cook-dashboard .supplier-info {
+    background: #f7fafc;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.cook-dashboard .supplier-name {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.cook-dashboard .supplier-contact {
+    font-size: 0.85rem;
+    color: #4a5568;
+    margin-bottom: 0.25rem;
+}
+
+.cook-dashboard .supplier-contact a {
+    color: #3182ce;
+    text-decoration: none;
+}
+
+.cook-dashboard .supplier-contact a:hover {
+    text-decoration: underline;
+}
+
+.cook-dashboard .popular-product {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #38a169;
+}
+
+.cook-dashboard .popular-product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.cook-dashboard .popular-product-name {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.cook-dashboard .popular-product-stats {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.cook-dashboard .ingredients-list {
+    background: #f7fafc;
+    padding: 0.75rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+}
+
+.cook-dashboard .ingredients-title {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.cook-dashboard .ingredient-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #718096;
+    margin-bottom: 0.25rem;
+}
+
+.cook-dashboard .supplier-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.cook-dashboard .supplier-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.cook-dashboard .supplier-card.inactive {
+    opacity: 0.6;
+    background-color: #f7fafc;
+}
+
+.cook-dashboard .supplier-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+}
+
+.cook-dashboard .supplier-name-card {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.25rem;
+}
+
+.cook-dashboard .supplier-contact-person {
+    font-size: 0.9rem;
+    color: #718096;
+}
+
+.cook-dashboard .supplier-status {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.cook-dashboard .supplier-status.active {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.cook-dashboard .supplier-status.inactive {
+    background-color: #fed7d7;
+    color: #c53030;
+}
+
+.cook-dashboard .supplier-contacts {
+    margin-bottom: 0.75rem;
+}
+
+.cook-dashboard .supplier-products {
+    background: #f7fafc;
+    padding: 0.75rem;
+    border-radius: 6px;
+}
+
+.cook-dashboard .supplier-products-title {
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.cook-dashboard .products-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.cook-dashboard .product-tag {
+    background-color: #edf2f7;
+    color: #4a5568;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+}
+
+/* Responsive para dashboards específicos */
+@media (max-width: 768px) {
+    .waiter-dashboard .products-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .waiter-dashboard .ranking-item,
+    .cook-dashboard .stock-alert,
+    .cook-dashboard .popular-product,
+    .cook-dashboard .supplier-card {
+        padding: 0.75rem;
+    }
+    
+    .cook-dashboard .supplier-header,
+    .cook-dashboard .popular-product-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .waiter-dashboard .menu-item,
+    .cook-dashboard .stock-alert,
+    .cook-dashboard .popular-product,
+    .cook-dashboard .supplier-card {
+        padding: 0.5rem;
+    }
+    
+    .waiter-dashboard .product-card {
+        padding: 0.75rem;
+    }
 }

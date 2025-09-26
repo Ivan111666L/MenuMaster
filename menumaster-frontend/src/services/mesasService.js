@@ -3,7 +3,7 @@ import api from './api';
 export const getMesas = async () => {
   try {
     // Obtenemos todas las mesas sin filtrar por estado
-    const response = await api.get('/api/mesas?todas=true');
+    const response = await api.get('/mesas?todas=true');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -32,7 +32,7 @@ export const getMesaById = async (id) => {
 
 export const getMesasDisponibles = async () => {
   try {
-    const response = await api.get('/api/mesas/disponibles');
+    const response = await api.get('/mesas/disponibles');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {

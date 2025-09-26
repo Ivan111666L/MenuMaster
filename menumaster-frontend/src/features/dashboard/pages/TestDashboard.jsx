@@ -16,7 +16,7 @@ const TestDashboard = () => {
         try {
             // Hacer llamada directa a la API para ver la respuesta cruda
             const api = (await import('@/services/api')).default;
-            const rawApiResponse = await api.get('/api/dashboard/summary');
+            const rawApiResponse = await api.get('/dashboard/summary');
             setRawResponse(rawApiResponse.data);
 
             // Usar el servicio de dashboard

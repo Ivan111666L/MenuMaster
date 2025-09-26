@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import '@/styles/global.css'; // Asegúrate de que los estilos globales estén importados
 
 const IngredienteCreado = () => {
-    const API_URL = '/api/ingredientes'; // Endpoint GET para obtener ingredientes
+    const API_URL = '/ingredientes'; // Endpoint GET para obtener ingredientes
 
     const [ingredientes, setIngredientes] = useState({});
     const [seleccionado, setSeleccionado] = useState(null);

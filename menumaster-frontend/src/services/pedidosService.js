@@ -2,7 +2,7 @@ import api from './api';
 
 export const getPedidos = async () => {
   try {
-    const response = await api.get('/api/pedidos');
+    const response = await api.get('/pedidos');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -31,7 +31,7 @@ export const getPedidoById = async (id) => {
 
 export const createPedido = async (pedidoData) => {
   try {
-    const response = await api.post('/api/pedidos', pedidoData);
+    const response = await api.post('/pedidos', pedidoData);
     return response.data;
   } catch (error) {
     console.error('Error al crear pedido:', error);

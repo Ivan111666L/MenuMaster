@@ -2,9 +2,9 @@
 // routes/pedidos_api.php
 
 // --- Dependencias ---
-require_once BASE_PATH . '/app/Controllers/PedidoController.php';
-require_once BASE_PATH . '/app/Middleware/AuthMiddleware.php';
-require_once BASE_PATH . '/app/Controllers/AuthController.php'; // Necesario para requireAdmin
+require_once BASE_PATH . '/App/Controllers/PedidoController.php';
+require_once BASE_PATH . '/App/Middleware/AuthMiddleware.php';
+require_once BASE_PATH . '/App/Controllers/AuthController.php'; // Necesario para requireAdmin
 
 use App\Controllers\PedidoController;
 use App\Middleware\AuthMiddleware;
@@ -108,6 +108,7 @@ if (!function_exists('requireAdmin')) {
         break;
 
     default:
-        throw new Exception("Acción '{$action}' no válida para el recurso de pedidos.", 404);
-}
+        // Si no hay acción específica, permitir el flujo normal del switch principal
+        break;
+    }
 }

@@ -1,8 +1,5 @@
 <?php
 
-
-
-
 // test_login_api.php - Test the login API endpoint
 
 $url = 'http://localhost/MenuMaster/menumaster-backend/public/api/auth/login';

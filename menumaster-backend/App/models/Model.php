@@ -1,12 +1,21 @@
 <?php
-// models/Model.php
+
+namespace App\Models;
+
+use PDO;
+
 class Model {
+    protected $db;
     protected $conn;
     protected $table;
+    protected $primaryKey = 'id';
 
-    public function __construct($db, $table) {
-        $this->conn = $db;
-        $this->table = $table;
+    public function __construct($db, $table = null) {
+        $this->db = $db;
+        $this->conn = $db; // Mantener compatibilidad con código existente
+        if ($table) {
+            $this->table = $table;
+        }
     }
 
     // Obtener todos los registros

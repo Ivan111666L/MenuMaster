@@ -45,7 +45,7 @@ const router = createBrowserRouter([
     children: [
       // --- Rutas Públicas ---
       {
-        path: '/',
+        path: '/home',
         element: <Home />,
       },
       {
@@ -69,9 +69,9 @@ const router = createBrowserRouter([
         element: <Unauthorized />,
       },
 
-      // --- Nido de Rutas Protegidas ---
-      // Todas estas rutas requieren login y se muestran dentro del Layout
+      // --- Rutas Protegidas con Layout ---
       {
+        path: '/',
         element: (
           <PrivateRoute>
             <Layout />
@@ -79,7 +79,11 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: '/dashboard', // CORRECCIÓN: La ruta raíz de los protegidos
+            index: true,
+            element: <Navigate to="/dashboard" replace />,
+          },
+          {
+            path: 'dashboard',
             element: <Dashboard />,
           },
           {
@@ -161,7 +165,7 @@ const router = createBrowserRouter([
           {
             path: 'analisis/*',
             element: (
-              <PrivateRoute roles={['administrador', 'gerente']}>
+              <PrivateRoute roles={['administrador']}>
                 <AnalisisModule />
               </PrivateRoute>
             ),

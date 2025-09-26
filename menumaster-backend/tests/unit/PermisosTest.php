@@ -22,11 +22,11 @@ try {
     echo "✅ Conexión exitosa\n";
 
     echo "2. Creando AuthMiddleware...\n";
-    $authMiddleware = new AuthMiddleware($db);
+    $authMiddleware = new AuthMiddleware();
     echo "✅ AuthMiddleware creado\n";
 
     echo "3. Creando PermisosController...\n";
-    $controller = new PermisosController($db, $authMiddleware);
+    $controller = new PermisosController();
     echo "✅ PermisosController creado\n";
 
     echo "4. Simulando token de autorización...\n";

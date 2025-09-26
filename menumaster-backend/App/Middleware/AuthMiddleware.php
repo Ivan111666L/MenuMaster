@@ -172,6 +172,23 @@ class AuthMiddleware
 
         return null;
     }
+    public function checkPermission(string $permission): bool
+    {
+        $usuario = $this->getCurrentUser();
+        if (!$usuario) {
+            return false;
+        }
+        return in_array($permission, $usuario['permisos']);
+    }
+
+    public function getCurrentUserPermissions(): ?array
+    {
+        $usuario = $this->getCurrentUser();
+        if (!$usuario) {
+            return null;
+        }
+        return $usuario['permisos'] ?? [];
+    }
 
     /**
      * Método público para uso interno en controladores

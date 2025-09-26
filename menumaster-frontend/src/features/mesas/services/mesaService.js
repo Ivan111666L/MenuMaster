@@ -5,7 +5,7 @@ import api from '@/services/api'; // Tu instancia central de Axios
  */
 const getMesas = async () => {
     // Llama a: GET /api/mesas
-    const response = await api.get('/api/mesas');
+    const response = await api.get('/mesas');
     return response.data.data;
 };
 
@@ -15,7 +15,7 @@ const getMesas = async () => {
  */
 const createMesa = async (mesaData) => {
     // Llama a: POST /api/mesas
-    const response = await api.post('/api/mesas', mesaData);
+    const response = await api.post('/mesas', mesaData);
     return response.data.data;
 };
 
@@ -44,7 +44,7 @@ const deleteMesa = async (id) => {
  */
 const resetAllMesas = async () => {
     // Llama a: POST /api/mesas/reset
-    const response = await api.post('/api/mesas/reset');
+    const response = await api.post('/mesas/reset');
     return response.data;
 };
 
