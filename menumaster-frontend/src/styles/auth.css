@@ -16,6 +16,7 @@
     width: 100%;
     max-width: 420px;
     border: 1px solid var(--border-light);
+    transition: all 0.3s ease;
 }
 
 /* Logo en páginas de autenticación */
@@ -27,23 +28,11 @@
 .auth-logo {
     max-width: 120px;
     height: auto;
-/* Responsive para auth */
-@media (max-width: 600px) {
-    .auth-form-container {
-        padding: 1rem;
-        border-radius: 8px;
-        max-width: 98vw;
-    }
-    .auth-logo {
-        max-width: 80px;
-    }
-    .auth-title {
-        font-size: 1.3rem;
-    }
-    .auth-subtitle {
-        font-size: 0.95rem;
-    }
+    transition: transform 0.3s ease;
 }
+
+.auth-logo:hover {
+    transform: scale(1.05);
 }
 
 .auth-title {
@@ -59,6 +48,7 @@
     color: var(--text-secondary);
     margin-bottom: 2rem;
     font-size: 1rem;
+    line-height: 1.5;
 }
 
 /* --- Formulario --- */
@@ -83,10 +73,16 @@
     padding: 0.5rem;
     border-radius: 4px;
     transition: color 0.3s ease;
+    z-index: 2;
 }
 
 .password-toggle-btn:hover {
     color: var(--primary-teal);
+}
+
+.password-toggle-btn:focus {
+    outline: 2px solid var(--primary-teal);
+    outline-offset: 2px;
 }
 
 /* 🔒 Fix: compatibilidad de user-select */
@@ -113,6 +109,18 @@
     text-align: center;
     font-size: 0.9rem;
     border-left: 4px solid var(--danger);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .auth-form .w-full {
@@ -129,11 +137,19 @@
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s ease;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
 }
 
 .auth-links a:hover {
     color: var(--primary-navy);
     text-decoration: underline;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.auth-links a:focus {
+    outline: 2px solid var(--primary-teal);
+    outline-offset: 2px;
 }
 
 /* --- Password Requirements --- */
@@ -207,10 +223,180 @@
     justify-content: space-between;
     margin-top: 1.5rem;
     font-size: 0.9rem;
+    gap: 1rem;
 }
 
 .auth-switch {
     text-align: center;
     margin-top: 1.5rem;
     font-size: 0.9rem;
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 768px) {
+    .auth-container {
+        padding: 1rem;
+    }
+    
+    .auth-form-container {
+        padding: 2rem;
+        border-radius: 12px;
+        max-width: 90vw;
+    }
+    
+    .auth-title {
+        font-size: 1.75rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .auth-logo {
+        max-width: 100px;
+    }
+    
+    .auth-links-container {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 0.5rem;
+        align-items: flex-start;
+        padding-top: 2rem;
+    }
+    
+    .auth-form-container {
+        padding: 1.5rem;
+        border-radius: 8px;
+        max-width: 95vw;
+        margin: 0 auto;
+    }
+    
+    .auth-title {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .auth-logo {
+        max-width: 80px;
+    }
+    
+    .auth-logo-container {
+        margin-bottom: 1.5rem;
+    }
+    
+    .auth-form .form-group {
+        margin-bottom: 1rem;
+    }
+    
+    .password-input-wrapper {
+        margin-bottom: 1rem;
+    }
+    
+    .password-toggle-btn {
+        padding: 0.75rem;
+        right: 8px;
+    }
+    
+    .auth-error-message {
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .password-requirements {
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .password-requirements h4 {
+        font-size: 0.85rem;
+    }
+    
+    .password-requirements li {
+        font-size: 0.8rem;
+    }
+    
+    .auth-links {
+        margin-top: 1rem;
+    }
+    
+    .auth-switch {
+        margin-top: 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 320px) {
+    .auth-form-container {
+        padding: 1rem;
+        max-width: 98vw;
+    }
+    
+    .auth-title {
+        font-size: 1.3rem;
+    }
+    
+    .auth-subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .auth-logo {
+        max-width: 70px;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .auth-form-container,
+    .auth-logo,
+    .password-toggle-btn,
+    .auth-links a {
+        transition: none;
+    }
+    
+    .auth-error-message {
+        animation: none;
+    }
+}
+
+/* Modo oscuro (si se implementa en el futuro) */
+@media (prefers-color-scheme: dark) {
+    .auth-container {
+        background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .auth-container {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    
+    .auth-form-container {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .auth-logo-container {
+        margin-bottom: 1rem;
+    }
+    
+    .auth-logo {
+        max-width: 60px;
+    }
 }

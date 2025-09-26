@@ -1,163 +1,653 @@
+/* === CONFIGURACIÓN MODULE - RESPONSIVE DESIGN === */
+
+/* === Variables CSS para consistencia === */
+:root {
+    --configuracion-primary: #4F46E5;
+    --configuracion-primary-dark: #4338CA;
+    --configuracion-primary-light: #EEF2FF;
+    --configuracion-success: #10B981;
+    --configuracion-success-light: #D1FAE5;
+    --configuracion-warning: #F59E0B;
+    --configuracion-warning-light: #FEF3C7;
+    --configuracion-danger: #EF4444;
+    --configuracion-danger-light: #FEE2E2;
+    --configuracion-text: #1F2937;
+    --configuracion-text-light: #6B7280;
+    --configuracion-text-muted: #9CA3AF;
+    --configuracion-border: #E5E7EB;
+    --configuracion-border-light: #F3F4F6;
+    --configuracion-surface: #FFFFFF;
+    --configuracion-background: #F9FAFB;
+    --configuracion-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --configuracion-shadow-hover: 0 8px 16px rgba(0,0,0,0.12);
+    --configuracion-shadow-medium: 0 6px 20px rgba(0,0,0,0.1);
+    --configuracion-radius: 1rem;
+    --configuracion-radius-small: 0.5rem;
+    --configuracion-spacing: 1rem;
+    --configuracion-spacing-large: 2rem;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
 .configuracion-container {
-    padding: 2rem;
+    background: var(--configuracion-background);
+    min-height: 100vh;
+    padding: var(--configuracion-spacing-large);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .configuracion-title {
     font-size: 2.2rem;
     font-weight: 700;
-    color: var(--color-text-primary);
+    color: var(--configuracion-text);
     margin-bottom: 2.5rem;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--configuracion-border);
+    padding-bottom: var(--configuracion-spacing);
+    text-align: center;
+    position: relative;
 }
 
+.configuracion-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--configuracion-primary), var(--configuracion-primary-dark));
+    border-radius: 2px;
+}
+
+/* === CONTENEDOR DE TARJETAS === */
 .card-container {
     display: grid;
-    /* Crea una cuadrícula responsiva para las tarjetas */
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--configuracion-spacing-large);
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
 .card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 1.5rem 2rem;
-    box-shadow: var(--shadow-small);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: var(--configuracion-surface);
+    border: 1px solid var(--configuracion-border);
+    border-radius: var(--configuracion-radius);
+    padding: var(--configuracion-spacing-large);
+    box-shadow: var(--configuracion-shadow);
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--configuracion-primary), var(--configuracion-primary-dark));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.card:hover::before {
+    transform: scaleX(1);
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-8px);
+    box-shadow: var(--configuracion-shadow-hover);
+    border-color: var(--configuracion-primary-light);
 }
 
 .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: var(--color-primary);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0 0 var(--configuracion-spacing) 0;
+    color: var(--configuracion-primary);
+    line-height: 1.3;
 }
 
 .card p {
-    color: var(--color-text-secondary);
-    flex-grow: 1; /* Empuja el botón hacia abajo */
-    margin-bottom: 1.5rem;
+    color: var(--configuracion-text-light);
+    flex-grow: 1;
+    margin-bottom: var(--configuracion-spacing-large);
+    line-height: 1.6;
+    font-size: 1rem;
 }
 
-/* El enlace ahora solo actúa como contenedor del botón */
 .card-link {
     text-decoration: none;
-    margin-top: auto; /* Alinea el botón al final de la tarjeta */
+    margin-top: auto;
+    display: block;
 }
-/* mesas configuracion */
-
+/* === GESTIÓN DE MESAS === */
 .gestion-mesas-container {
-    padding: 2rem;
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
+    padding: var(--configuracion-spacing-large);
+    background: var(--configuracion-surface);
+    border-radius: var(--configuracion-radius);
+    box-shadow: var(--configuracion-shadow-medium);
+    margin-bottom: var(--configuracion-spacing-large);
 }
 
 .gestion-mesas-title {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 2rem;
+    color: var(--configuracion-text);
+    margin-bottom: var(--configuracion-spacing-large);
+    text-align: center;
 }
 
 .crear-mesa-form {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem;
-    padding: 1.5rem;
-    background-color: var(--color-background);
-    border-radius: var(--border-radius-small);
-    margin-bottom: 2rem;
+    gap: var(--configuracion-spacing);
+    padding: var(--configuracion-spacing-large);
+    background: var(--configuracion-background);
+    border-radius: var(--configuracion-radius-small);
+    margin-bottom: var(--configuracion-spacing-large);
+    border: 1px solid var(--configuracion-border);
 }
 
 .crear-mesa-form .form-group {
     flex: 1;
-    min-width: 150px;
+    min-width: 200px;
     margin-bottom: 0;
 }
 
 .buscador-mesas {
-    margin-bottom: 2rem;
+    margin-bottom: var(--configuracion-spacing-large);
     max-width: 400px;
 }
 
 .mesas-table {
     width: 100%;
     border-collapse: collapse;
+    background: var(--configuracion-surface);
+    border-radius: var(--configuracion-radius-small);
+    overflow: hidden;
+    box-shadow: var(--configuracion-shadow);
 }
 
-.mesas-table th, .mesas-table td {
-    padding: 0.75rem 1rem;
+.mesas-table th, 
+.mesas-table td {
+    padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--configuracion-border);
 }
 
 .mesas-table th {
-    background-color: var(--color-background);
+    background: var(--configuracion-background);
     font-weight: 600;
+    color: var(--configuracion-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mesas-table td {
+    color: var(--configuracion-text-light);
 }
 
 .mesas-table td select {
     padding: 0.5rem;
-    border-radius: var(--border-radius-small);
-    border: 1px solid var(--color-border);
+    border-radius: var(--configuracion-radius-small);
+    border: 1px solid var(--configuracion-border);
+    background: var(--configuracion-surface);
+    color: var(--configuracion-text);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
 }
 
-/* gestion usuarios */
+.mesas-table td select:focus {
+    outline: none;
+    border-color: var(--configuracion-primary);
+    box-shadow: 0 0 0 3px var(--configuracion-primary-light);
+}
+
+/* === GESTIÓN DE USUARIOS === */
 .gestion-usuarios-container {
-    padding: 2rem;
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
+    padding: var(--configuracion-spacing-large);
+    background: var(--configuracion-surface);
+    border-radius: var(--configuracion-radius);
+    box-shadow: var(--configuracion-shadow-medium);
 }
 
 .gestion-usuarios-title {
     font-size: 2rem;
     font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 2rem;
+    color: var(--configuracion-text);
+    margin-bottom: var(--configuracion-spacing-large);
+    text-align: center;
 }
 
 .buscador-usuarios {
-    margin-bottom: 2rem;
+    margin-bottom: var(--configuracion-spacing-large);
     max-width: 400px;
 }
 
 .usuarios-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 1rem;
+    margin-bottom: var(--configuracion-spacing);
+    background: var(--configuracion-surface);
+    border-radius: var(--configuracion-radius-small);
+    overflow: hidden;
+    box-shadow: var(--configuracion-shadow);
 }
 
-.usuarios-table th, .usuarios-table td {
-    padding: 0.75rem 1rem;
+.usuarios-table th, 
+.usuarios-table td {
+    padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--configuracion-border);
     vertical-align: middle;
 }
 
 .usuarios-table th {
-    background-color: var(--color-background);
+    background: var(--configuracion-background);
     font-weight: 600;
+    color: var(--configuracion-text);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.usuarios-table td {
+    color: var(--configuracion-text-light);
 }
 
 .usuarios-table td select {
     padding: 0.5rem;
-    border-radius: var(--border-radius-small);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-surface);
+    border-radius: var(--configuracion-radius-small);
+    border: 1px solid var(--configuracion-border);
+    background: var(--configuracion-surface);
+    color: var(--configuracion-text);
+    font-size: 0.9rem;
+    transition: border-color 0.2s ease;
+}
+
+.usuarios-table td select:focus {
+    outline: none;
+    border-color: var(--configuracion-primary);
+    box-shadow: 0 0 0 3px var(--configuracion-primary-light);
 }
 
 .usuarios-table .btn {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 1rem;
     font-size: 0.85rem;
+    border-radius: var(--configuracion-radius-small);
+    border: none;
+    background: var(--configuracion-primary);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+}
+
+.usuarios-table .btn:hover {
+    background: var(--configuracion-primary-dark);
+    transform: translateY(-1px);
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Pantallas grandes (1400px+) */
+@media (min-width: 1400px) {
+    .configuracion-container {
+        padding: 3rem;
+    }
+    
+    .card-container {
+        max-width: 1600px;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    }
+    
+    .configuracion-title {
+        font-size: 2.5rem;
+    }
+}
+
+/* Pantallas medianas-grandes (1200px - 1400px) */
+@media (max-width: 1200px) {
+    .configuracion-container {
+        padding: 1.5rem;
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .configuracion-title {
+        font-size: 2rem;
+    }
+}
+
+/* Tablets grandes (1024px - 1200px) */
+@media (max-width: 1024px) {
+    .configuracion-container {
+        padding: 1.25rem;
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+    
+    .card {
+        padding: 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        padding: 1.5rem;
+    }
+    
+    .crear-mesa-form {
+        padding: 1.5rem;
+    }
+    
+    .crear-mesa-form .form-group {
+        min-width: 180px;
+    }
+}
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 768px) {
+    .configuracion-container {
+        padding: 1rem;
+    }
+    
+    .configuracion-title {
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+    
+    .card {
+        padding: 1.25rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card p {
+        font-size: 0.9rem;
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        padding: 1.25rem;
+    }
+    
+    .gestion-mesas-title,
+    .gestion-usuarios-title {
+        font-size: 1.6rem;
+    }
+    
+    .crear-mesa-form {
+        flex-direction: column;
+        padding: 1.25rem;
+    }
+    
+    .crear-mesa-form .form-group {
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .mesas-table,
+    .usuarios-table {
+        font-size: 0.9rem;
+    }
+    
+    .mesas-table th,
+    .mesas-table td,
+    .usuarios-table th,
+    .usuarios-table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .buscador-mesas,
+    .buscador-usuarios {
+        max-width: 100%;
+    }
+}
+
+/* Móviles grandes (600px - 768px) */
+@media (max-width: 600px) {
+    .configuracion-container {
+        padding: 0.75rem;
+    }
+    
+    .configuracion-title {
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .card-container {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .card p {
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        padding: 1rem;
+    }
+    
+    .gestion-mesas-title,
+    .gestion-usuarios-title {
+        font-size: 1.4rem;
+    }
+    
+    .crear-mesa-form {
+        padding: 1rem;
+    }
+    
+    .mesas-table,
+    .usuarios-table {
+        font-size: 0.8rem;
+    }
+    
+    .mesas-table th,
+    .mesas-table td,
+    .usuarios-table th,
+    .usuarios-table td {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .usuarios-table .btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* Móviles (480px - 600px) */
+@media (max-width: 480px) {
+    .configuracion-container {
+        padding: 0.5rem;
+    }
+    
+    .configuracion-title {
+        font-size: 1.4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        padding: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 0.95rem;
+    }
+    
+    .card p {
+        font-size: 0.8rem;
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        padding: 0.75rem;
+    }
+    
+    .gestion-mesas-title,
+    .gestion-usuarios-title {
+        font-size: 1.2rem;
+    }
+    
+    .crear-mesa-form {
+        padding: 0.75rem;
+    }
+    
+    .mesas-table,
+    .usuarios-table {
+        font-size: 0.75rem;
+    }
+    
+    .mesas-table th,
+    .mesas-table td,
+    .usuarios-table th,
+    .usuarios-table td {
+        padding: 0.4rem 0.2rem;
+    }
+    
+    .usuarios-table .btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 320px) */
+@media (max-width: 320px) {
+    .configuracion-container {
+        padding: 0.25rem;
+    }
+    
+    .configuracion-title {
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card {
+        padding: 0.5rem;
+    }
+    
+    .card-title {
+        font-size: 0.9rem;
+    }
+    
+    .card p {
+        font-size: 0.75rem;
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        padding: 0.5rem;
+    }
+    
+    .gestion-mesas-title,
+    .gestion-usuarios-title {
+        font-size: 1rem;
+    }
+    
+    .crear-mesa-form {
+        padding: 0.5rem;
+    }
+    
+    .mesas-table,
+    .usuarios-table {
+        font-size: 0.7rem;
+    }
+    
+    .mesas-table th,
+    .mesas-table td,
+    .usuarios-table th,
+    .usuarios-table td {
+        padding: 0.3rem 0.1rem;
+    }
+    
+    .usuarios-table .btn {
+        padding: 0.25rem 0.4rem;
+        font-size: 0.65rem;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    
+    .configuracion-title {
+        margin-bottom: 1rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    .crear-mesa-form {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .crear-mesa-form .form-group {
+        min-width: 150px;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .card,
+    .card::before,
+    .usuarios-table .btn,
+    .mesas-table td select,
+    .usuarios-table td select {
+        transition: none;
+    }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .card {
+        border: 2px solid var(--configuracion-border);
+    }
+    
+    .gestion-mesas-container,
+    .gestion-usuarios-container {
+        border: 2px solid var(--configuracion-border);
+    }
+    
+    .mesas-table,
+    .usuarios-table {
+        border: 2px solid var(--configuracion-border);
+    }
+    
+    .usuarios-table .btn {
+        border: 2px solid var(--configuracion-primary-dark);
+    }
 }

@@ -1,94 +1,280 @@
-/* Pedidos */
+/* === PEDIDOS MODULE - RESPONSIVE DESIGN === */
+
+/* === Variables CSS para consistencia === */
+:root {
+    --pedidos-primary: #F57C00;
+    --pedidos-primary-dark: #e96a00;
+    --pedidos-primary-light: #FFF3E0;
+    --pedidos-success: #43a047;
+    --pedidos-danger: #d32f2f;
+    --pedidos-text: #333;
+    --pedidos-text-light: #666;
+    --pedidos-text-muted: #999;
+    --pedidos-border: #e0e0e0;
+    --pedidos-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --pedidos-shadow-hover: 0 8px 16px rgba(0,0,0,0.12);
+    --pedidos-radius: 1rem;
+    --pedidos-radius-small: 0.5rem;
+    --pedidos-spacing: 1rem;
+    --pedidos-spacing-large: 2rem;
+}
+
+/* === CONTENEDOR PRINCIPAL DE PEDIDOS === */
 .pedidos-container {
     background-color: white;
-    border-radius: 1.5rem;
-    padding: 2rem 1rem;
-    margin: 2rem auto;
-    max-width: 950px;
+    border-radius: var(--pedidos-radius);
+    padding: var(--pedidos-spacing-large) var(--pedidos-spacing);
+    margin: var(--pedidos-spacing-large) auto;
+    max-width: 1200px;
     min-height: 60vh;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--pedidos-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
 }
+
 .pedidos-title {
-    color: #F57C00;
+    color: var(--pedidos-primary);
     font-size: 2.2rem;
     margin-bottom: 0.5rem;
     text-align: center;
+    font-weight: 700;
+    line-height: 1.2;
 }
+
 .pedidos-description {
-    color: #333;
-    margin-bottom: 2rem;
+    color: var(--pedidos-text);
+    margin-bottom: var(--pedidos-spacing-large);
     text-align: center;
+    font-size: 1.1rem;
+    line-height: 1.5;
 }
+
+/* === LAYOUT PRINCIPAL === */
 .pedidos-content {
     width: 100%;
     display: flex;
-    gap: 2rem;
+    gap: var(--pedidos-spacing-large);
     justify-content: center;
+    align-items: flex-start;
 }
+
+/* === LISTA DE PEDIDOS === */
 .pedidos-lista {
     background: #fff7ec;
-    border: 2px solid #F57C00;
-    border-radius: 1rem;
-    padding: 1rem;
-    min-width: 210px;
-    max-width: 250px;
+    border: 2px solid var(--pedidos-primary);
+    border-radius: var(--pedidos-radius);
+    padding: var(--pedidos-spacing);
+    min-width: 280px;
+    max-width: 350px;
     height: fit-content;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    box-shadow: var(--pedidos-shadow);
+    flex-shrink: 0;
 }
+
 .pedido-resumen {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    padding: 0.6rem 0.5rem;
-    border-radius: 0.5rem;
-    margin-bottom: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--pedidos-radius-small);
+    margin-bottom: 0.75rem;
     cursor: pointer;
     background: #fff;
-    border: 1px solid #F57C00;
+    border: 1px solid var(--pedidos-primary);
+    transition: all 0.3s ease;
+    position: relative;
+}
 
-/* Estilos para categorías de productos */
+.pedido-resumen:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--pedidos-shadow-hover);
+    border-color: var(--pedidos-primary-dark);
+}
+
+.pedido-resumen.seleccionado {
+    background: var(--pedidos-primary);
+    color: #fff;
+    border: 2px solid var(--pedidos-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--pedidos-shadow-hover);
+}
+
+.pedido-mesa {
+    font-weight: bold;
+    color: var(--pedidos-primary);
+    font-size: 1.1rem;
+    margin-bottom: 0.25rem;
+}
+
+.pedido-resumen.seleccionado .pedido-mesa {
+    color: #fff;
+}
+
+.pedido-estado {
+    font-size: 0.85rem;
+    margin: 0.25rem 0;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    color: #fff;
+    background: #bbb;
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pedido-estado.enpreparacion {
+    background: var(--pedidos-primary);
+}
+
+.pedido-estado.listoparaservir {
+    background: var(--pedidos-success);
+}
+
+.pedido-estado.pendiente {
+    background: var(--pedidos-danger);
+}
+
+.pedido-hora {
+    font-size: 0.9rem;
+    color: var(--pedidos-text-light);
+    margin-top: 0.25rem;
+}
+
+.pedido-resumen.seleccionado .pedido-hora {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* === DETALLE DE PEDIDOS === */
+.pedidos-detalle {
+    flex: 1;
+    background: #f9f9f9;
+    border-radius: var(--pedidos-radius);
+    padding: 1.5rem;
+    min-width: 300px;
+    box-shadow: var(--pedidos-shadow);
+    min-height: 400px;
+}
+
+.pedidos-items {
+    list-style: none;
+    padding: 0;
+    margin-bottom: var(--pedidos-spacing);
+}
+
+.pedidos-items li {
+    margin-bottom: 0.5rem;
+    color: var(--pedidos-text);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--pedidos-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pedidos-items li:last-child {
+    border-bottom: none;
+}
+
+.pedidos-detalle-estado,
+.pedidos-detalle-mesa,
+.pedidos-detalle-hora {
+    margin-bottom: 0.75rem;
+    color: var(--pedidos-text);
+    font-weight: 500;
+}
+
+.pedidos-placeholder {
+    color: var(--pedidos-text-muted);
+    text-align: center;
+    margin-top: var(--pedidos-spacing-large);
+    font-style: italic;
+    padding: var(--pedidos-spacing-large);
+    background: #f5f5f5;
+    border-radius: var(--pedidos-radius-small);
+    border: 2px dashed var(--pedidos-border);
+}
+
+/* === CATEGORÍAS DE PRODUCTOS === */
 .categoria-filtros {
     display: flex;
-    gap: 0.5rem;
-    margin: 1rem 0;
+    gap: 0.75rem;
+    margin: var(--pedidos-spacing) 0;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .categoria-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #F57C00;
+    padding: 0.75rem 1.25rem;
+    border: 2px solid var(--pedidos-primary);
     background: white;
-    color: #F57C00;
+    color: var(--pedidos-primary);
     border-radius: 25px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     transition: all 0.3s ease;
     font-size: 0.9rem;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.categoria-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.categoria-btn:hover::before {
+    left: 100%;
 }
 
 .categoria-btn:hover {
-    background: #FFF3E0;
-    transform: translateY(-1px);
+    background: var(--pedidos-primary-light);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 124, 0, 0.2);
 }
 
 .categoria-btn.active {
-    background: #F57C00;
+    background: var(--pedidos-primary);
     color: white;
-    box-shadow: 0 2px 8px rgba(245, 124, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(245, 124, 0, 0.4);
+    transform: translateY(-1px);
 }
 
+/* === PRODUCTOS POR CATEGORÍA === */
 .productos-por-categoria {
-    max-height: 500px;
+    max-height: 600px;
     overflow-y: auto;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--pedidos-primary) #f1f1f1;
+}
+
+.productos-por-categoria::-webkit-scrollbar {
+    width: 6px;
+}
+
+.productos-por-categoria::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.productos-por-categoria::-webkit-scrollbar-thumb {
+    background: var(--pedidos-primary);
+    border-radius: 3px;
 }
 
 .categoria-seccion {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: var(--pedidos-spacing-large);
+    border-bottom: 1px solid var(--pedidos-border);
     padding-bottom: 1.5rem;
 }
 
@@ -98,55 +284,78 @@
 }
 
 .categoria-titulo {
-    color: #F57C00;
-    font-size: 1.3rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
+    color: var(--pedidos-primary);
+    font-size: 1.4rem;
+    margin-bottom: var(--pedidos-spacing);
+    font-weight: 700;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    position: sticky;
+    top: 0;
+    background: white;
+    padding: 0.5rem 0;
+    z-index: 10;
 }
 
 .categoria-titulo::before {
     content: '🍽️';
+    font-size: 1.2rem;
 }
 
-.categoria-seccion:nth-child(1) .categoria-titulo::before { content: '🥗'; } /* Entradas */
-.categoria-seccion:nth-child(2) .categoria-titulo::before { content: '🍽️'; } /* Platos Fuertes */
-.categoria-seccion:nth-child(3) .categoria-titulo::before { content: '🥤'; } /* Bebidas */
-.categoria-seccion:nth-child(4) .categoria-titulo::before { content: '🍰'; } /* Postres */
+.categoria-seccion:nth-child(1) .categoria-titulo::before { content: '🥗'; }
+.categoria-seccion:nth-child(2) .categoria-titulo::before { content: '🍽️'; }
+.categoria-seccion:nth-child(3) .categoria-titulo::before { content: '🥤'; }
+.categoria-seccion:nth-child(4) .categoria-titulo::before { content: '🍰'; }
 
 .productos-categoria-lista {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
 }
 
 .producto-card {
     background: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    border: 1px solid var(--pedidos-border);
+    border-radius: 12px;
     overflow: hidden;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+.producto-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--pedidos-primary), var(--pedidos-primary-dark));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.producto-card:hover::before {
+    transform: scaleX(1);
 }
 
 .producto-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border-color: #F57C00;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.12);
+    border-color: var(--pedidos-primary);
 }
 
 .producto-btn {
     width: 100%;
-    padding: 1rem;
+    padding: 1.25rem;
     border: none;
     background: none;
     cursor: pointer;
     text-align: left;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
     transition: background-color 0.2s ease;
 }
 
@@ -162,552 +371,701 @@
 }
 
 .producto-nombre {
-    font-weight: 600;
-    color: #333;
-    font-size: 1rem;
+    font-weight: 700;
+    color: var(--pedidos-text);
+    font-size: 1.1rem;
     flex: 1;
+    line-height: 1.3;
 }
 
 .producto-precio {
-    font-weight: 700;
-    color: #F57C00;
-    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--pedidos-primary);
+    font-size: 1.2rem;
+    white-space: nowrap;
 }
 
 .producto-descripcion {
-    color: #666;
-    font-size: 0.85rem;
-    line-height: 1.3;
+    color: var(--pedidos-text-light);
+    font-size: 0.9rem;
+    line-height: 1.4;
     margin-top: 0.25rem;
 }
 
-/* Responsive para dispositivos móviles */
-@media (max-width: 768px) {
-    .categoria-filtros {
-        justify-content: center;
-    }
-    
-    .categoria-btn {
-        font-size: 0.8rem;
-        padding: 0.4rem 0.8rem;
-    }
-    
-    .productos-categoria-lista {
-        grid-template-columns: 1fr;
-    }
-    
-    .categoria-titulo {
-        font-size: 1.1rem;
-        text-align: center;
-    }
-    
-    .productos-por-categoria {
-        max-height: 400px;
-    }
-}
-    transition: background 0.2s, border 0.2s;
-}
-.pedido-resumen.seleccionado {
-    background: #F57C00;
-    color: #fff;
-    border: 2px solid #F57C00;
-}
-.pedido-mesa {
-    font-weight: bold;
-    color: #F57C00;
-}
-.pedido-estado {
-    font-size: 0.95rem;
-    margin: 0.2rem 0;
-    padding: 0.1rem 0.5rem;
-    border-radius: 0.4rem;
-    font-weight: bold;
-    color: #fff;
-    background: #bbb;
-    display: inline-block;
-}
-.pedido-estado.enpreparación {
-    background: #F57C00;
-}
-.pedido-estado.listoparaservir {
-    background: #43a047;
-}
-.pedido-estado.pendiente {
-    background: #d32f2f;
-}
-.pedido-hora {
-    font-size: 0.9rem;
-    color: #666;
-}
-.pedidos-detalle {
-    flex: 1;
-    background: #f9f9f9;
-    border-radius: 1rem;
-    padding: 1.2rem 1rem;
-    min-width: 220px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-.pedidos-items {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 1rem;
-}
-.pedidos-items li {
-    margin-bottom: 0.4rem;
-    color: #333;
-}
-.pedidos-detalle-estado,
-.pedidos-detalle-mesa,
-.pedidos-detalle-hora {
-    margin-bottom: 0.5rem;
-    color: #333;
-}
-.pedidos-placeholder {
-    color: #999;
-    text-align: center;
-    margin-top: 2rem;
-}
-@media (max-width: 900px) {
-    .pedidos-content {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: stretch;
-    }
-    .pedidos-lista, .pedidos-detalle {
-        max-width: 100%;
-        min-width: 0;
-    }
-}
-@media (max-width: 600px) {
-    .pedidos-container {
-        padding: 1rem 0.3rem;
-        margin: 1rem 0.2rem;
-    }
-    .pedidos-title {
-        font-size: 1.3rem;
-    }
-    .pedidos-content {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-}
-/* Fin Pedidos */
-
-/* Toma de Pedidos */
+/* === TOMA DE PEDIDOS === */
 .toma-pedidos-container {
     background-color: white;
-    border-radius: 1.5rem;
-    padding: 2rem 1rem;
-    margin: 2rem auto;
-    max-width: 950px;
+    border-radius: var(--pedidos-radius);
+    padding: var(--pedidos-spacing-large) var(--pedidos-spacing);
+    margin: var(--pedidos-spacing-large) auto;
+    max-width: 1200px;
     min-height: 60vh;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    box-shadow: var(--pedidos-shadow);
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 .toma-pedidos-title {
-    color: #F57C00;
+    color: var(--pedidos-primary);
     font-size: 2.2rem;
     margin-bottom: 0.5rem;
     text-align: center;
+    font-weight: 700;
 }
+
 .toma-pedidos-description {
-    color: #333;
-    margin-bottom: 2rem;
+    color: var(--pedidos-text);
+    margin-bottom: var(--pedidos-spacing-large);
     text-align: center;
-}
-.toma-pedidos-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    align-items: center;
-    margin-bottom: 2rem;
-    justify-content: center;
-}
-.toma-pedidos-form label {
-    display: flex;
-    flex-direction: column;
-    font-weight: bold;
-    color: #333;
-}
-.toma-pedidos-form select,
-.toma-pedidos-form input[type="number"] {
-    margin-top: 0.3rem;
-    border-radius: 0.4rem;
-    border: 1px solid #ccc;
-    padding: 0.3rem 0.6rem;
-    font-size: 1rem;
-}
-.toma-pedidos-boton {
-    background: #F57C00;
-    color: #fff;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-    height: 2.5rem;
-    align-self: flex-end;
-}
-.toma-pedidos-boton:hover {
-    background: #e96a00;
-}
-.toma-pedidos-resumen {
-    width: 100%;
-    margin-top: 1.5rem;
-    background: #fff7ec;
-    border-radius: 1rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 1.2rem 1rem;
-}
-.toma-pedidos-tabla {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1rem;
-}
-.toma-pedidos-tabla th, .toma-pedidos-tabla td {
-    padding: 0.6rem 0.4rem;
-    text-align: center;
-    border-bottom: 1px solid #F57C00;
-}
-.toma-pedidos-tabla th {
-    background: #F57C00;
-    color: #fff;
-    font-weight: bold;
-}
-.toma-pedidos-tabla tr:last-child td {
-    border-bottom: none;
-}
-.toma-pedidos-cantidad {
-    width: 50px;
-    border-radius: 0.3rem;
-    border: 1px solid #ccc;
-    padding: 0.2rem 0.4rem;
-}
-.toma-pedidos-eliminar {
-    background: #d32f2f;
-    color: #fff;
-    border: none;
-    border-radius: 0.4rem;
-    padding: 0.3rem 0.7rem;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-.toma-pedidos-eliminar:hover {
-    background: #b71c1c;
-}
-.toma-pedidos-total {
     font-size: 1.1rem;
-    color: #F57C00;
-    margin-bottom: 1rem;
-    text-align: right;
 }
-.toma-pedidos-enviar {
-    background: #43a047;
-    color: #fff;
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
-    width: 100%;
-    margin-bottom: 0.5rem;
-}
-.toma-pedidos-enviar:disabled {
-    background: #bbb;
-    cursor: not-allowed;
-}
-.toma-pedidos-exito {
-    color: #43a047;
-    font-weight: bold;
-    margin-top: 0.5rem;
-    text-align: center;
-}
-.toma-pedidos-vacio {
-    color: #999;
-    text-align: center;
-    margin: 1rem 0;
-}
-@media (max-width: 600px) {
-    .toma-pedidos-container {
-        padding: 1rem 0.3rem;
-        margin: 1rem 0.2rem;
-    }
-    .toma-pedidos-title {
-        font-size: 1.3rem;
-    }
-    .toma-pedidos-form {
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    .toma-pedidos-resumen {
-        padding: 0.7rem 0.3rem;
-    }
-    .toma-pedidos-tabla th, .toma-pedidos-tabla td {
-        padding: 0.3rem 0.1rem;
-        font-size: 0.95rem;
-    }
-    /* --- PedidoForm Container --- */
+
 .toma-pedidos-form {
     display: flex;
     flex-wrap: wrap;
     gap: 1.5rem;
-    padding: 2rem;
-    background-color: var(--color-background-card);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-small);
-    margin-bottom: 2rem;
     align-items: flex-end;
+    margin-bottom: var(--pedidos-spacing-large);
+    justify-content: center;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: var(--pedidos-radius);
+    width: 100%;
+    max-width: 800px;
 }
 
-/* --- Estilos de las etiquetas y campos --- */
 .toma-pedidos-form label {
     display: flex;
     flex-direction: column;
     font-weight: 600;
-    color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    color: var(--pedidos-text);
+    min-width: 150px;
+    flex: 1;
 }
 
 .toma-pedidos-form select,
 .toma-pedidos-form input[type="number"] {
-    width: 100%;
-    padding: 0.75rem;
     margin-top: 0.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-small);
-    background-color: var(--color-white);
-    color: var(--color-text-primary);
+    border-radius: var(--pedidos-radius-small);
+    border: 2px solid var(--pedidos-border);
+    padding: 0.75rem;
     font-size: 1rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    background: white;
 }
 
 .toma-pedidos-form select:focus,
 .toma-pedidos-form input[type="number"]:focus {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+    border-color: var(--pedidos-primary);
+    box-shadow: 0 0 0 3px rgba(245, 124, 0, 0.1);
     outline: none;
 }
 
-/* --- Botón de Agregar --- */
 .toma-pedidos-boton {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--color-primary);
-    color: var(--color-white);
-    font-size: 1rem;
-    font-weight: 600;
+    background: var(--pedidos-primary);
+    color: #fff;
     border: none;
-    border-radius: var(--border-radius-small);
+    border-radius: var(--pedidos-radius-small);
+    padding: 0.75rem 1.5rem;
+    font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    flex-grow: 1; /* Permite que el botón crezca para llenar el espacio */
+    transition: all 0.3s ease;
+    height: 3rem;
+    align-self: flex-end;
+    min-width: 120px;
+    font-size: 1rem;
 }
 
 .toma-pedidos-boton:hover {
-    background-color: var(--color-primary-dark);
+    background: var(--pedidos-primary-dark);
     transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(245, 124, 0, 0.3);
 }
 
 .toma-pedidos-boton:active {
     transform: translateY(0);
 }
 
-/* --- Adaptación a pantallas pequeñas --- */
-@media (max-width: 768px) {
-    .toma-pedidos-form {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .toma-pedidos-boton {
-        width: 100%;
-    }
-}
-}
-/* Fin Toma de Pedidos */
-
-/* pedidos form,reumen y lista pedidos */
-/* --- ESTILOS GENERALES Y TIPOGRAFÍA --- */
-/* --- CONTENEDOR PRINCIPAL --- */
-.toma-pedidos-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-}
-
-.toma-pedidos-title {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 8px;
-}
-
-.toma-pedidos-description {
-    text-align: center;
-    color: #7f8c8d;
-    margin-bottom: 30px;
-}
-
-/* --- LAYOUT DE DOS COLUMNAS (FORMULARIO Y RESUMEN) --- */
-.pedidos-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-}
-
-/* --- ESTILOS PARA EL FORMULARIO DE PEDIDO --- */
-.pedido-form, .pedido-resumen {
-    padding: 25px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fdfdfd;
-}
-
-.pedido-form h2, .pedido-resumen h2 {
-    margin-top: 0;
-    color: #34495e;
-    border-bottom: 2px solid #eeeeee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #555;
-}
-
-.form-group select,
-.form-group input {
+/* === RESUMEN DE PEDIDOS === */
+.toma-pedidos-resumen {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 16px;
-    box-sizing: border-box; /* Importante para que el padding no afecte el ancho */
-    transition: border-color 0.2s;
+    max-width: 800px;
+    margin-top: 1.5rem;
+    background: #fff7ec;
+    border-radius: var(--pedidos-radius);
+    box-shadow: var(--pedidos-shadow);
+    padding: 1.5rem;
+    border: 1px solid var(--pedidos-primary);
 }
 
-.form-group select:focus,
-.form-group input:focus {
-    outline: none;
-    border-color: #3498db;
+.toma-pedidos-tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--pedidos-spacing);
+    background: white;
+    border-radius: var(--pedidos-radius-small);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* --- ESTILOS PARA EL RESUMEN DEL PEDIDO --- */
-.pedido-resumen ul {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-    max-height: 300px; /* Altura máxima antes de mostrar scroll */
-    overflow-y: auto;
+.toma-pedidos-tabla th,
+.toma-pedidos-tabla td {
+    padding: 1rem 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid var(--pedidos-border);
 }
 
-.pedido-resumen li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
+.toma-pedidos-tabla th {
+    background: var(--pedidos-primary);
+    color: #fff;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
 }
 
-.pedido-resumen li:last-child {
+.toma-pedidos-tabla tr:last-child td {
     border-bottom: none;
 }
 
-.resumen-total {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #34495e;
-    text-align: right;
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #2c3e50;
+.toma-pedidos-tabla tr:nth-child(even) {
+    background: #f8f9fa;
 }
 
-/* --- ESTILOS PARA BOTONES --- */
-button {
-    cursor: pointer;
+.toma-pedidos-cantidad {
+    width: 60px;
+    border-radius: var(--pedidos-radius-small);
+    border: 1px solid var(--pedidos-border);
+    padding: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.toma-pedidos-eliminar {
+    background: var(--pedidos-danger);
+    color: #fff;
     border: none;
-    border-radius: 6px;
-    padding: 12px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    transition: all 0.2s ease-in-out;
+    border-radius: var(--pedidos-radius-small);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
 }
 
-/* Botón principal (Agregar / Completar) */
-.btn-agregar, .btn-completar {
+.toma-pedidos-eliminar:hover {
+    background: #b71c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(211, 47, 47, 0.3);
+}
+
+.toma-pedidos-total {
+    font-size: 1.3rem;
+    color: var(--pedidos-primary);
+    margin-bottom: var(--pedidos-spacing);
+    text-align: right;
+    font-weight: 800;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--pedidos-radius-small);
+    border: 2px solid var(--pedidos-primary);
+}
+
+.toma-pedidos-enviar {
+    background: var(--pedidos-success);
+    color: #fff;
+    border: none;
+    border-radius: var(--pedidos-radius-small);
+    padding: 1rem 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
     width: 100%;
-    background-color: #3498db;
-    color: white;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.btn-agregar:hover, .btn-completar:hover {
-    background-color: #2980b9;
+.toma-pedidos-enviar:hover:not(:disabled) {
+    background: #388e3c;
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(67, 160, 71, 0.3);
 }
 
-/* Botones de acciones en el resumen */
-.resumen-acciones {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-/* Botón de limpiar */
-.btn-limpiar {
-    background-color: #e74c3c;
-    color: white;
-}
-.btn-limpiar:hover {
-    background-color: #c0392b;
-}
-
-/* Botón para eliminar item */
-.btn-eliminar {
-    background-color: #f1c40f;
-    color: #333;
-    padding: 5px 10px;
-    font-size: 14px;
-    margin-left: 10px;
-}
-.btn-eliminar:hover {
-    background-color: #f39c12;
-}
-
-/* Estado deshabilitado para botones */
-button:disabled {
-    background-color: #bdc3c7;
+.toma-pedidos-enviar:disabled {
+    background: #bbb;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
 }
 
-/* --- DISEÑO RESPONSIVO (PARA PANTALLAS PEQUEÑAS) --- */
-@media (max-width: 768px) {
-    body {
-        padding: 10px;
+.toma-pedidos-exito {
+    color: var(--pedidos-success);
+    font-weight: 700;
+    margin-top: 0.5rem;
+    text-align: center;
+    padding: 1rem;
+    background: #e8f5e8;
+    border-radius: var(--pedidos-radius-small);
+    border: 1px solid var(--pedidos-success);
+}
+
+.toma-pedidos-vacio {
+    color: var(--pedidos-text-muted);
+    text-align: center;
+    margin: var(--pedidos-spacing) 0;
+    font-style: italic;
+    padding: var(--pedidos-spacing-large);
+    background: #f5f5f5;
+    border-radius: var(--pedidos-radius-small);
+    border: 2px dashed var(--pedidos-border);
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets grandes (1024px - 1200px) */
+@media (max-width: 1200px) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        max-width: 95%;
+        margin: 1.5rem auto;
     }
     
-    .pedidos-layout {
-        grid-template-columns: 1fr; /* Apila las columnas una sobre otra */
+    .productos-categoria-lista {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
     }
+}
 
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .pedidos-content {
+        gap: 1.5rem;
+    }
+    
+    .pedidos-lista {
+        min-width: 250px;
+        max-width: 300px;
+    }
+    
+    .categoria-filtros {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .categoria-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+    
+    .productos-categoria-lista {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .toma-pedidos-form {
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (600px - 768px) */
+@media (max-width: 768px) {
+    .pedidos-container,
     .toma-pedidos-container {
-        padding: 15px;
+        padding: 1.5rem 1rem;
+        margin: 1rem;
+    }
+    
+    .pedidos-title,
+    .toma-pedidos-title {
+        font-size: 1.8rem;
+    }
+    
+    .pedidos-description,
+    .toma-pedidos-description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .pedidos-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    
+    .pedidos-lista,
+    .pedidos-detalle {
+        max-width: 100%;
+        min-width: 0;
+    }
+    
+    .pedidos-lista {
+        order: 2;
+    }
+    
+    .pedidos-detalle {
+        order: 1;
+        min-height: 300px;
+    }
+    
+    .categoria-filtros {
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .categoria-btn {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+    }
+    
+    .productos-categoria-lista {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .categoria-titulo {
+        font-size: 1.2rem;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .productos-por-categoria {
+        max-height: 400px;
+    }
+    
+    .producto-card {
+        margin: 0 auto;
+        max-width: 400px;
+    }
+    
+    .toma-pedidos-form {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        padding: 1rem;
+    }
+    
+    .toma-pedidos-form label {
+        min-width: auto;
+    }
+    
+    .toma-pedidos-boton {
+        width: 100%;
+        align-self: stretch;
+        height: auto;
+        padding: 1rem;
+    }
+    
+    .toma-pedidos-tabla th,
+    .toma-pedidos-tabla td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .toma-pedidos-resumen {
+        padding: 1rem;
+    }
+}
+
+/* Móviles (480px - 600px) */
+@media (max-width: 600px) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        padding: 1rem 0.75rem;
+        margin: 0.5rem;
+        border-radius: 0.75rem;
+    }
+    
+    .pedidos-title,
+    .toma-pedidos-title {
+        font-size: 1.5rem;
+    }
+    
+    .pedidos-description,
+    .toma-pedidos-description {
+        font-size: 0.9rem;
+    }
+    
+    .pedidos-content {
+        gap: 1rem;
+    }
+    
+    .pedidos-lista,
+    .pedidos-detalle {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .pedido-resumen {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .pedido-mesa {
+        font-size: 1rem;
+    }
+    
+    .pedido-estado {
+        font-size: 0.75rem;
+        padding: 0.2rem 0.6rem;
+    }
+    
+    .categoria-btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .categoria-titulo {
+        font-size: 1.1rem;
+    }
+    
+    .produto-nome {
+        font-size: 1rem;
+    }
+    
+    .produto-preco {
+        font-size: 1.1rem;
+    }
+    
+    .produto-descricao {
+        font-size: 0.8rem;
+    }
+    
+    .toma-pedidos-form {
+        padding: 0.75rem;
+    }
+    
+    .toma-pedidos-tabla th,
+    .toma-pedidos-tabla td {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .toma-pedidos-quantidade {
+        width: 50px;
+        padding: 0.25rem;
+    }
+    
+    .toma-pedidos-eliminar {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    
+    .toma-pedidos-total {
+        font-size: 1.1rem;
+        padding: 0.75rem;
+    }
+    
+    .toma-pedidos-enviar {
+        padding: 0.875rem;
+        font-size: 1rem;
+    }
+}
+
+/* Móviles pequeños (320px - 480px) */
+@media (max-width: 480px) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        padding: 0.75rem 0.5rem;
+        margin: 0.25rem;
+    }
+    
+    .pedidos-title,
+    .toma-pedidos-title {
+        font-size: 1.3rem;
+    }
+    
+    .pedidos-description,
+    .toma-pedidos-description {
+        font-size: 0.85rem;
+    }
+    
+    .pedidos-lista,
+    .pedidos-detalle {
+        padding: 0.75rem;
+    }
+    
+    .pedido-resumen {
+        padding: 0.6rem;
+    }
+    
+    .categoria-btn {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.7rem;
+    }
+    
+    .categoria-titulo {
+        font-size: 1rem;
+    }
+    
+    .produto-card {
+        max-width: 100%;
+    }
+    
+    .produto-btn {
+        padding: 1rem;
+    }
+    
+    .toma-pedidos-tabla {
+        font-size: 0.75rem;
+    }
+    
+    .toma-pedidos-tabla th,
+    .toma-pedidos-tabla td {
+        padding: 0.4rem 0.2rem;
+    }
+    
+    .toma-pedidos-resumen {
+        padding: 0.75rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 320px) */
+@media (max-width: 320px) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        padding: 0.5rem 0.25rem;
+        margin: 0.125rem;
+    }
+    
+    .pedidos-title,
+    .toma-pedidos-title {
+        font-size: 1.2rem;
+    }
+    
+    .categoria-btn {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.65rem;
+    }
+    
+    .produto-nome {
+        font-size: 0.9rem;
+    }
+    
+    .produto-preco {
+        font-size: 1rem;
+    }
+    
+    .toma-pedidos-tabla th,
+    .toma-pedidos-tabla td {
+        padding: 0.3rem 0.1rem;
+        font-size: 0.7rem;
+    }
+    
+    .toma-pedidos-quantidade {
+        width: 40px;
+    }
+    
+    .toma-pedidos-eliminar {
+        padding: 0.3rem 0.4rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .pedidos-content {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    
+    .pedidos-lista {
+        min-width: 200px;
+        max-width: 250px;
+        order: 1;
+    }
+    
+    .pedidos-detalle {
+        order: 2;
+        min-height: 250px;
+    }
+    
+    .produtos-categoria-lista {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .toma-pedidos-form {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-end;
+    }
+    
+    .toma-pedidos-form label {
+        min-width: 120px;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .pedido-resumen,
+    .categoria-btn,
+    .produto-card,
+    .toma-pedidos-boton,
+    .toma-pedidos-eliminar,
+    .toma-pedidos-enviar {
+        transition: none;
+    }
+    
+    .categoria-btn::before {
+        transition: none;
+    }
+    
+    .produto-card::before {
+        transition: none;
+    }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        border: 2px solid var(--pedidos-text);
+    }
+    
+    .pedido-resumen {
+        border: 2px solid var(--pedidos-primary);
+    }
+    
+    .categoria-btn {
+        border: 2px solid var(--pedidos-primary);
+    }
+    
+    .produto-card {
+        border: 2px solid var(--pedidos-border);
+    }
+}
+
+/* Pantallas grandes (1400px+) */
+@media (min-width: 1400px) {
+    .pedidos-container,
+    .toma-pedidos-container {
+        max-width: 1400px;
+        padding: 3rem 2rem;
+    }
+    
+    .pedidos-title,
+    .toma-pedidos-title {
+        font-size: 2.5rem;
+    }
+    
+    .produtos-categoria-lista {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .produto-card {
+        max-width: none;
+    }
+    
+    .toma-pedidos-form {
+        max-width: 1000px;
+        padding: 2rem;
+    }
+    
+    .toma-pedidos-resumen {
+        max-width: 1000px;
+        padding: 2rem;
     }
 }

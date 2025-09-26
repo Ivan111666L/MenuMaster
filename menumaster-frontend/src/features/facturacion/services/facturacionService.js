@@ -4,7 +4,7 @@ import api from '@/services/api'; // Tu instancia central de Axios
  * Obtiene los pedidos que están listos para ser facturados (ej. estado 'listo para servir').
  */
 const getPedidosParaFacturar = async () => {
-    const response = await api.get('/pedidos?estado=listo para servir');
+    const response = await api.get('/api/pedidos?estado=listo para servir');
     return response.data.data;
 };
 
@@ -15,7 +15,7 @@ const getPedidosParaFacturar = async () => {
  */
 const facturarPedido = async (pedidoId, datosPago) => {
     // Usamos el endpoint que ya creamos en el backend para esto.
-    const response = await api.post(`/pedidos/${pedidoId}/facturar`, datosPago);
+    const response = await api.post(`/api/pedidos/${pedidoId}/facturar`, datosPago);
     return response.data;
 };
 

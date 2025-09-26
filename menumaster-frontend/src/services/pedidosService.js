@@ -2,7 +2,7 @@ import api from './api';
 
 export const getPedidos = async () => {
   try {
-    const response = await api.get('/pedidos');
+    const response = await api.get('/api/pedidos');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -21,7 +21,7 @@ export const getPedidos = async () => {
 
 export const getPedidoById = async (id) => {
   try {
-    const response = await api.get(`/pedidos/${id}`);
+    const response = await api.get(`/api/pedidos/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener pedido ${id}:`, error);
@@ -31,7 +31,7 @@ export const getPedidoById = async (id) => {
 
 export const createPedido = async (pedidoData) => {
   try {
-    const response = await api.post('/pedidos', pedidoData);
+    const response = await api.post('/api/pedidos', pedidoData);
     return response.data;
   } catch (error) {
     console.error('Error al crear pedido:', error);
@@ -41,7 +41,7 @@ export const createPedido = async (pedidoData) => {
 
 export const updatePedido = async (id, pedidoData) => {
   try {
-    const response = await api.put(`/pedidos/${id}`, pedidoData);
+    const response = await api.put(`/api/pedidos/${id}`, pedidoData);
     return response.data;
   } catch (error) {
     console.error(`Error al actualizar pedido ${id}:`, error);
@@ -51,7 +51,7 @@ export const updatePedido = async (id, pedidoData) => {
 
 export const deletePedido = async (id) => {
   try {
-    const response = await api.delete(`/pedidos/${id}`);
+    const response = await api.delete(`/api/pedidos/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al eliminar pedido ${id}:`, error);
@@ -61,7 +61,7 @@ export const deletePedido = async (id) => {
 
 export const cambiarEstadoPedido = async (id, nuevoEstado) => {
   try {
-    const response = await api.put(`/pedidos/${id}/estado`, { estado: nuevoEstado });
+    const response = await api.put(`/api/pedidos/${id}/estado`, { estado: nuevoEstado });
     return response.data;
   } catch (error) {
     console.error(`Error al cambiar estado del pedido ${id}:`, error);

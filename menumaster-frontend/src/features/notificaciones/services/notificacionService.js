@@ -1,19 +1,16 @@
-import axios from 'axios';
-
-const API_URL = '/api/notificaciones';
+import api from '@/services/api';
 
 export const getNotificaciones = async () => {
-  const res = await axios.get(API_URL);
+  const res = await api.get('/notificaciones');
   return res.data;
 };
 
 export const marcarLeida = async (id) => {
-  const res = await axios.post(`${API_URL}/${id}/leida`);
+  const res = await api.post(`/notificaciones/${id}/leida`);
   return res.data;
 };
 
-const LOGS_URL = '/api/logs';
 export const getLogs = async () => {
-  const res = await axios.get(LOGS_URL);
+  const res = await api.get('/logs');
   return res.data;
 };

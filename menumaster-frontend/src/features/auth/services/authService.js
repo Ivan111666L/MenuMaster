@@ -7,7 +7,7 @@ import api from '@/services/api';
  * @param {object} userData - Datos del nuevo usuario.
  */
 const register = async (userData) => {
-  const response = await api.post('/auth/register', userData);
+  const response = await api.post('/api/auth/register', userData);
   return response.data;
 };
 
@@ -16,7 +16,7 @@ const register = async (userData) => {
  * @param {object} credentials - Email y password del usuario.
  */
 const login = async (credentials) => {
-  const response = await api.post('/auth/login', credentials);
+  const response = await api.post('/api/auth/login', credentials);
   console.log("Respuesta del backend login:", response.data);
   // Ajusta esta línea según la estructura real del JSON que devuelve tu backend:
   // Si tu backend devuelve directamente { user, token, expiraEn }, usa:
@@ -35,7 +35,7 @@ const login = async (credentials) => {
  * @param {object} emailData - Objeto que contiene el email.
  */
 const forgotPassword = async (emailData) => {
-  const response = await api.post('/auth/forgot-password', emailData);
+  const response = await api.post('/api/auth/forgot-password', emailData);
   return response.data;
 };
 
@@ -44,7 +44,7 @@ const forgotPassword = async (emailData) => {
  * @param {object} resetData - Datos para el reseteo.
  */
 const resetPassword = async (resetData) => {
-  const response = await api.post('/auth/reset-password', resetData);
+  const response = await api.post('/api/auth/reset-password', resetData);
   return response.data;
 };
 

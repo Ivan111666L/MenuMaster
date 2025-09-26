@@ -566,7 +566,7 @@ class AuthController
         $hashedPassword = password_hash($data['password'], PASSWORD_BCRYPT);
 
         $stmt = $this->db->prepare("
-            INSERT INTO usuarios (nombre, email, password, rol_id, estado_id, created_at)
+            INSERT INTO usuarios (nombre, email, password, rol_id, estado_id, fecha_creacion)
             VALUES (:nombre, :email, :password, :rol_id, :estado_id, NOW())
         ");
         

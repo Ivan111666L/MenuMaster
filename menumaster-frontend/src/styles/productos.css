@@ -1,227 +1,76 @@
-/* Selector de Ingredientes */
-.selector-ingredientes {
-    margin: 1.5rem 0;
-    padding: 1rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background-color: var(--color-background-card);
+/* === PRODUCTOS MODULE - RESPONSIVE DESIGN === */
+
+/* === Variables CSS para consistencia === */
+:root {
+    --productos-primary: #4F46E5;
+    --productos-primary-dark: #4338CA;
+    --productos-primary-light: #EEF2FF;
+    --productos-success: #10B981;
+    --productos-danger: #EF4444;
+    --productos-warning: #F59E0B;
+    --productos-text: #1F2937;
+    --productos-text-light: #6B7280;
+    --productos-text-muted: #9CA3AF;
+    --productos-border: #E5E7EB;
+    --productos-border-light: #F3F4F6;
+    --productos-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --productos-shadow-hover: 0 8px 16px rgba(0,0,0,0.12);
+    --productos-shadow-medium: 0 6px 20px rgba(0,0,0,0.1);
+    --productos-radius: 1rem;
+    --productos-radius-small: 0.5rem;
+    --productos-spacing: 1rem;
+    --productos-spacing-large: 2rem;
 }
 
-.selector-ingredientes h3 {
-    color: var(--color-text-primary);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-}
-
-.selector-ingredientes h4 {
-    color: var(--color-text-secondary);
-    margin-bottom: 0.75rem;
-    font-size: 1rem;
-}
-
-.selector-ingredientes-loading,
-.selector-ingredientes-error {
-    padding: 1rem;
-    text-align: center;
-    border-radius: var(--border-radius);
-}
-
-.selector-ingredientes-loading {
-    background-color: var(--color-background-light);
-    color: var(--color-text-secondary);
-}
-
-.selector-ingredientes-error {
-    background-color: var(--color-error-light);
-    color: var(--color-error);
-}
-
-.ingredientes-busqueda {
-    margin-bottom: 1rem;
-}
-
-.ingredientes-busqueda input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    font-size: 0.875rem;
-}
-
-.ingredientes-disponibles {
-    margin-bottom: 1.5rem;
-}
-
-.ingredientes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 0.75rem;
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 0.5rem;
-    border: 1px solid var(--color-border-light);
-    border-radius: var(--border-radius);
-}
-
-.ingrediente-card {
-    position: relative;
-    padding: 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    background-color: var(--color-background-light);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.ingrediente-card:hover {
-    border-color: var(--color-primary);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.ingrediente-card.seleccionado {
-    border-color: var(--color-primary);
-    background-color: var(--color-primary-light);
-}
-
-.ingrediente-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.ingrediente-nombre {
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin-bottom: 0.25rem;
-}
-
-.ingrediente-stock {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-}
-
-.ingrediente-seleccionado-badge {
-    position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    background-color: var(--color-primary);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-}
-
-.ingredientes-seleccionados {
-    border-top: 1px solid var(--color-border);
-    padding-top: 1rem;
-}
-
-.ingredientes-seleccionados-lista {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.ingrediente-seleccionado {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background-color: var(--color-background-light);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-}
-
-.ingrediente-seleccionado .ingrediente-nombre {
-    flex: 1;
-    font-weight: 500;
-    color: var(--color-text-primary);
-}
-
-.ingrediente-cantidad-control {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.ingrediente-cantidad-control label {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-}
-
-.cantidad-input {
-    width: 80px;
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    font-size: 0.875rem;
-}
-
-.ingrediente-cantidad-control .unidad {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .ingredientes-grid {
-        grid-template-columns: 1fr;
-        max-height: 200px;
-    }
-    
-    .ingrediente-seleccionado {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.5rem;
-    }
-    
-    .ingrediente-cantidad-control {
-        width: 100%;
-        justify-content: space-between;
-    }
-}
-
-/*productosNuevos.css*/
-/* --- Contenedor principal de la aplicación --- */
+/* === CONTENEDOR PRINCIPAL DE APLICACIÓN === */
 .app-container {
-    background-color: var(--color-background-light);
+    background-color: #F9FAFB;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: var(--productos-spacing);
 }
 
-/* --- Contenedor del formulario --- */
-.productos-form-wrapper {
-    background-color: var(--color-background-card);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-medium);
-    padding: 2rem 2.5rem;
+/* === CONTENEDOR DE PRODUCTOS === */
+.productos-container {
+    background-color: white;
+    padding: var(--productos-spacing-large);
+    border-radius: var(--productos-radius);
+    box-shadow: var(--productos-shadow);
     width: 100%;
-    max-width: 32rem;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .productos-title {
-    font-size: 1.875rem;
-    font-weight: bold;
-    color: var(--color-text-primary);
-    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--productos-text);
     margin-bottom: 0.5rem;
+    text-align: center;
+    line-height: 1.2;
 }
 
 .productos-description {
-    color: var(--color-text-secondary);
+    color: var(--productos-text-light);
     text-align: center;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
+    margin-bottom: var(--productos-spacing-large);
+    font-size: 1.1rem;
+    line-height: 1.5;
 }
 
-/* --- Formulario y sus elementos --- */
+/* === FORMULARIO DE PRODUCTOS === */
+.productos-form-wrapper {
+    background-color: white;
+    border-radius: var(--productos-radius);
+    box-shadow: var(--productos-shadow-medium);
+    padding: var(--productos-spacing-large);
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .productos-form {
     display: flex;
     flex-direction: column;
@@ -231,209 +80,1082 @@
 .form-group {
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
-.form-group label, .form-group-checkbox label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text-primary);
-    margin-bottom: 0.25rem;
+.form-group label,
+.form-group-checkbox label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--productos-text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input,
+.form-group select,
+.form-group textarea {
     display: block;
     width: 100%;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius-small);
-    box-shadow: var(--shadow-small);
-    font-size: 0.875rem;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    padding: 0.75rem;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius-small);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+    box-sizing: border-box;
 }
 
-.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+    border-color: var(--productos-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+    font-family: inherit;
 }
 
 .form-group-checkbox {
     display: flex;
     align-items: center;
-    margin-top: 1rem;
+    margin-top: var(--productos-spacing);
+    padding: 1rem;
+    background: var(--productos-border-light);
+    border-radius: var(--productos-radius-small);
+    border: 1px solid var(--productos-border);
 }
 
 .form-group-checkbox input {
-    margin-right: 0.5rem;
-    width: 1rem;
-    height: 1rem;
-    color: var(--color-primary);
-    border-color: var(--color-border);
-    border-radius: 0.25rem;
+    margin-right: 0.75rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: var(--productos-primary);
     cursor: pointer;
+}
+
+.form-group-checkbox label {
+    margin-bottom: 0;
+    cursor: pointer;
+    font-weight: 500;
 }
 
 .form-actions {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 1.5rem;
+    justify-content: center;
+    margin-top: var(--productos-spacing-large);
+    gap: 1rem;
 }
 
 .btn-crear {
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    color: var(--color-white);
-    background-color: var(--color-primary);
+    padding: 1rem 2rem;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(135deg, var(--productos-primary), var(--productos-primary-dark));
     border: none;
-    border-radius: var(--border-radius-small);
+    border-radius: var(--productos-radius-small);
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    min-width: 150px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-crear::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-crear:hover::before {
+    left: 100%;
 }
 
 .btn-crear:hover {
-    background-color: var(--color-primary-dark);
-}
-/* productos creados */
-/* --- CONTENEDOR PRINCIPAL --- */
-.app-container {
-    max-width: 900px;
-    margin: auto;
+    background: linear-gradient(135deg, var(--productos-primary-dark), #3730A3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(79, 70, 229, 0.4);
 }
 
-.productos-container {
-    background-color: #ffffff;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+.btn-crear:active {
+    transform: translateY(0);
 }
 
-.productos-title {
-    font-size: 2rem;
-    color: #212529;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
+/* === SELECTOR DE INGREDIENTES === */
+.selector-ingredientes {
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius);
+    background-color: white;
+    box-shadow: var(--productos-shadow);
 }
 
-.productos-description {
+.selector-ingredientes h3 {
+    color: var(--productos-primary);
+    margin-bottom: var(--productos-spacing);
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.selector-ingredientes h3::before {
+    content: '🥘';
+    font-size: 1.2rem;
+}
+
+.selector-ingredientes h4 {
+    color: var(--productos-text);
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.selector-ingredientes-loading,
+.selector-ingredientes-error {
+    padding: 1.5rem;
+    text-align: center;
+    border-radius: var(--productos-radius-small);
+    margin: var(--productos-spacing) 0;
+}
+
+.selector-ingredientes-loading {
+    background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+    color: var(--productos-text-light);
+    border: 2px dashed var(--productos-border);
+}
+
+.selector-ingredientes-error {
+    background: #FEF2F2;
+    color: var(--productos-danger);
+    border: 2px solid #FECACA;
+}
+
+.ingredientes-busqueda {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.ingredientes-busqueda input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius-small);
     font-size: 1rem;
-    color: #6c757d;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.ingredientes-busqueda::before {
+    content: '🔍';
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: var(--productos-text-muted);
+    z-index: 1;
+}
+
+.ingredientes-busqueda input:focus {
+    border-color: var(--productos-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+.ingredientes-disponibles {
     margin-bottom: 2rem;
 }
 
-/* --- ESTILOS DE LA TABLA --- */
+.ingredientes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1rem;
+    max-height: 350px;
+    overflow-y: auto;
+    padding: 1rem;
+    border: 2px solid var(--productos-border-light);
+    border-radius: var(--productos-radius-small);
+    background: #FAFAFA;
+    scrollbar-width: thin;
+    scrollbar-color: var(--productos-primary) #f1f1f1;
+}
+
+.ingredientes-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ingredientes-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.ingredientes-grid::-webkit-scrollbar-thumb {
+    background: var(--productos-primary);
+    border-radius: 3px;
+}
+
+.ingrediente-card {
+    position: relative;
+    padding: 1rem;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius-small);
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.ingrediente-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--productos-primary), var(--productos-primary-dark));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.ingrediente-card:hover::before {
+    transform: scaleX(1);
+}
+
+.ingrediente-card:hover {
+    border-color: var(--productos-primary);
+    box-shadow: var(--productos-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.ingrediente-card.seleccionado {
+    border-color: var(--productos-primary);
+    background: var(--productos-primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--productos-shadow-hover);
+}
+
+.ingrediente-card.seleccionado::before {
+    transform: scaleX(1);
+}
+
+.ingrediente-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ingrediente-nombre {
+    font-weight: 600;
+    color: var(--productos-text);
+    font-size: 1rem;
+    line-height: 1.3;
+}
+
+.ingrediente-stock {
+    font-size: 0.8rem;
+    color: var(--productos-text-light);
+    font-weight: 500;
+}
+
+.ingrediente-seleccionado-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    background: var(--productos-success);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.ingredientes-seleccionados {
+    border-top: 2px solid var(--productos-border);
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.ingredientes-seleccionados h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.ingredientes-seleccionados h4::before {
+    content: '✅';
+    font-size: 1rem;
+}
+
+.ingredientes-seleccionados-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ingrediente-seleccionado {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius-small);
+    box-shadow: var(--productos-shadow);
+    transition: all 0.3s ease;
+}
+
+.ingrediente-seleccionado:hover {
+    border-color: var(--productos-primary);
+    transform: translateY(-1px);
+    box-shadow: var(--productos-shadow-hover);
+}
+
+.ingrediente-seleccionado .ingrediente-nombre {
+    flex: 1;
+    font-weight: 600;
+    color: var(--productos-text);
+    font-size: 1rem;
+}
+
+.ingrediente-cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: var(--productos-border-light);
+    padding: 0.5rem 1rem;
+    border-radius: var(--productos-radius-small);
+    border: 1px solid var(--productos-border);
+}
+
+.ingrediente-cantidad-control label {
+    font-size: 0.9rem;
+    color: var(--productos-text);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cantidad-input {
+    width: 80px;
+    padding: 0.5rem;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius-small);
+    font-size: 0.9rem;
+    text-align: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cantidad-input:focus {
+    border-color: var(--productos-primary);
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    outline: none;
+}
+
+.ingrediente-cantidad-control .unidad {
+    font-size: 0.8rem;
+    color: var(--productos-text-light);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* === TABLA DE PRODUCTOS === */
 .productos-table-wrapper {
-    overflow-x: auto; /* Permite scroll horizontal en pantallas pequeñas */
+    overflow-x: auto;
+    border-radius: var(--productos-radius-small);
+    box-shadow: var(--productos-shadow);
+    margin-top: var(--productos-spacing-large);
 }
 
 .productos-table {
     width: 100%;
-    border-collapse: collapse; /* Une los bordes de las celdas */
-    text-align: left;
+    border-collapse: collapse;
+    background: white;
+    border-radius: var(--productos-radius-small);
+    overflow: hidden;
 }
 
 .table-header-cell {
-    background-color: #f2f2f2;
-    padding: 1rem;
-    font-size: 0.875rem;
+    background: linear-gradient(135deg, var(--productos-primary), var(--productos-primary-dark));
+    color: white;
+    padding: 1.25rem 1rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #495057;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 .table-row {
-    border-bottom: 1px solid #dee2e6; /* Línea separadora entre filas */
+    border-bottom: 1px solid var(--productos-border);
+    transition: background-color 0.2s ease;
+}
+
+.table-row:hover {
+    background: var(--productos-border-light);
 }
 
 .table-row:last-child {
-    border-bottom: none; /* Elimina la última línea */
+    border-bottom: none;
 }
 
 .table-cell {
-    padding: 1rem;
-    vertical-align: middle; /* Alinea el contenido verticalmente */
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
     font-size: 0.95rem;
-    color: #495057;
+    color: var(--productos-text);
+    line-height: 1.4;
 }
 
 .font-semibold {
     font-weight: 600;
-    color: #343a40;
+    color: var(--productos-text);
 }
 
-/* --- ESTILOS PARA EL BOTÓN DE ELIMINAR --- */
+/* === BOTONES === */
 .btn-eliminar {
-    background-color: #dc3545;
+    background: linear-gradient(135deg, var(--productos-danger), #DC2626);
     color: white;
     border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-size: 0.875rem;
-    font-weight: bold;
+    border-radius: var(--productos-radius-small);
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-eliminar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-eliminar:hover::before {
+    left: 100%;
 }
 
 .btn-eliminar:hover {
-    background-color: #c82333;
-    transform: translateY(-1px); /* Efecto sutil al pasar el mouse */
+    background: linear-gradient(135deg, #DC2626, #B91C1C);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(239, 68, 68, 0.4);
 }
 
 .btn-eliminar:active {
     transform: translateY(0);
 }
-.productos-container {
-    padding: 2rem;
-}
 
-.productos-title {
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 2.5rem;
-    border-bottom: 1px solid var(--color-border);
-    padding-bottom: 1rem;
-}
-
-/* Estos estilos de tarjeta son los mismos que usamos en Configuracion.jsx,
-   lo que demuestra la consistencia de tu diseño. Podrían incluso moverse
-   a un archivo de componentes si se usan mucho. */
+/* === CARDS DE PRODUCTOS === */
 .card-container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: var(--productos-spacing-large);
 }
 
 .card {
-    background-color: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--border-radius);
-    padding: 1.5rem 2rem;
-    box-shadow: var(--shadow-small);
-    transition: transform 0.2s, box-shadow 0.2s;
+    background: white;
+    border: 2px solid var(--productos-border);
+    border-radius: var(--productos-radius);
+    padding: 1.5rem;
+    box-shadow: var(--productos-shadow);
+    transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--productos-primary), var(--productos-primary-dark));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.card:hover::before {
+    transform: scaleX(1);
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: var(--shadow-medium);
+    transform: translateY(-4px);
+    box-shadow: var(--productos-shadow-hover);
+    border-color: var(--productos-primary);
 }
 
 .card-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: var(--color-primary);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.75rem 0;
+    color: var(--productos-primary);
+    line-height: 1.3;
 }
 
 .card p {
-    color: var(--color-text-secondary);
+    color: var(--productos-text-light);
     flex-grow: 1;
     margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
 }
 
 .card-link {
     text-decoration: none;
     margin-top: auto;
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--productos-primary), var(--productos-primary-dark));
+    color: white;
+    border-radius: var(--productos-radius-small);
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem;
+}
+
+.card-link:hover {
+    background: linear-gradient(135deg, var(--productos-primary-dark), #3730A3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets grandes (1024px - 1200px) */
+@media (max-width: 1200px) {
+    .productos-container {
+        max-width: 95%;
+        padding: 1.5rem;
+    }
+    
+    .ingredientes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .productos-form-wrapper {
+        max-width: 90%;
+        padding: 1.5rem;
+    }
+    
+    .ingredientes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        max-height: 300px;
+    }
+    
+    .ingrediente-cantidad-control {
+        gap: 0.5rem;
+        padding: 0.4rem 0.75rem;
+    }
+    
+    .cantidad-input {
+        width: 70px;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (600px - 768px) */
+@media (max-width: 768px) {
+    .app-container {
+        padding: 0.75rem;
+        align-items: flex-start;
+        padding-top: 1rem;
+    }
+    
+    .productos-container {
+        padding: 1.5rem 1rem;
+    }
+    
+    .productos-title {
+        font-size: 1.8rem;
+    }
+    
+    .productos-description {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .productos-form-wrapper {
+        padding: 1.5rem 1rem;
+        max-width: 100%;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.75rem;
+        font-size: 1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .btn-crear {
+        width: 100%;
+        padding: 1rem;
+    }
+    
+    .selector-ingredientes {
+        padding: 1rem;
+    }
+    
+    .selector-ingredientes h3 {
+        font-size: 1.2rem;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .ingredientes-grid {
+        grid-template-columns: 1fr;
+        max-height: 250px;
+        gap: 0.75rem;
+    }
+    
+    .ingrediente-seleccionado {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+    
+    .ingrediente-cantidad-control {
+        width: 100%;
+        justify-content: space-between;
+        padding: 0.75rem;
+    }
+    
+    .cantidad-input {
+        width: 80px;
+    }
+    
+    .productos-table-wrapper {
+        margin-top: 1.5rem;
+    }
+    
+    .table-header-cell,
+    .table-cell {
+        padding: 1rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .card-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .card {
+        padding: 1.25rem;
+    }
+    
+    .card-title {
+        font-size: 1.2rem;
+    }
+}
+
+/* Móviles (480px - 600px) */
+@media (max-width: 600px) {
+    .app-container {
+        padding: 0.5rem;
+    }
+    
+    .productos-container {
+        padding: 1rem 0.75rem;
+        border-radius: 0.75rem;
+    }
+    
+    .productos-title {
+        font-size: 1.5rem;
+    }
+    
+    .productos-description {
+        font-size: 0.9rem;
+    }
+    
+    .productos-form-wrapper {
+        padding: 1rem 0.75rem;
+        border-radius: 0.75rem;
+    }
+    
+    .form-group {
+        gap: 1rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.6rem;
+        font-size: 0.95rem;
+    }
+    
+    .selector-ingredientes {
+        padding: 0.75rem;
+        margin: 1rem 0;
+    }
+    
+    .selector-ingredientes h3 {
+        font-size: 1.1rem;
+    }
+    
+    .ingredientes-busqueda input {
+        padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+        font-size: 0.95rem;
+    }
+    
+    .ingredientes-grid {
+        padding: 0.75rem;
+        max-height: 200px;
+    }
+    
+    .ingrediente-card {
+        padding: 0.75rem;
+    }
+    
+    .ingrediente-nome {
+        font-size: 0.9rem;
+    }
+    
+    .ingrediente-stock {
+        font-size: 0.75rem;
+    }
+    
+    .ingrediente-seleccionado-badge {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .ingrediente-seleccionado {
+        padding: 0.75rem;
+    }
+    
+    .ingrediente-quantidade-control {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .quantidade-input {
+        width: 60px;
+        padding: 0.4rem;
+    }
+    
+    .table-header-cell,
+    .table-cell {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-eliminar {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .card p {
+        font-size: 0.9rem;
+    }
+    
+    .card-link {
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Móviles pequeños (320px - 480px) */
+@media (max-width: 480px) {
+    .app-container {
+        padding: 0.25rem;
+    }
+    
+    .productos-container {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .productos-title {
+        font-size: 1.3rem;
+    }
+    
+    .produtos-description {
+        font-size: 0.85rem;
+    }
+    
+    .produtos-form-wrapper {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-crear {
+        padding: 0.875rem;
+        font-size: 0.9rem;
+    }
+    
+    .selector-ingredientes {
+        padding: 0.5rem;
+    }
+    
+    .selector-ingredientes h3 {
+        font-size: 1rem;
+    }
+    
+    .ingredientes-busqueda input {
+        padding: 0.5rem 0.5rem 0.5rem 2rem;
+        font-size: 0.9rem;
+    }
+    
+    .ingredientes-grid {
+        padding: 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .ingrediente-card {
+        padding: 0.6rem;
+    }
+    
+    .ingrediente-seleccionado {
+        padding: 0.6rem;
+        gap: 0.5rem;
+    }
+    
+    .ingrediente-quantidade-control {
+        padding: 0.4rem 0.5rem;
+        gap: 0.5rem;
+    }
+    
+    .quantidade-input {
+        width: 50px;
+        padding: 0.3rem;
+        font-size: 0.85rem;
+    }
+    
+    .table-header-cell,
+    .table-cell {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.8rem;
+    }
+    
+    .btn-eliminar {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.75rem;
+    }
+    
+    .card {
+        padding: 0.75rem;
+    }
+    
+    .card-title {
+        font-size: 1rem;
+    }
+    
+    .card p {
+        font-size: 0.85rem;
+    }
+    
+    .card-link {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 320px) */
+@media (max-width: 320px) {
+    .produtos-container {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .produtos-title {
+        font-size: 1.2rem;
+    }
+    
+    .produtos-form-wrapper {
+        padding: 0.5rem 0.25rem;
+    }
+    
+    .selector-ingredientes {
+        padding: 0.25rem;
+    }
+    
+    .ingredientes-grid {
+        padding: 0.25rem;
+    }
+    
+    .ingrediente-card {
+        padding: 0.5rem;
+    }
+    
+    .ingrediente-seleccionado {
+        padding: 0.5rem;
+    }
+    
+    .table-header-cell,
+    .table-cell {
+        padding: 0.4rem 0.1rem;
+        font-size: 0.75rem;
+    }
+    
+    .card {
+        padding: 0.5rem;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .ingredientes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        max-height: 200px;
+    }
+    
+    .ingrediente-seleccionado {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .ingrediente-quantidad-control {
+        width: auto;
+        justify-content: flex-end;
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .ingrediente-card,
+    .ingrediente-seleccionado,
+    .btn-crear,
+    .btn-eliminar,
+    .card,
+    .card-link {
+        transition: none;
+    }
+    
+    .ingrediente-seleccionado-badge {
+        animation: none;
+    }
+    
+    .btn-crear::before,
+    .btn-eliminar::before,
+    .ingrediente-card::before,
+    .card::before {
+        transition: none;
+    }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .produtos-container,
+    .produtos-form-wrapper {
+        border: 2px solid var(--produtos-text);
+    }
+    
+    .ingrediente-card {
+        border: 2px solid var(--produtos-border);
+    }
+    
+    .ingrediente-card.seleccionado {
+        border: 3px solid var(--produtos-primary);
+    }
+    
+    .card {
+        border: 2px solid var(--produtos-border);
+    }
+}
+
+/* Pantallas grandes (1400px+) */
+@media (min-width: 1400px) {
+    .produtos-container {
+        max-width: 1400px;
+        padding: 3rem 2rem;
+    }
+    
+    .produtos-title {
+        font-size: 2.5rem;
+    }
+    
+    .produtos-form-wrapper {
+        max-width: 700px;
+        padding: 3rem;
+    }
+    
+    .ingredientes-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        max-height: 400px;
+    }
+    
+    .card-container {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .card {
+        padding: 2rem;
+    }
 }

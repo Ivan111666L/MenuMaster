@@ -113,6 +113,10 @@ class PedidoController
             }
             
             $nuevoPedido = $this->pedidoModel->getPedidoWithDetails($pedidoId);
+            
+            // Imprimir automáticamente en cocina después de crear el pedido
+            $this->imprimirPedidoCocina($nuevoPedido);
+            
             $this->sendResponse(201, "Pedido creado exitosamente", null, $nuevoPedido);
             
         } catch (Exception $e) {
@@ -278,6 +282,29 @@ class PedidoController
         }
     }
     
+    /**
+     * Imprime un pedido automáticamente en cocina (método interno)
+     */
+    private function imprimirPedidoCocina(array $pedido): void
+    {
+        try {
+            // Cargar el gestor de impresión
+            $printerManager = new \App\Utils\PrinterManager();
+            
+            // Imprimir pedido en cocina
+            $resultado = $printerManager->printOrder($pedido);
+            
+            if ($resultado) {
+                error_log("Pedido ID {$pedido['id']} enviado automáticamente a impresión en cocina");
+            } else {
+                error_log("Advertencia: No se pudo imprimir automáticamente el pedido ID {$pedido['id']} en cocina");
+            }
+        } catch (Exception $e) {
+            error_log("Error al imprimir automáticamente en cocina el pedido ID {$pedido['id']}: " . $e->getMessage());
+            // No lanzamos excepción para no interrumpir el flujo principal de creación del pedido
+        }
+    }
+
     /**
      * POST /api/pedidos/{id}/imprimir
      * Imprime un pedido para la cocina

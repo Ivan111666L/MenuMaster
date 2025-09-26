@@ -1,18 +1,16 @@
-import axios from 'axios';
-
-const API_URL = '/api/facturas';
+import api from '@/services/api';
 
 export const getFacturas = async () => {
-  const res = await axios.get(API_URL);
+  const res = await api.get('/facturas');
   return res.data;
 };
 
 export const getFactura = async (id) => {
-  const res = await axios.get(`${API_URL}/${id}`);
+  const res = await api.get(`/facturas/${id}`);
   return res.data;
 };
 
 export const reimprimirFactura = async (id) => {
-  const res = await axios.post(`${API_URL}/${id}/reimprimir`);
+  const res = await api.post(`/facturas/${id}/reimprimir`);
   return res.data;
 };

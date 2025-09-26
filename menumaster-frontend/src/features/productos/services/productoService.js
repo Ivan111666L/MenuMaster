@@ -24,7 +24,7 @@ async function handleRequest(request) {
  */
 const getProductos = async () => {
   try {
-    const response = await api.get('/productos');
+    const response = await api.get('/api/productos');
     if (response.data && response.data.success) {
       return response.data.data;
     } else {
@@ -71,7 +71,7 @@ const getProductoById = async (id) => {
  */
 const createProducto = async (productoData) => {
   try {
-    const response = await api.post('/productos', productoData);
+    const response = await api.post('/api/productos', productoData);
     if (response.data && response.data.success) {
       return { "data": { ...response.data.data } };
     } else {
@@ -136,7 +136,7 @@ const deleteProducto = async (id) => {
  */
 const getCategorias = async () => {
   try {
-    const response = await api.get('/categorias');
+    const response = await api.get('/api/categorias');
     if (response.data && response.data.success) {
       return response.data.data;
     } else {
@@ -159,7 +159,7 @@ const getCategorias = async () => {
  */
 const getIngredientes = async () => {
   try {
-    const response = await api.get('/ingredientes');
+    const response = await api.get('/api/ingredientes');
     if (response.data && response.data.success) {
       return response.data.data;
     } else {

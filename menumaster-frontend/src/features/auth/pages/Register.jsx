@@ -8,7 +8,7 @@ import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 // Importamos el logo
-import MenuMasterLogo from '@/assets/menumaster-logo.svg';
+import MenuMasterLogo from '@/assets/logo.png';
 
 // Define el estado inicial para limpiar el formulario fácilmente
 const estadoInicialFormulario = {

@@ -1,97 +1,955 @@
+/* === MESAS MODULE - RESPONSIVE DESIGN === */
+
+/* === Variables CSS para consistencia === */
+:root {
+    --mesas-primary: #4F46E5;
+    --mesas-primary-dark: #4338CA;
+    --mesas-primary-light: #EEF2FF;
+    --mesas-success: #10B981;
+    --mesas-success-light: #D1FAE5;
+    --mesas-warning: #F59E0B;
+    --mesas-warning-light: #FEF3C7;
+    --mesas-danger: #EF4444;
+    --mesas-danger-light: #FEE2E2;
+    --mesas-text: #1F2937;
+    --mesas-text-light: #6B7280;
+    --mesas-text-muted: #9CA3AF;
+    --mesas-border: #E5E7EB;
+    --mesas-border-light: #F3F4F6;
+    --mesas-surface: #FFFFFF;
+    --mesas-background: #F9FAFB;
+    --mesas-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    --mesas-shadow-hover: 0 8px 16px rgba(0,0,0,0.12);
+    --mesas-shadow-medium: 0 6px 20px rgba(0,0,0,0.1);
+    --mesas-radius: 1rem;
+    --mesas-radius-small: 0.5rem;
+    --mesas-spacing: 1rem;
+    --mesas-spacing-large: 2rem;
+}
+
+/* === CONTENEDOR PRINCIPAL === */
 .gestion-mesas-app {
-    padding: 2rem;
+    background: var(--mesas-background);
+    min-height: 100vh;
+    padding: var(--mesas-spacing-large);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .gestion-mesas-container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: var(--mesas-spacing-large);
 }
 
+/* === HEADER Y CONTROLES === */
 .header-controles {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem;
-    background-color: var(--color-surface);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-small);
+    padding: var(--mesas-spacing-large);
+    background: linear-gradient(135deg, var(--mesas-surface), #FAFBFC);
+    border-radius: var(--mesas-radius);
+    box-shadow: var(--mesas-shadow-medium);
+    border: 1px solid var(--mesas-border);
+    position: relative;
+    overflow: hidden;
+}
+
+.header-controles::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--mesas-primary), var(--mesas-primary-dark));
 }
 
 .header-controles h1 {
     margin: 0;
-    font-size: 1.8rem;
-    color: var(--color-text-primary);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--mesas-text);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    line-height: 1.2;
 }
 
+.header-controles h1::before {
+    content: '🍽️';
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.header-stats {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: var(--mesas-surface);
+    border-radius: var(--mesas-radius-small);
+    border: 2px solid var(--mesas-border);
+    box-shadow: var(--mesas-shadow);
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--mesas-shadow-hover);
+    border-color: var(--mesas-primary);
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--mesas-primary);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--mesas-text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+}
+
+/* === FILTROS Y CONTROLES === */
+.filtros-container {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--mesas-surface);
+    border-radius: var(--mesas-radius);
+    box-shadow: var(--mesas-shadow);
+    border: 1px solid var(--mesas-border);
+    flex-wrap: wrap;
+}
+
+.filtro-grupo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.filtro-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--mesas-text);
+    white-space: nowrap;
+}
+
+.filtro-select {
+    padding: 0.6rem 1rem;
+    border: 2px solid var(--mesas-border);
+    border-radius: var(--mesas-radius-small);
+    background: var(--mesas-surface);
+    color: var(--mesas-text);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.filtro-select:focus {
+    outline: none;
+    border-color: var(--mesas-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.btn-refresh {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, var(--mesas-primary), var(--mesas-primary-dark));
+    color: white;
+    border: none;
+    border-radius: var(--mesas-radius-small);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-refresh::before {
+    content: '🔄';
+    font-size: 1rem;
+}
+
+.btn-refresh:hover {
+    background: linear-gradient(135deg, var(--mesas-primary-dark), #3730A3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+}
+
+/* === CONTENEDOR DE MESAS === */
 .mesa-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 1.5rem;
+    padding: 0.5rem;
 }
 
+/* === TARJETAS DE MESA === */
 .mesa-card {
-    background: var(--color-surface);
-    border-radius: var(--border-radius);
-    padding: 1.5rem;
-    box-shadow: var(--shadow-medium);
+    background: var(--mesas-surface);
+    border-radius: var(--mesas-radius);
+    padding: 1.75rem;
+    box-shadow: var(--mesas-shadow);
     cursor: pointer;
-    border-left: 8px solid;
-    transition: transform 0.2s, box-shadow 0.2s;
+    border-left: 6px solid;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.mesa-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(79, 70, 229, 0.05));
+    border-radius: 0 var(--mesas-radius) 0 100%;
+    transition: all 0.3s ease;
 }
 
 .mesa-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
+    box-shadow: var(--mesas-shadow-hover);
+}
+
+.mesa-card:hover::before {
+    width: 80px;
+    height: 80px;
+}
+
+.mesa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
 }
 
 .mesa-card h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    color: var(--color-text-primary);
-    font-size: 1.5rem;
+    margin: 0;
+    color: var(--mesas-text);
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.2;
+}
+
+.mesa-card h3::before {
+    content: '🪑';
+    font-size: 1.4rem;
+}
+
+.mesa-numero {
+    background: var(--mesas-primary-light);
+    color: var(--mesas-primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.mesa-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex-grow: 1;
 }
 
 .mesa-card p {
-    color: var(--color-text-secondary);
-    margin: 0.25rem 0;
+    color: var(--mesas-text-light);
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    line-height: 1.4;
+}
+
+.mesa-card p strong {
+    color: var(--mesas-text);
+    font-weight: 600;
+}
+
+.mesa-capacidad::before {
+    content: '👥';
+    font-size: 1rem;
+}
+
+.mesa-ubicacion::before {
+    content: '📍';
+    font-size: 1rem;
+}
+
+.mesa-tiempo::before {
+    content: '⏰';
+    font-size: 1rem;
 }
 
 .mesa-card .estado-badge {
-    font-weight: bold;
-    text-transform: capitalize;
-    margin-top: 1.5rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    display: inline-block;
-    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: auto;
+    padding: 0.75rem 1.25rem;
+    border-radius: 25px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-/* Colores de estado */
-.mesa-card.disponible { border-color: var(--color-success); }
-.mesa-card.disponible .estado-badge { color: #059669; background-color: #d1fae5; }
+.estado-badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    transition: left 0.5s;
+}
 
-.mesa-card.ocupada { border-color: #f59e0b; }
-.mesa-card.ocupada .estado-badge { color: #b45309; background-color: #fef3c7; }
+.estado-badge:hover::before {
+    left: 100%;
+}
 
-.mesa-card.reservada { border-color: var(--color-error); }
-.mesa-card.reservada .estado-badge { color: #b91c1c; background-color: #fee2e2; }
+/* === ESTADOS DE MESA === */
+.mesa-card.disponible { 
+    border-left-color: var(--mesas-success);
+}
 
-.loader-container, .no-mesas {
+.mesa-card.disponible .estado-badge { 
+    color: #065F46; 
+    background: linear-gradient(135deg, var(--mesas-success-light), #A7F3D0);
+    border: 2px solid var(--mesas-success);
+}
+
+.mesa-card.disponible .estado-badge::after {
+    content: '✅';
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.mesa-card.ocupada { 
+    border-left-color: var(--mesas-warning);
+}
+
+.mesa-card.ocupada .estado-badge { 
+    color: #92400E; 
+    background: linear-gradient(135deg, var(--mesas-warning-light), #FDE68A);
+    border: 2px solid var(--mesas-warning);
+}
+
+.mesa-card.ocupada .estado-badge::after {
+    content: '🔄';
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.mesa-card.reservada { 
+    border-left-color: var(--mesas-danger);
+}
+
+.mesa-card.reservada .estado-badge { 
+    color: #991B1B; 
+    background: linear-gradient(135deg, var(--mesas-danger-light), #FECACA);
+    border: 2px solid var(--mesas-danger);
+}
+
+.mesa-card.reservada .estado-badge::after {
+    content: '📅';
+    margin-left: 0.5rem;
+    font-size: 0.9rem;
+}
+
+/* === ESTADOS DE CARGA === */
+.loader-container, 
+.no-mesas {
     text-align: center;
-    font-size: 1.2rem;
-    color: var(--color-text-secondary);
-    padding: 3rem;
-    grid-column: 1 / -1; /* Ocupa todo el ancho del grid */
+    font-size: 1.3rem;
+    color: var(--mesas-text-light);
+    padding: 4rem 2rem;
+    grid-column: 1 / -1;
+    background: var(--mesas-surface);
+    border-radius: var(--mesas-radius);
+    box-shadow: var(--mesas-shadow);
+    border: 2px dashed var(--mesas-border);
 }
 
-/* ... (Los estilos que te proporcioné en la respuesta anterior) ... */
-.gestion-mesas-app {
-    padding: 2rem;
-}
-.header-controles {
+.loader-container {
     display: flex;
-    justify-content: space-between;
-    /* ... etc ... */
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--mesas-border);
+    border-top: 4px solid var(--mesas-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.no-mesas::before {
+    content: '🍽️';
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* === ACCIONES DE MESA === */
+.mesa-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--mesas-border-light);
+}
+
+.btn-mesa {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: var(--mesas-radius-small);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-mesa::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn-mesa:hover::before {
+    left: 100%;
+}
+
+.btn-ocupar {
+    background: linear-gradient(135deg, var(--mesas-warning), #D97706);
+    color: white;
+}
+
+.btn-ocupar:hover {
+    background: linear-gradient(135deg, #D97706, #B45309);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(245, 158, 11, 0.3);
+}
+
+.btn-liberar {
+    background: linear-gradient(135deg, var(--mesas-success), #059669);
+    color: white;
+}
+
+.btn-liberar:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(16, 185, 129, 0.3);
+}
+
+.btn-reservar {
+    background: linear-gradient(135deg, var(--mesas-danger), #DC2626);
+    color: white;
+}
+
+.btn-reservar:hover {
+    background: linear-gradient(135deg, #DC2626, #B91C1C);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(239, 68, 68, 0.3);
+}
+
+/* === RESPONSIVE DESIGN === */
+
+/* Tablets grandes (1024px - 1200px) */
+@media (max-width: 1200px) {
+    .gestion-mesas-container {
+        max-width: 95%;
+    }
+    
+    .mesa-container {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.25rem;
+    }
+    
+    .header-stats {
+        gap: 1rem;
+    }
+    
+    .stat-item {
+        padding: 0.75rem 1rem;
+        min-width: 80px;
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+    }
+}
+
+/* Tablets (768px - 1024px) */
+@media (max-width: 1024px) {
+    .gestion-mesas-app {
+        padding: 1.5rem;
+    }
+    
+    .header-controles {
+        padding: 1.5rem;
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+    }
+    
+    .header-controles h1 {
+        font-size: 2rem;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .header-stats {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .mesa-container {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    .filtros-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+    
+    .filtro-grupo {
+        justify-content: space-between;
+    }
+    
+    .filtro-select {
+        min-width: 150px;
+    }
+}
+
+/* Tablets pequeñas y móviles grandes (600px - 768px) */
+@media (max-width: 768px) {
+    .gestion-mesas-app {
+        padding: 1rem;
+    }
+    
+    .gestion-mesas-container {
+        gap: 1.5rem;
+    }
+    
+    .header-controles {
+        padding: 1.25rem;
+    }
+    
+    .header-controles h1 {
+        font-size: 1.8rem;
+    }
+    
+    .header-stats {
+        gap: 0.75rem;
+    }
+    
+    .stat-item {
+        padding: 0.6rem 0.75rem;
+        min-width: 70px;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .mesa-container {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .mesa-card {
+        padding: 1.5rem;
+    }
+    
+    .mesa-card h3 {
+        font-size: 1.4rem;
+    }
+    
+    .mesa-actions {
+        flex-direction: column;
+    }
+    
+    .btn-mesa {
+        padding: 0.75rem;
+    }
+    
+    .filtros-container {
+        padding: 1rem;
+    }
+    
+    .btn-refresh {
+        padding: 0.75rem 1.25rem;
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Móviles (480px - 600px) */
+@media (max-width: 600px) {
+    .gestion-mesas-app {
+        padding: 0.75rem;
+    }
+    
+    .header-controles {
+        padding: 1rem;
+        border-radius: 0.75rem;
+    }
+    
+    .header-controles h1 {
+        font-size: 1.6rem;
+    }
+    
+    .header-stats {
+        gap: 0.5rem;
+    }
+    
+    .stat-item {
+        padding: 0.5rem;
+        min-width: 60px;
+        border-radius: 0.375rem;
+    }
+    
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .mesa-card {
+        padding: 1.25rem;
+        border-radius: 0.75rem;
+    }
+    
+    .mesa-card h3 {
+        font-size: 1.3rem;
+    }
+    
+    .mesa-card p {
+        font-size: 0.9rem;
+    }
+    
+    .estado-badge {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .filtros-container {
+        padding: 0.75rem;
+        border-radius: 0.75rem;
+    }
+    
+    .filtro-select {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-refresh {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+}
+
+/* Móviles pequeños (320px - 480px) */
+@media (max-width: 480px) {
+    .gestion-mesas-app {
+        padding: 0.5rem;
+    }
+    
+    .gestion-mesas-container {
+        gap: 1rem;
+    }
+    
+    .header-controles {
+        padding: 0.75rem;
+    }
+    
+    .header-controles h1 {
+        font-size: 1.4rem;
+    }
+    
+    .header-stats {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+    
+    .stat-item {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.75rem;
+        min-width: auto;
+        width: 100%;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        margin-top: 0;
+        text-transform: none;
+    }
+    
+    .mesa-card {
+        padding: 1rem;
+    }
+    
+    .mesa-card h3 {
+        font-size: 1.2rem;
+    }
+    
+    .mesa-card p {
+        font-size: 0.85rem;
+    }
+    
+    .mesa-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .mesa-numero {
+        align-self: flex-end;
+    }
+    
+    .estado-badge {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.75rem !important;
+    }
+    
+    .mesa-actions {
+        gap: 0.5rem;
+    }
+    
+    .btn-mesa {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .filtros-container {
+        padding: 0.5rem;
+    }
+    
+    .filtro-select {
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        min-width: 120px;
+    }
+    
+    .btn-refresh {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+    }
+}
+
+/* Móviles muy pequeños (hasta 320px) */
+@media (max-width: 320px) {
+    .gestion-mesas-app {
+        padding: 0.25rem;
+    }
+    
+    .header-controles {
+        padding: 0.5rem;
+    }
+    
+    .header-controles h1 {
+        font-size: 1.2rem;
+    }
+    
+    .mesa-card {
+        padding: 0.75rem;
+    }
+    
+    .mesa-card h3 {
+        font-size: 1.1rem;
+    }
+    
+    .mesa-card p {
+        font-size: 0.8rem;
+    }
+    
+    .estado-badge {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .btn-mesa {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+    }
+    
+    .filtro-select {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.75rem;
+        min-width: 100px;
+    }
+}
+
+/* Orientación landscape en móviles */
+@media (max-width: 768px) and (orientation: landscape) {
+    .mesa-container {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+    
+    .header-controles {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .header-stats {
+        flex-direction: row;
+    }
+    
+    .stat-item {
+        flex-direction: column;
+        min-width: 60px;
+    }
+    
+    .mesa-actions {
+        flex-direction: row;
+    }
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    .mesa-card,
+    .btn-mesa,
+    .btn-refresh,
+    .stat-item,
+    .estado-badge {
+        transition: none;
+    }
+    
+    .loader-spinner {
+        animation: none;
+    }
+    
+    .estado-badge::before,
+    .btn-mesa::before {
+        transition: none;
+    }
+}
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .mesa-card {
+        border: 2px solid var(--mesas-border);
+    }
+    
+    .header-controles {
+        border: 2px solid var(--mesas-border);
+    }
+    
+    .filtros-container {
+        border: 2px solid var(--mesas-border);
+    }
+    
+    .estado-badge {
+        border-width: 3px !important;
+    }
+}
+
+/* Pantallas grandes (1400px+) */
+@media (min-width: 1400px) {
+    .gestion-mesas-container {
+        max-width: 1600px;
+    }
+    
+    .gestion-mesas-app {
+        padding: 3rem;
+    }
+    
+    .header-controles {
+        padding: 2.5rem;
+    }
+    
+    .header-controles h1 {
+        font-size: 2.5rem;
+    }
+    
+    .mesa-container {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 2rem;
+    }
+    
+    .mesa-card {
+        padding: 2rem;
+    }
+    
+    .stat-item {
+        padding: 1.25rem 1.75rem;
+        min-width: 120px;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
 }

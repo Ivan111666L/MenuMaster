@@ -64,7 +64,7 @@ const pedidoService = {
      * Obtiene el ticket HTML de un pedido por su ID
      */
     getPedidoTicket: async (pedidoId) => {
-        const response = await api.get(`/imprimir_pedido.php?id=${pedidoId}`);
+        const response = await api.get(`/api/imprimir_pedido.php?id=${pedidoId}`);
         return response.data.data ? response.data.data : response.data;
     },
 };

@@ -1,13 +1,10 @@
-import axios from 'axios';
-
-const API_URL = 'http://localhost/MenuMaster/menumaster-backend';
+import api from '@/services/api';
 
 // Obtener resumen de ventas diarias
 export const getResumenVentas = async (fechaInicio, fechaFin) => {
   try {
-    const response = await axios.get(`${API_URL}/cuadre_diario/resumen-ventas`, {
-      params: { fecha_inicio: fechaInicio, fecha_fin: fechaFin },
-      withCredentials: true
+    const response = await api.get('/cuadre_diario/resumen-ventas', {
+      params: { fecha_inicio: fechaInicio, fecha_fin: fechaFin }
     });
     return response.data;
   } catch (error) {

@@ -1,23 +1,21 @@
-import axios from 'axios';
-
-const API_URL = '/api/pagos';
+import api from '@/services/api';
 
 export const getPagos = async () => {
-  const res = await axios.get(API_URL);
+  const res = await api.get('/pagos');
   return res.data;
 };
 
 export const createPago = async (data) => {
-  const res = await axios.post(API_URL, data);
+  const res = await api.post('/pagos', data);
   return res.data;
 };
 
 export const getMetodosPago = async () => {
-  const res = await axios.get(`${API_URL}/metodos`);
+  const res = await api.get('/pagos/metodos');
   return res.data;
 };
 
 export const createMetodoPago = async (data) => {
-  const res = await axios.post(`${API_URL}/metodos`, data);
+  const res = await api.post('/pagos/metodos', data);
   return res.data;
 };

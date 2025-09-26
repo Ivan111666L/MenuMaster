@@ -3,7 +3,7 @@ import api from './api';
 export const getProductos = async () => {
   try {
     // Modificamos para obtener todos los productos activos sin filtros
-    const response = await api.get('/productos?todos=true');
+    const response = await api.get('/api/productos?todos=true');
     
     // Aseguramos que todos los productos estén disponibles
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -25,7 +25,7 @@ export const getProductos = async () => {
 
 export const getProductoById = async (id) => {
   try {
-    const response = await api.get(`/productos/${id}`);
+    const response = await api.get(`/api/productos/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener producto ${id}:`, error);
@@ -35,7 +35,7 @@ export const getProductoById = async (id) => {
 
 export const getProductosByCategoria = async (categoriaId) => {
   try {
-    const response = await api.get(`/productos/categoria/${categoriaId}`);
+    const response = await api.get(`/api/productos/categoria/${categoriaId}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener productos de la categoría ${categoriaId}:`, error);
@@ -45,7 +45,7 @@ export const getProductosByCategoria = async (categoriaId) => {
 
 export const getCategorias = async () => {
   try {
-    const response = await api.get('/categorias');
+    const response = await api.get('/api/categorias');
     return response.data.data;
   } catch (error) {
     console.error("Error al obtener categorías:", error);

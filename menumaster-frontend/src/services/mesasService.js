@@ -3,7 +3,7 @@ import api from './api';
 export const getMesas = async () => {
   try {
     // Obtenemos todas las mesas sin filtrar por estado
-    const response = await api.get('/mesas?todas=true');
+    const response = await api.get('/api/mesas?todas=true');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -22,7 +22,7 @@ export const getMesas = async () => {
 
 export const getMesaById = async (id) => {
   try {
-    const response = await api.get(`/mesas/${id}`);
+    const response = await api.get(`/api/mesas/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener mesa ${id}:`, error);
@@ -32,7 +32,7 @@ export const getMesaById = async (id) => {
 
 export const getMesasDisponibles = async () => {
   try {
-    const response = await api.get('/mesas/disponibles');
+    const response = await api.get('/api/mesas/disponibles');
     
     // Verificamos la estructura de la respuesta
     if (response.data && response.data.data && Array.isArray(response.data.data)) {
@@ -51,7 +51,7 @@ export const getMesasDisponibles = async () => {
 
 export const cambiarEstadoMesa = async (id, estado) => {
   try {
-    const response = await api.patch(`/mesas/${id}/estado`, { estado });
+    const response = await api.patch(`/api/mesas/${id}/estado`, { estado });
     return response.data;
   } catch (error) {
     console.error(`Error al cambiar estado de la mesa ${id}:`, error);
@@ -61,7 +61,7 @@ export const cambiarEstadoMesa = async (id, estado) => {
 
 export const deleteMesa = async (id) => {
   try {
-    await api.delete(`/mesas/${id}`);
+    await api.delete(`/api/mesas/${id}`);
   } catch (error) {
     console.error(`Error al eliminar la mesa ${id}:`, error);
     throw error;

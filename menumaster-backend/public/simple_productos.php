@@ -14,9 +14,9 @@ $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
 $dotenv->load();
 require_once __DIR__ . '/../App/config/conexionDb.php';
 
-use app\config\ConexionDb;
-use app\Models\ProductoModel;
-use app\Models\ProductoIngredientesModel;
+use App\config\ConexionDb;
+use App\Models\ProductoModel;
+use App\Models\ProductoIngredientesModel;
 
 try {
     $db = ConexionDb::getConnection();

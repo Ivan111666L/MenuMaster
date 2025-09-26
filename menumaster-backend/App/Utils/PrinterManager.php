@@ -102,10 +102,6 @@ class PrinterManager
      */
     public function printOrder(array $pedido)
     {
-        if (!$this->isEnabled) {
-            return false;
-        }
-        
         try {
             $content = $this->formatOrderContent($pedido);
             return $this->sendToPrinter($content);

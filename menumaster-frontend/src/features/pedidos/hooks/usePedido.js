@@ -35,6 +35,9 @@ const imprimirContenido = (contenido) => {
 // ---------------------------------------------
 
 export const usePedido = () => {
+    // --- Hooks ---
+    const { showWarning, showSuccess, showError } = useNotifications();
+    
     // --- Estados ---
     const [productos, setProductos] = useState([]);
     const [mesas, setMesas] = useState([]);
@@ -109,7 +112,7 @@ export const usePedido = () => {
 
     const savePedido = async () => {
         if (!pedidoActual.mesa_id || pedidoActual.items.length === 0) {
-            toast.warn('Por favor, selecciona una mesa y agrega al menos un producto.');
+            showWarning('Por favor, selecciona una mesa y agrega al menos un producto.');
             return;
         }
         try {
@@ -119,10 +122,10 @@ export const usePedido = () => {
             const ticketData = await pedidoService.getPedidoTicket(pedidoCreado.id);
             setTicketHtml(ticketData.html);
             setTicketOpen(true);
-            toast.success('¡Pedido enviado a cocina exitosamente!');
+            showSuccess('¡Pedido enviado a cocina exitosamente!');
             setPedidoActual({ mesa_id: '', items: [], notas: '' });
         } catch (err) {
-            toast.error(err.response?.data?.error || 'Error al enviar el pedido.');
+            showError(err.response?.data?.error || 'Error al enviar el pedido.');
         } finally {
             setLoading(false);
         }
