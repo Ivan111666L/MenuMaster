@@ -35,6 +35,12 @@ import ConfiguracionMesas from '@/features/configuracion/pages/ConfiguracionMesa
 
 // Módulo de Análisis Avanzado
 import AnalisisModule from '@/features/analisis';
+// Nuevos módulos para acceso completo del administrador
+import CategoriaModule from '@/features/categorias/CategoriaModule.jsx';
+import NotificacionesModule from '@/features/notificaciones/NotificacionesModule.jsx';
+import PagoModule from '@/features/pagos/PagoModule.jsx';
+import ProveedoresLista from '@/features/proveedores/pages/ProveedoresLista.jsx';
+import MenuDelDia from '@/features/cocina/pages/MenuDelDia.jsx';
 
 
 const router = createBrowserRouter([
@@ -179,6 +185,47 @@ const router = createBrowserRouter([
             element: (
               <PrivateRoute roles={['administrador']}>
                 <AnalisisModule />
+              </PrivateRoute>
+            ),
+          },
+          // --- Accesos adicionales para administrador ---
+          {
+            path: 'categorias/*',
+            element: (
+              <PrivateRoute roles={['administrador']}>
+                <CategoriaModule />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'notificaciones/*',
+            element: (
+              <PrivateRoute roles={['administrador']}>
+                <NotificacionesModule />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'pagos/*',
+            element: (
+              <PrivateRoute roles={['administrador']}>
+                <PagoModule />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'proveedores',
+            element: (
+              <PrivateRoute roles={['administrador']}>
+                <ProveedoresLista />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'cocina/menudeldia',
+            element: (
+              <PrivateRoute roles={['administrador', 'cocinero']}>
+                <MenuDelDia />
               </PrivateRoute>
             ),
           },

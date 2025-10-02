@@ -61,6 +61,8 @@ function Navbar() {
                     roleLinks.map((item) => (
                         <li key={item.to}>
                             <Link to={item.to} className="nav-link">{item.label}</Link>
+                            <Link to="/pedidos" className="nav-link">Pedidos</Link>
+                            <Link to="/contacto" className="nav-link">Contacto</Link>
                         </li>
                     ))
                 ) : (
@@ -68,6 +70,10 @@ function Navbar() {
                     <>
                         <li>
                             <Link to="/home" className="nav-link">Inicio</Link>
+                            <Link to="/login" className="nav-link">Iniciar Sesión</Link>
+                            <Link to="/register" className="nav-link">Registrarse</Link>
+                            <Link to="/contacto" className="nav-link">Contacto</Link>
+                            <Link to="/sobre-nosotros" className="nav-link">Sobre Nosotros</Link>
                         </li>
                     </>
                 )}
@@ -82,6 +88,7 @@ function Navbar() {
                     </div>
                 ) : (
                     <Link to="/login" className="nav-link login-link">Iniciar Sesión</Link>
+                    
                 )}
             </div>
         </nav>

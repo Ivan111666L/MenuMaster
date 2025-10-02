@@ -21,7 +21,6 @@ function Dashboard() {
             case 'cocinero':
                 return <CookDashboard />;
             case 'administrador':
-            case 'admin':
             default:
                 // Para administradores y roles no especificados, mostrar dashboard completo
                 return <AdminDashboard />;

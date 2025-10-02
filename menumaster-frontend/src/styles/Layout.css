@@ -49,7 +49,7 @@
 }
 
 .sidebar-header {
-    padding: 1.5rem 1rem;
+    padding: 1rem 0.75rem;
     border-bottom: 1px solid rgba(219, 143, 55, 0.1);
     display: flex;
     align-items: center;
@@ -58,10 +58,11 @@
 }
 
 .sidebar-logo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border: 2px solid rgba(255,255,255,0.2);
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
 }
 
 .sidebar-title {
@@ -153,9 +154,10 @@
     background: var(--primary-color);
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    border-radius: 24px;
+    width: auto;
+    height: 40px;
+    padding: 0 12px;
     font-size: 1.2rem;
     cursor: pointer;
     box-shadow: var(--shadow-medium);
@@ -330,9 +332,10 @@
 /* Móviles y tablets pequeñas */
 @media (max-width: 768px) {
     .sidebar-toggle {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
+        gap: 8px;
     }
     
     .sidebar-overlay {
@@ -376,11 +379,11 @@
     }
     
     .sidebar-link {
-        padding: 1rem 1.5rem;
+        padding: 1rem 1.25rem;
         margin-right: 0;
         border-radius: 0;
     }
-    
+
     .sidebar-header {
         padding: 1rem;
     }

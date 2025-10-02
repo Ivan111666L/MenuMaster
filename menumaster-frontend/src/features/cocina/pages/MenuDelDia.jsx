@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import menuDelDiaService from '@/features/cocina/services/menuDelDiaService';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
-import '@/cocina.css'; // Estilos dedicados para esta página
+import '@/styles/cocina.css'; // Estilos dedicados para esta página
 
 function MenuDelDia() {
     // --- Estados del Componente ---

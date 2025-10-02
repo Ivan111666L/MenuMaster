@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AuthContext } from '../context/AuthContext'; // Asegúrate que la ruta sea correcta
+import { AuthContext } from '@/context/AuthContext'; // Asegúrate que la ruta sea correcta
 
 /**
  * Hook personalizado para acceder al contexto de autenticación.

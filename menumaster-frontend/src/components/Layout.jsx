@@ -5,7 +5,7 @@ import permisosService from "@/services/permisosService.js";
 import {
   FaHome, FaClipboardList, FaBoxes, FaFileInvoiceDollar,
   FaChartBar, FaCog, FaSignOutAlt, FaUtensils, FaTable,
-  FaBars, FaTimes, FaUsers, FaTruck
+  FaBars, FaTimes, FaUsers, FaTruck, FaBell, FaCreditCard, FaTags
 } from "react-icons/fa";
 import "@/styles/global.css";
 import "@/styles/Layout.css";
@@ -18,20 +18,27 @@ const Layout = () => {
     const [userPermissions, setUserPermissions] = useState({});
     const [loading, setLoading] = useState(true);
     const location = useLocation();
-
     // Obtenemos el usuario y la función de logout directamente del contexto
     const { user, logout } = useAuth();
 
     // BUG CORREGIDO: Usamos 'user.rol' en lugar de 'user.role' para coincidir con la API
     const rol = user?.rol;
 
+
+    // Menús derivados por permisos/rol se calculan más abajo con getMenuItems()
     // Cargar permisos del usuario al montar el componente
     useEffect(() => {
         const loadUserPermissions = async () => {
             if (user) {
                 try {
                     const permissions = await permisosService.getPermissionsByModule();
-                    setUserPermissions(permissions);
+                    // Si no hay permisos definidos, usar permisos básicos por rol para garantizar visibilidad
+                    if (!permissions || Object.keys(permissions).length === 0) {
+                        const basicPermissions = getBasicPermissionsByRole(user.rol);
+                        setUserPermissions(basicPermissions);
+                    } else {
+                        setUserPermissions(permissions);
+                    }
                 } catch (error) {
                     console.error('Error al cargar permisos:', error);
                     // En caso de error, usar permisos básicos basados en el rol
@@ -182,7 +189,7 @@ const Layout = () => {
                 path: "/analisis", 
                 label: "Análisis Avanzado", 
                 icon: <FaChartBar />, 
-                module: "reportes", 
+                module: "analisis", 
                 action: "ver",
                 roles: ["administrador"]
             },
@@ -195,10 +202,42 @@ const Layout = () => {
                 roles: ["administrador"]
             },
             { 
-                path: "/usuarios", 
+                path: "/configuracion/usuarios", 
                 label: "Usuarios", 
                 icon: <FaUsers />, 
                 module: "usuarios", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/categorias", 
+                label: "Categorías", 
+                icon: <FaTags />, 
+                module: "categorias", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/notificaciones", 
+                label: "Notificaciones", 
+                icon: <FaBell />, 
+                module: "notificaciones", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/pagos", 
+                label: "Pagos", 
+                icon: <FaCreditCard />, 
+                module: "pagos", 
+                action: "ver",
+                roles: ["administrador"]
+            },
+            { 
+                path: "/proveedores", 
+                label: "Proveedores", 
+                icon: <FaTruck />, 
+                module: "proveedores", 
                 action: "ver",
                 roles: ["administrador"]
             },
@@ -214,11 +253,12 @@ const Layout = () => {
 
         // Filtrar menús basado en rol y permisos
         return allMenuItems.filter(item => {
-            // Verificar si el rol tiene acceso básico
-            if (!item.roles.includes(rol?.toLowerCase())) return false;
+            // Administrador siempre ve todas las secciones
+            const isAdmin = rol?.toLowerCase() === 'administrador';
+            if (!isAdmin && !item.roles.includes(rol?.toLowerCase())) return false;
             
             // Verificar permisos específicos del usuario
-            return hasModulePermission(item.module, item.action);
+            return isAdmin ? true : hasModulePermission(item.module, item.action);
         });
     };
 
@@ -272,6 +312,7 @@ const Layout = () => {
                                     <span className="sidebar-icon">{item.icon}</span> 
                                     <span className="sidebar-label">{item.label}</span>
                                 </Link>
+                        
                             </li>
                         ))}
                     </ul>

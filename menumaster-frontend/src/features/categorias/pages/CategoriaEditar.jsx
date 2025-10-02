@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCategoria, updateCategoria } from '../services/categoriaService';
+import { getCategoriaById, updateCategoria } from '../services/categoriaService';
 import Button from '@/components/Button';
 
 function CategoriaEditar({ categoriaId, onSuccess }) {
@@ -9,7 +9,7 @@ function CategoriaEditar({ categoriaId, onSuccess }) {
 
   useEffect(() => {
     if (categoriaId) {
-      getCategoria(categoriaId)
+      getCategoriaById(categoriaId)
         .then(cat => setNombre(cat.nombre))
         .catch(() => setError('Error al cargar la categoría'))
         .finally(() => setLoading(false));
