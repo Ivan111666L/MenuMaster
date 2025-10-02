@@ -1,5 +1,5 @@
 import React from 'react';
-import DashboardAdmin from './pages/DashboardAdmin';
+import DashboardAdmin from '@/features/dashboard/pages/DashboardAdmin';
 
 function DashboardModule() {
   return <DashboardAdmin />;

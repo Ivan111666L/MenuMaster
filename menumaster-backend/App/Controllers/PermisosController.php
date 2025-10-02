@@ -33,9 +33,8 @@ class PermisosController extends Controller
             }
 
             $stmt = $this->db->prepare("
-                SELECT id, nombre, descripcion, modulo, accion, estado_id, created_at
+                SELECT id, nombre, descripcion, modulo, accion, created_at
                 FROM permisos 
-                WHERE estado_id = 1
                 ORDER BY modulo, nombre
             ");
             
@@ -197,8 +196,8 @@ class PermisosController extends Controller
             }
 
             $stmt = $this->db->prepare("
-                INSERT INTO permisos (nombre, descripcion, modulo, accion, estado_id, created_at)
-                VALUES (:nombre, :descripcion, :modulo, :accion, 1, NOW())
+                INSERT INTO permisos (nombre, descripcion, modulo, accion, created_at)
+                VALUES (:nombre, :descripcion, :modulo, :accion, NOW())
             ");
             
             $stmt->execute([
@@ -337,7 +336,7 @@ class PermisosController extends Controller
 
     private function permisoExists(int $permisoId): bool
     {
-        $stmt = $this->db->prepare("SELECT id FROM permisos WHERE id = :id AND estado_id = 1 LIMIT 1");
+        $stmt = $this->db->prepare("SELECT id FROM permisos WHERE id = :id LIMIT 1");
         $stmt->execute([':id' => $permisoId]);
         return $stmt->fetch() !== false;
     }

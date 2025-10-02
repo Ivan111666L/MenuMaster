@@ -26,9 +26,9 @@ class Config {
 
     public static function getJwtConfig() {
         return [
-            "secret" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MenuMaster2024!", // Secure JWT secret key
+            "secret" => $_ENV['JWT_SECRET_KEY'] ?? "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.MenuMaster2024!", // Use env variable or fallback
             "algorithm" => "HS256",
-            "expiration" => 3600 // 1 hora
+            "expiration" => (int)($_ENV['JWT_EXPIRES_SECONDS'] ?? 3600) // 1 hora
         ];
     }
 }

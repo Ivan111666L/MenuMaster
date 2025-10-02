@@ -13,15 +13,39 @@ function Navbar() {
     // Obtenemos todo lo necesario del contexto de autenticación.
     const { isAuthenticated, user, rol, logout } = useAuth();
 
-    // CORRECCIÓN: Lógica de enrutamiento simplificada.
-    // Mapeamos cada rol a su ruta de dashboard principal.
-    const dashboardLinks = {
-        administrador: "/dashboard", // O la ruta principal de admin
-        mesero: "/mesas",          // O la ruta principal de mesero
-        cocinero: "/cocina"        // O la ruta principal de cocinero
+    // Enlaces por rol para navegar por los módulos principales
+    const navLinksByRole = {
+        administrador: [
+            { to: '/dashboard', label: 'Dashboard' },
+            { to: '/mesas', label: 'Mesas' },
+            { to: '/pedidos', label: 'Pedidos' },
+            { to: '/cocina', label: 'Cocina' },
+            { to: '/inventario', label: 'Inventario' },
+            { to: '/productos', label: 'Productos' },
+            { to: '/facturacion', label: 'Facturación' },
+            { to: '/analisis', label: 'Análisis' },
+            { to: '/configuracion', label: 'Configuración' }
+        ],
+        mesero: [
+            { to: '/dashboard', label: 'Dashboard' },
+            { to: '/mesas', label: 'Mesas' },
+            { to: '/pedidos', label: 'Pedidos' },
+            { to: '/facturacion', label: 'Facturación' }
+        ],
+        cocinero: [
+            { to: '/dashboard', label: 'Dashboard' },
+            { to: '/cocina', label: 'Cocina' },
+            { to: '/inventario', label: 'Inventario' },
+            { to: '/productos', label: 'Productos' }
+        ],
+        cajero: [
+            { to: '/dashboard', label: 'Dashboard' },
+            { to: '/facturacion', label: 'Facturación' },
+            { to: '/pedidos', label: 'Pedidos' }
+        ]
     };
-
-    const userDashboardPath = rol ? dashboardLinks[rol] : null;
+    const roleKey = rol ? rol.toLowerCase() : null;
+    const roleLinks = roleKey ? (navLinksByRole[roleKey] || []) : [];
 
     return (
         <nav className="navbar">
@@ -33,13 +57,20 @@ function Navbar() {
             </div>
             
             <ul className="navbar-links">
-                {/* Si el usuario está logueado y tiene una ruta de dashboard, se muestra el enlace. */}
-                {isAuthenticated && userDashboardPath && (
-                    <li>
-                        <Link to={userDashboardPath} className="nav-link">Dashboard</Link>
-                    </li>
+                {isAuthenticated && roleLinks.length > 0 ? (
+                    roleLinks.map((item) => (
+                        <li key={item.to}>
+                            <Link to={item.to} className="nav-link">{item.label}</Link>
+                        </li>
+                    ))
+                ) : (
+                    // Enlaces públicos básicos
+                    <>
+                        <li>
+                            <Link to="/home" className="nav-link">Inicio</Link>
+                        </li>
+                    </>
                 )}
-                {/* Puedes añadir más enlaces públicos o protegidos aquí */}
             </ul>
 
             {/* CORRECCIÓN: Lógica de usuario unificada y más limpia. */}

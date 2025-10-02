@@ -45,8 +45,8 @@ const router = createBrowserRouter([
     children: [
       // --- Rutas Públicas ---
       {
-        path: '/home',
-        element: <Home />,
+        path: '/',
+        element: <Navigate to="/home" replace />,
       },
       {
         path: '/login',
@@ -67,6 +67,10 @@ const router = createBrowserRouter([
       {
         path: '/unauthorized',
         element: <Unauthorized />,
+      },
+      {
+        path: '/home',
+        element: <Home />,
       },
 
       // --- Rutas Protegidas con Layout ---
@@ -120,20 +124,28 @@ const router = createBrowserRouter([
           },
           {
             path: 'inventario',
-            element: <InventarioLayout />,
+            element: (
+              <PrivateRoute roles={['administrador', 'cocinero']}>
+                <InventarioLayout />
+              </PrivateRoute>
+            ),
             children: [
               { index: true, element: <InventarioMenu /> },
-              { path: 'ver', element: <IngredienteCreado /> },
+              { path: 'creados', element: <IngredienteCreado /> },
               { path: 'nuevo', element: <IngredienteNuevo /> },
             ],
           },
           {
             path: 'productos',
-            element: <ProductosLayout />,
+            element: (
+              <PrivateRoute roles={['administrador', 'cocinero']}>
+                <ProductosLayout />
+              </PrivateRoute>
+            ),
             children: [
               { index: true, element: <ProductosMenu /> },
               { path: 'creados', element: <ProductosCreados /> },
-              { path: 'nuevos', element: <ProductoNuevo /> },
+              { path: 'nuevo', element: <ProductoNuevo /> },
             ],
           },
           {

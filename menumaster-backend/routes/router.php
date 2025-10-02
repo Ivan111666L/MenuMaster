@@ -53,11 +53,11 @@ try {
                         $authController->login();
                     }
                     break;
-                // case 'verify':
-                //     if ($requestMethod === 'GET') {
-                //         $authController->verifyToken();
-                //     }
-                    // break;
+                case 'verify':
+                    if ($requestMethod === 'GET') {
+                        $authController->verifyToken();
+                    }
+                    break;
                 default:
                     throw new Exception("Acción '{$action}' no válida para auth.", 404);
             }

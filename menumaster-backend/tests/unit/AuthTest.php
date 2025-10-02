@@ -3,7 +3,69 @@
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use PHPUnit\Framework\TestCase;
+// Import statements must be at the top level
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+
+// Check if PHPUnit is available and create fallback if needed
+if (!class_exists('PHPUnit\Framework\TestCase')) {
+    // Fallback: Create a simple TestCase class if PHPUnit is not available
+    class TestCase {
+        protected function setUp(): void {}
+        public static function setUpBeforeClass(): void {}
+        
+        protected function assertEquals($expected, $actual, $message = '') {
+            if ($expected !== $actual) {
+                throw new Exception($message ?: "Assertion failed: expected '$expected', got '$actual'");
+            }
+        }
+        
+        protected function assertTrue($condition, $message = '') {
+            if (!$condition) {
+                throw new Exception($message ?: "Assertion failed: expected true");
+            }
+        }
+        
+        protected function assertFalse($condition, $message = '') {
+            if ($condition) {
+                throw new Exception($message ?: "Assertion failed: expected false");
+            }
+        }
+        
+        protected function assertIsArray($actual, $message = '') {
+            if (!is_array($actual)) {
+                throw new Exception($message ?: "Assertion failed: expected array, got " . gettype($actual));
+            }
+        }
+        
+        protected function assertArrayHasKey($key, $array, $message = '') {
+            if (!is_array($array) || !array_key_exists($key, $array)) {
+                throw new Exception($message ?: "Assertion failed: array does not have key '$key'");
+            }
+        }
+        
+        protected function assertNotEmpty($actual, $message = '') {
+            if (empty($actual)) {
+                throw new Exception($message ?: "Assertion failed: expected non-empty value");
+            }
+        }
+        
+        protected function assertStringContainsString($needle, $haystack, $message = '') {
+            if (!is_string($haystack) || strpos($haystack, $needle) === false) {
+                throw new Exception($message ?: "Assertion failed: string '$haystack' does not contain '$needle'");
+            }
+        }
+        
+        protected function assertNull($actual, $message = '') {
+            if ($actual !== null) {
+                throw new Exception($message ?: "Assertion failed: expected null, got " . gettype($actual));
+            }
+        }
+    }
+} else {
+    // If PHPUnit is available, create an alias
+    class_alias('PHPUnit\Framework\TestCase', 'TestCase');
+}
+
 use App\Controllers\AuthController;
 use App\Models\UsuarioModel;
 use App\Models\RolModel;

@@ -4,7 +4,7 @@ namespace App\Controllers;
 use App\Models\UsuarioModel;
 use App\Models\RolModel;
 use App\Config\Config;
-use App\Config\conexionDb;
+use App\Config\ConexionDb;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use PDO;
@@ -21,9 +21,9 @@ class AuthController
     private const MAX_LOGIN_ATTEMPTS = 5;
     private const LOCKOUT_TIME = 900; // 15 minutos
 
-    public function __construct(PDO $db = null, UsuarioModel $usuarioModel = null, RolModel $rolModel = null)
+    public function __construct(?PDO $db = null, ?UsuarioModel $usuarioModel = null, ?RolModel $rolModel = null)
     {
-        $this->db = $db ?? conexionDb::getConnection();
+        $this->db = $db ?? ConexionDb::getConnection();
         $this->usuarioModel = $usuarioModel ?? new UsuarioModel($this->db);
         $this->rolModel = $rolModel ?? new RolModel($this->db);
     }
@@ -698,7 +698,6 @@ class AuthController
         header('Content-Type: application/json; charset=utf-8');
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: DENY');
-        header('X-XSS-Protection: 1; mode=block');
         
         http_response_code($statusCode);
 

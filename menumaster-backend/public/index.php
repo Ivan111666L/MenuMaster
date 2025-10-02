@@ -3,12 +3,27 @@
 ob_start();
 
 // ===== INICIO DEL CÓDIGO CORS =====
-// Permitir solicitudes desde tu frontend (ajusta el puerto si es diferente)
-header("Access-Control-Allow-Origin: http://localhost:5173");
+// Permitir solicitudes desde tu frontend (desarrollo y vista previa de Vite)
+$allowedOrigins = [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:5174', // Vite dev alt port
+    'http://localhost:4173', // Vite preview server
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowedOrigins)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    // Fallback para desarrollo local
+    header("Access-Control-Allow-Origin: http://localhost:5173");
+}
 // Permitir los métodos HTTP que tu API utiliza
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 // Permitir las cabeceras que el frontend pueda enviar (Authorization es clave para tokens)
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
+// Asegurar que proxies caches respeten el origen
+header("Vary: Origin");
+// Si se usan cookies/sesión, permitir credenciales (JWT por header no requiere esto, pero no afecta)
+header("Access-Control-Allow-Credentials: true");
 
 // Manejar la solicitud de pre-vuelo (preflight) del navegador
 if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'OPTIONS') {

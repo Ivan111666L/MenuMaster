@@ -342,7 +342,7 @@ class RolesController extends Controller
      */
     private function permisoExists(int $permisoId): bool
     {
-        $stmt = $this->db->prepare("SELECT COUNT(*) FROM permisos WHERE id = :id AND estado_id = 1");
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM permisos WHERE id = :id");
         $stmt->execute([':id' => $permisoId]);
         return $stmt->fetchColumn() > 0;
     }

@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import dashboardService from '@/features/dashboard/services/dashboardService';
 import Spinner from '@/components/Spinner';
-import WaiterDashboard from './WaiterDashboard';
-import CookDashboard from './CookDashboard';
+import WaiterDashboard from '@/features/dashboard/pages/WaiterDashboard';
+import CookDashboard from '@/features/dashboard/pages/CookDashboard';
 
 // Importamos los estilos desde su propio archivo
 import '@/styles/dashboard.css';
@@ -75,19 +75,23 @@ function AdminDashboard() {
 
     // useEffect para cargar los datos cuando el componente se monta
     useEffect(() => {
-        fetchData();
-    }, [fetchData]);
+        // Solo hacer la llamada si hay un usuario autenticado
+        if (user && user.token) {
+            fetchData();
+        }
+    }, [fetchData, user]);
 
     // useEffect para auto-refresh cada 30 segundos
     useEffect(() => {
         const interval = setInterval(() => {
-            if (!isLoading && !isRefreshing) {
+            // Solo hacer refresh si hay usuario autenticado y no estamos cargando
+            if (user && user.token && !isLoading && !isRefreshing) {
                 fetchData(true); // Usar indicador de refresh
             }
         }, 30000); // 30 segundos
 
         return () => clearInterval(interval);
-    }, [fetchData, isLoading, isRefreshing]);
+    }, [fetchData, isLoading, isRefreshing, user]);
 
     // Función para refresh manual
     const handleManualRefresh = () => {

@@ -101,7 +101,7 @@
   color: rgba(33, 37, 41, 0.8);
 }
 
-/* Animaciones personalizadas */
+/* Animaciones personalizadas optimizadas para rendimiento */
 @keyframes slideInRight {
   from {
     transform: translate3d(110%, 0, 0);
@@ -124,12 +124,24 @@
   }
 }
 
+/* Optimized animations using will-change for better performance */
 .Toastify__slide-enter--top-right {
   animation: slideInRight 0.3s ease-out;
+  will-change: transform, opacity;
 }
 
 .Toastify__slide-exit--top-right {
   animation: slideOutRight 0.3s ease-in;
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes to free up resources */
+.Toastify__slide-enter--top-right.Toastify__slide-enter-done {
+  will-change: auto;
+}
+
+.Toastify__slide-exit--top-right.Toastify__slide-exit-done {
+  will-change: auto;
 }
 
 /* Responsive */
@@ -214,5 +226,96 @@
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Override React-Toastify default keyframes to avoid layout-triggering properties */
+/* Library defines @keyframes Toastify__slideInRight with `visibility`, which triggers Layout */
+@keyframes Toastify__slideInRight {
+  from {
+    transform: translate3d(110%, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes Toastify__slideOutRight {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(110%, 0, 0);
+    opacity: 0;
+  }
+}
+
+/* Additional overrides to remove visibility from all Toastify slide animations */
+@keyframes Toastify__slideInLeft {
+  from {
+    transform: translate3d(-110%, 0, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes Toastify__slideOutLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(-110%, 0, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes Toastify__slideInUp {
+  from {
+    transform: translate3d(0, 110%, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes Toastify__slideOutDown {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, 500px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes Toastify__slideInDown {
+  from {
+    transform: translate3d(0, -110%, 0);
+    opacity: 0;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes Toastify__slideOutUp {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(0, -500px, 0);
+    opacity: 0;
   }
 }

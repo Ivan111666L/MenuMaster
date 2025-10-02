@@ -34,7 +34,9 @@ const Layout = () => {
                     setUserPermissions(permissions);
                 } catch (error) {
                     console.error('Error al cargar permisos:', error);
-                    setUserPermissions({});
+                    // En caso de error, usar permisos básicos basados en el rol
+                    const basicPermissions = getBasicPermissionsByRole(user.rol);
+                    setUserPermissions(basicPermissions);
                 } finally {
                     setLoading(false);
                 }
@@ -45,6 +47,44 @@ const Layout = () => {
 
         loadUserPermissions();
     }, [user]);
+
+    // Función para obtener permisos básicos por rol como fallback
+    const getBasicPermissionsByRole = (rol) => {
+        const rolePermissions = {
+            'administrador': {
+                dashboard: [{ accion: 'ver' }],
+                productos: [{ accion: 'ver' }],
+                inventario: [{ accion: 'ver' }],
+                facturacion: [{ accion: 'ver' }],
+                pedidos: [{ accion: 'ver' }],
+                mesas: [{ accion: 'ver' }],
+                cocina: [{ accion: 'ver' }],
+                reportes: [{ accion: 'ver' }],
+                configuracion: [{ accion: 'ver' }],
+                usuarios: [{ accion: 'ver' }]
+            },
+            'cajero': {
+                dashboard: [{ accion: 'ver' }],
+                facturacion: [{ accion: 'ver' }],
+                pedidos: [{ accion: 'ver' }]
+            },
+            'cocinero': {
+                dashboard: [{ accion: 'ver' }],
+                productos: [{ accion: 'ver' }],
+                inventario: [{ accion: 'ver' }],
+                pedidos: [{ accion: 'ver' }],
+                cocina: [{ accion: 'ver' }]
+            },
+            'mesero': {
+                dashboard: [{ accion: 'ver' }],
+                facturacion: [{ accion: 'ver' }],
+                pedidos: [{ accion: 'ver' }],
+                mesas: [{ accion: 'ver' }]
+            }
+        };
+        
+        return rolePermissions[rol?.toLowerCase()] || { dashboard: [{ accion: 'ver' }] };
+    };
 
     // Detectar cambios en el tamaño de pantalla
     useEffect(() => {
@@ -175,7 +215,7 @@ const Layout = () => {
         // Filtrar menús basado en rol y permisos
         return allMenuItems.filter(item => {
             // Verificar si el rol tiene acceso básico
-            if (!item.roles.includes(rol)) return false;
+            if (!item.roles.includes(rol?.toLowerCase())) return false;
             
             // Verificar permisos específicos del usuario
             return hasModulePermission(item.module, item.action);

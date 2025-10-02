@@ -39,18 +39,22 @@ function CookDashboard() {
     }, [data]);
 
     useEffect(() => {
-        fetchCookData();
-    }, [fetchCookData]);
+        // Solo hacer la llamada si hay un usuario autenticado
+        if (user && user.token) {
+            fetchCookData();
+        }
+    }, [fetchCookData, user]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (!isLoading && !isRefreshing) {
+            // Solo hacer refresh si hay usuario autenticado y no estamos cargando
+            if (user && user.token && !isLoading && !isRefreshing) {
                 fetchCookData(true);
             }
         }, 30000);
 
         return () => clearInterval(interval);
-    }, [fetchCookData, isLoading, isRefreshing]);
+    }, [fetchCookData, isLoading, isRefreshing, user]);
 
     const handleManualRefresh = () => {
         fetchCookData(true);

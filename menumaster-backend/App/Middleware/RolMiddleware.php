@@ -299,8 +299,7 @@ class RolMiddleware
             SELECT p.nombre, p.descripcion, p.modulo, p.accion
             FROM rol_permisos rp
             INNER JOIN permisos p ON rp.permiso_id = p.id
-            WHERE rp.rol_id = :rol_id 
-            AND p.estado_id = 1
+            WHERE rp.rol_id = :rol_id
             ORDER BY p.modulo, p.nombre
         ");
         
@@ -384,7 +383,7 @@ class RolMiddleware
     /**
      * Método para enviar respuestas JSON estandarizadas
      */
-    public function sendJsonResponse(int $statusCode, string $message, $data = null, string $errorCode = null): void
+    public function sendJsonResponse(int $statusCode, string $message, mixed $data = null, ?string $errorCode = null): void
     {
         http_response_code($statusCode);
         header('Content-Type: application/json; charset=utf-8');

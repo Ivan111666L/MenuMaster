@@ -39,18 +39,22 @@ function WaiterDashboard() {
     }, [data]);
 
     useEffect(() => {
-        fetchWaiterData();
-    }, [fetchWaiterData]);
+        // Solo hacer la llamada si hay un usuario autenticado
+        if (user && user.token) {
+            fetchWaiterData();
+        }
+    }, [fetchWaiterData, user]);
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (!isLoading && !isRefreshing) {
+            // Solo hacer refresh si hay usuario autenticado y no estamos cargando
+            if (user && user.token && !isLoading && !isRefreshing) {
                 fetchWaiterData(true);
             }
         }, 30000);
 
         return () => clearInterval(interval);
-    }, [fetchWaiterData, isLoading, isRefreshing]);
+    }, [fetchWaiterData, isLoading, isRefreshing, user]);
 
     const handleManualRefresh = () => {
         fetchWaiterData(true);

@@ -21,7 +21,7 @@ class PedidoModel
      * @param string|null $estados Nombres de los estados para filtrar, separados por coma (ej. 'pendiente,en preparacion').
      * @return array|false Un array de pedidos o false si hay error.
      */
-    public function findAll(string $estados = null): array|false
+    public function findAll(?string $estados = null): array|false
     {
         $sql = "SELECT 
                     p.id, m.numero AS mesa_numero, u.nombre AS mesero_nombre,
@@ -118,15 +118,18 @@ class PedidoModel
 
             // 2. Preparar statement para insertar items del pedido
             $stmtItems = $this->db->prepare(
-                "INSERT INTO detalles_pedido (pedido_id, producto_id, combo_id, es_combo, cantidad, precio_unitario, notas) 
-                 VALUES (:pedido_id, :producto_id, :combo_id, :es_combo, :cantidad, :precio_unitario, :notas)"
+                "INSERT INTO detalles_pedido (pedido_id, producto_id, cantidad, precio_unitario, notas) 
+                 VALUES (:pedido_id, :producto_id, :cantidad, :precio_unitario, :notas)"
             );
             
+            // Combo functionality temporarily disabled - table doesn't exist
+            /*
             // 3. Preparar statement para insertar elementos de combos
             $stmtComboElementos = $this->db->prepare(
                 "INSERT INTO detalles_pedido_combo_elementos (detalle_pedido_id, producto_id, cantidad, precio_unitario, subtotal)
                 VALUES (:detalle_pedido_id, :producto_id, :cantidad, :precio_unitario, :subtotal)"
             );
+            */
 
             // 4. Insertar cada item del pedido
             foreach ($items as $item) {
@@ -140,15 +143,11 @@ class PedidoModel
                     throw new Exception("Producto con ID {$item['producto_id']} no encontrado.");
                 }
 
-                $esCombo = isset($item['es_combo']) && $item['es_combo'] ? 1 : 0;
-                $comboId = isset($item['combo_id']) ? $item['combo_id'] : null;
                 $itemNotas = isset($item['notas']) ? $item['notas'] : null;
                 
                 // Insertar el item con el precio actual
                 $stmtItems->bindParam(':pedido_id', $pedidoId, PDO::PARAM_INT);
                 $stmtItems->bindParam(':producto_id', $item['producto_id'], PDO::PARAM_INT);
-                $stmtItems->bindParam(':combo_id', $comboId, $comboId ? PDO::PARAM_INT : PDO::PARAM_NULL);
-                $stmtItems->bindParam(':es_combo', $esCombo, PDO::PARAM_INT);
                 $stmtItems->bindParam(':cantidad', $item['cantidad'], PDO::PARAM_INT);
                 $stmtItems->bindParam(':precio_unitario', $producto['precio']);
                 $stmtItems->bindParam(':notas', $itemNotas);
@@ -156,6 +155,8 @@ class PedidoModel
                 
                 $detalleId = (int)$this->db->lastInsertId();
                 
+                // Combo functionality temporarily disabled - table structure doesn't support it
+                /*
                 // Si es un combo, insertar sus elementos
                 if ($esCombo && !empty($item['elementos'])) {
                     foreach ($item['elementos'] as $elemento) {
@@ -174,6 +175,7 @@ class PedidoModel
                 if (!$esCombo) {
                     $this->actualizarStockMenuDelDia($item['producto_id'], $item['cantidad']);
                 }
+                */
             }
 
             $this->db->commit();
@@ -263,9 +265,8 @@ class PedidoModel
             $stmt->execute();
             $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Instanciar modelo de producto-ingrediente
-            require_once BASE_PATH . '/app/Models/ProductoIngredienteModel.php';
-            $productoIngredienteModel = new \app\Models\ProductoIngredienteModel($this->db);
+            // Instanciar modelo de producto-ingrediente (autoload PSR-4)
+            $productoIngredienteModel = new ProductoIngredienteModel($this->db);
             
             // Descontar ingredientes del inventario para cada producto
             foreach ($detalles as $detalle) {
@@ -283,7 +284,9 @@ class PedidoModel
                     $updateCostoStmt->execute();
                 } catch (Exception $e) {
                     // Si hay error en el descuento, revertir transacción
-                    $this->db->rollBack();
+                    if ($this->db->inTransaction()) {
+                        $this->db->rollBack();
+                    }
                     error_log('Error al descontar inventario: ' . $e->getMessage());
                     return false;
                 }
@@ -362,9 +365,8 @@ class PedidoModel
             $stmtDetalles->execute();
             $detalles = $stmtDetalles->fetchAll(PDO::FETCH_ASSOC);
             
-            // Instanciar modelo de producto-ingrediente para calcular costos
-            require_once BASE_PATH . '/app/Models/ProductoIngredienteModel.php';
-            $productoIngredienteModel = new \app\Models\ProductoIngredienteModel($this->db);
+            // Instanciar modelo de producto-ingrediente para calcular costos (autoload PSR-4)
+            $productoIngredienteModel = new ProductoIngredienteModel($this->db);
             
             // 4. Insertar detalles en historial_detalles_pedido
             $sqlHistorialDetalles = "INSERT INTO historial_detalles_pedido
@@ -387,7 +389,11 @@ class PedidoModel
                 $stmtHistorialDetalles->bindParam(':producto_nombre', $detalle['producto_nombre']);
                 $stmtHistorialDetalles->bindParam(':cantidad', $detalle['cantidad'], PDO::PARAM_INT);
                 $stmtHistorialDetalles->bindParam(':precio_unitario', $detalle['precio_unitario']);
-                $stmtHistorialDetalles->bindParam(':subtotal', $detalle['subtotal']);
+                // Calcular subtotal si no existe en el detalle
+                $subtotal = (isset($detalle['subtotal']) && $detalle['subtotal'] > 0)
+                    ? $detalle['subtotal']
+                    : ($detalle['precio_unitario'] * $detalle['cantidad']);
+                $stmtHistorialDetalles->bindParam(':subtotal', $subtotal);
                 $stmtHistorialDetalles->bindParam(':costo_total', $costoTotal, PDO::PARAM_STR);
                 $stmtHistorialDetalles->execute();
             }
@@ -408,7 +414,9 @@ class PedidoModel
             return true;
             
         } catch (Exception $e) {
-            $this->db->rollBack();
+            if ($this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
             error_log('Error en PedidoModel::guardarEnHistorial: ' . $e->getMessage());
             return false;
         }
@@ -439,7 +447,7 @@ class PedidoModel
     /**
      * Obtiene estadísticas de ventas para análisis
      */
-    public function getEstadisticasVentas(string $fechaInicio = null, string $fechaFin = null): array
+    public function getEstadisticasVentas(?string $fechaInicio = null, ?string $fechaFin = null): array
     {
         try {
             // Si no se especifican fechas, usar el último mes

@@ -133,7 +133,7 @@ class RolModel {
             SELECT p.id, p.nombre, p.descripcion, p.modulo, p.accion
             FROM rol_permisos rp
             INNER JOIN permisos p ON rp.permiso_id = p.id
-            WHERE rp.rol_id = :rol_id AND p.estado_id = 1
+            WHERE rp.rol_id = :rol_id
             ORDER BY p.modulo, p.nombre
         ";
         $stmt = $this->db->prepare($sql);

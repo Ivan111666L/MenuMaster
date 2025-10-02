@@ -84,10 +84,20 @@ class AnalisisController
             $estadisticas = $this->pedidoModel->getEstadisticasVentas($fechaInicio, $fechaFin);
             
             // Generar el PDF con FPDF
-            require_once BASE_PATH . '/vendor/setasign/fpdf/fpdf.php';
+            $fpdfPath = BASE_PATH . '/vendor/setasign/fpdf/fpdf.php';
+            if (file_exists($fpdfPath)) {
+                require_once $fpdfPath;
+            } else {
+                // Fallback: try alternative FPDF path or create a simple response
+                throw new Exception('FPDF library not found. Please install via: composer require setasign/fpdf');
+            }
             
-// First install FPDF via Composer:
-// composer require setasign/fpdf
+            // First install FPDF via Composer:
+            // composer require setasign/fpdf
+            if (!class_exists('FPDF')) {
+                throw new Exception('FPDF class not available. Please install FPDF library.');
+            }
+            
             $pdf = new \FPDF();
             $pdf->AddPage();
             

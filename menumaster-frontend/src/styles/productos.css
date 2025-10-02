@@ -109,7 +109,15 @@
 }
 
 .form-group input:focus,
+.form-group input:focus,
 .form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--productos-primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    transform: translateY(-1px);
+    appearance: none;
+}
 .form-group textarea:focus {
     outline: none;
     border-color: var(--productos-primary);
@@ -294,10 +302,19 @@
     border: 2px solid var(--productos-border-light);
     border-radius: var(--productos-radius-small);
     background: #FAFAFA;
-    scrollbar-width: thin;
-    scrollbar-color: var(--productos-primary) #f1f1f1;
+    /* Safari smooth scrolling */
+    -webkit-overflow-scrolling: touch;
 }
 
+/* Firefox scrollbar styling - only apply where supported */
+@supports (scrollbar-width: thin) {
+    .ingredientes-grid {
+        scrollbar-width: thin;
+        scrollbar-color: var(--productos-primary) #f1f1f1;
+    }
+}
+
+/* WebKit browsers (Chrome, Safari, Edge) scrollbar styling */
 .ingredientes-grid::-webkit-scrollbar {
     width: 6px;
 }
@@ -310,6 +327,19 @@
 .ingredientes-grid::-webkit-scrollbar-thumb {
     background: var(--productos-primary);
     border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+.ingredientes-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--productos-secondary, #0056b3);
+}
+
+/* Safari fallback - ensure scrolling works even if styling is not supported */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+    .ingredientes-grid {
+        -webkit-appearance: none;
+        appearance: none;
+    }
 }
 
 .ingrediente-card {

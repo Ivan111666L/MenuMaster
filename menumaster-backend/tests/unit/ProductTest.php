@@ -59,7 +59,7 @@ try {
     
     try {
         $productoCreado = $productoModel->create($nuevoProducto);
-        if ($productoCreado && isset($productoCreado['id'])) {
+        if ($productoCreado && is_array($productoCreado) && isset($productoCreado['id'])) {
             $productoId = $productoCreado['id'];
             echo "   ✓ Created new product with ID: " . $productoId . "\n";
             
