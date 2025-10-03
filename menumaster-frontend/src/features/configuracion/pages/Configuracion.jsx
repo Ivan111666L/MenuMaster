@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 // Importamos el componente reutilizable de Botón
 import Button from '@/components/Button';
@@ -31,6 +31,8 @@ function Configuracion() {
 
        
       </div>
+      {/* Renderiza rutas hijas directamente cuando se visita /configuracion/usuarios o /configuracion/mesas */}
+      <Outlet />
     </div>
   );
 };

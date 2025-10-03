@@ -1,0 +1,78 @@
+/* Contenedor principal */
+.proveedores-container {
+  padding: 16px;
+}
+
+.proveedores-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* Tabla responsive */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.proveedores-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.proveedores-table th,
+.proveedores-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.proveedores-table thead th {
+  background-color: #f7f7f7;
+}
+
+/* Acciones */
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 100%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .proveedores-table th,
+  .proveedores-table td {
+    padding: 8px 10px;
+  }
+
+  .proveedores-header h2 {
+    font-size: 1.25rem;
+  }
+}

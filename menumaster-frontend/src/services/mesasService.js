@@ -22,7 +22,7 @@ export const getMesas = async () => {
 
 export const getMesaById = async (id) => {
   try {
-    const response = await api.get(`/api/mesas/${id}`);
+    const response = await api.get(`/mesas/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener mesa ${id}:`, error);
@@ -51,7 +51,7 @@ export const getMesasDisponibles = async () => {
 
 export const cambiarEstadoMesa = async (id, estado) => {
   try {
-    const response = await api.patch(`/api/mesas/${id}/estado`, { estado });
+    const response = await api.patch(`/mesas/${id}/estado`, { estado });
     return response.data;
   } catch (error) {
     console.error(`Error al cambiar estado de la mesa ${id}:`, error);
@@ -61,7 +61,7 @@ export const cambiarEstadoMesa = async (id, estado) => {
 
 export const deleteMesa = async (id) => {
   try {
-    await api.delete(`/api/mesas/${id}`);
+    await api.delete(`/mesas/${id}`);
   } catch (error) {
     console.error(`Error al eliminar la mesa ${id}:`, error);
     throw error;

@@ -1,4 +1,5 @@
 import api from '@/services/api'; // Tu instancia central de Axios
+import { getPedidoTicket as getPedidoTicketPublic } from './imprimirPedidoService';
 import { getMesasDisponibles } from '@/services/mesasService';
 import { getProductosDisponibles } from '@/services/productosSimpleService';
 
@@ -64,8 +65,8 @@ const pedidoService = {
      * Obtiene el ticket HTML de un pedido por su ID
      */
     getPedidoTicket: async (pedidoId) => {
-        const response = await api.get(`/api/imprimir_pedido.php?id=${pedidoId}`);
-        return response.data.data ? response.data.data : response.data;
+        // Delegar al servicio de impresión que usa la URL pública correcta
+        return await getPedidoTicketPublic(pedidoId);
     },
 };
 

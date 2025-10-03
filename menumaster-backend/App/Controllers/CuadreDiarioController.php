@@ -123,7 +123,28 @@ class CuadreDiarioController {
             $fechaFin = isset($_GET['fecha_fin']) ? $_GET['fecha_fin'] : null;
             
             $rentabilidad = $this->cuadreDiarioModel->obtenerRentabilidadProductos($fechaInicio, $fechaFin);
-            
+
+            // Agregar ingredientes y costo de fabricación por producto
+            foreach ($rentabilidad as &$producto) {
+                $productoId = isset($producto['producto_id']) ? (int)$producto['producto_id'] : null;
+                if ($productoId) {
+                    // Ingredientes detallados
+                    $ingredientes = $this->productoIngredienteModel->getIngredientesByProductoId($productoId);
+                    foreach ($ingredientes as &$ing) {
+                        $cantidad = isset($ing['cantidad']) ? (float)$ing['cantidad'] : 0.0;
+                        $costoUnitario = isset($ing['costo_unitario']) ? (float)$ing['costo_unitario'] : 0.0;
+                        $ing['costo_subtotal'] = $cantidad * $costoUnitario;
+                    }
+                    $producto['ingredientes'] = $ingredientes;
+
+                    // Costo total de fabricación usando ingredientes
+                    $producto['costo_fabricacion'] = (float)$this->productoIngredienteModel->calcularCostoProducto($productoId);
+                } else {
+                    $producto['ingredientes'] = [];
+                    $producto['costo_fabricacion'] = 0.0;
+                }
+            }
+
             return [
                 'status' => 'success',
                 'data' => $rentabilidad

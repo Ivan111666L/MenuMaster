@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCategorias, deleteCategoria } from '../services/categoriaService';
+import { getCategorias, deleteCategoria } from '@/features/categorias/services/categoriaService';
 import Button from '@/components/Button';
 
 function CategoriasLista({ onEdit }) {

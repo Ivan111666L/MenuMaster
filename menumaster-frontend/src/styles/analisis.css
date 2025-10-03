@@ -1,0 +1,110 @@
+/* Estilos para módulo de Análisis */
+
+:root {
+  --analisis-primary: #2563eb; /* azul */
+  --analisis-secondary: #0ea5e9; /* celeste */
+  --analisis-bg: #f8fafc; /* gris muy claro */
+  --analisis-border: #e2e8f0; /* gris borde */
+  --analisis-text: #1f2937; /* gris oscuro */
+}
+
+.analisis-app {
+  background: var(--analisis-bg);
+  min-height: 100%;
+}
+
+.analisis-section-title {
+  color: var(--analisis-text);
+  font-weight: 700;
+}
+
+.analisis-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #374151;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.analisis-nav .nav-link:hover {
+  background: #f1f5f9;
+  color: #111827;
+}
+
+.analisis-nav .nav-link.active {
+  background: #eef2ff;
+  border-left: 3px solid var(--analisis-primary);
+  color: #111827;
+}
+
+.analisis-card {
+  border: 1px solid var(--analisis-border);
+  border-radius: 12px;
+}
+
+.analisis-section {
+  padding-top: 0.5rem;
+}
+
+/* Barra superior y acciones */
+.analisis-toolbar {
+  padding: 0.25rem 0;
+}
+
+.analisis-filters .form-label {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.analisis-summary .card {
+  text-align: center;
+  min-height: 120px;
+}
+
+.analisis-summary h6 {
+  color: #6b7280;
+  margin-bottom: 0.35rem;
+}
+
+.analisis-table thead th {
+  background: #f8fafc;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.analisis-table .table {
+  border-color: var(--analisis-border);
+}
+
+.analisis-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.analisis-filters {
+  gap: 1rem;
+}
+
+/* Bloques internos dentro del Card principal del layout */
+.section-block {
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--analisis-border);
+}
+
+.section-block:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* Ajuste de tablas para integrarse al Card padre */
+.analisis-table .table {
+  margin-bottom: 0;
+}
+
+@media (max-width: 992px) {
+  .analisis-summary {
+    row-gap: 1rem;
+  }
+}

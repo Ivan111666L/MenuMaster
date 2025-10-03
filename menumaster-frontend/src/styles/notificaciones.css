@@ -1,0 +1,76 @@
+/* Estilos para módulo de Notificaciones */
+
+.notificaciones-app .section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.notificaciones-app .section-header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #2d3748;
+}
+
+.section-subtitle {
+  color: #718096;
+  font-size: 0.95rem;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-tab {
+  border: 1px solid #cbd5e0;
+  background: #edf2f7;
+  color: #2d3748;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-tab.active {
+  background: #4299e1;
+  color: #fff;
+  border-color: #4299e1;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+}
+
+.notification-item.leida {
+  background: #f1f5f9;
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .button-group {
+    flex-wrap: wrap;
+  }
+}

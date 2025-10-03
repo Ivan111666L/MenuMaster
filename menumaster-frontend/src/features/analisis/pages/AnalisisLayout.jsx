@@ -2,17 +2,18 @@ import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
 import { Container, Row, Col, Nav, Card } from 'react-bootstrap';
 import { FaChartLine, FaBalanceScale, FaBoxes, FaCalendarAlt } from 'react-icons/fa';
+import '@/styles/analisis.css';
 
 const AnalisisLayout = () => {
   return (
-    <Container fluid className="py-3">
-      <h2 className="mb-4">Análisis Avanzado</h2>
+    <Container fluid className="py-3 analisis-app">
+      <h2 className="mb-4 analisis-section-title">Análisis Avanzado</h2>
       
       <Row>
         <Col md={3} lg={2} className="mb-4">
-          <Card className="shadow-sm">
+          <Card className="shadow-sm analisis-card">
             <Card.Body className="p-0">
-              <Nav className="flex-column">
+              <Nav className="flex-column analisis-nav">
                 <Nav.Link as={NavLink} to="/analisis" end className="py-3 px-3 border-bottom">
                   <FaChartLine className="me-2" /> Resumen de Ventas
                 </Nav.Link>
@@ -31,7 +32,7 @@ const AnalisisLayout = () => {
         </Col>
         
         <Col md={9} lg={10}>
-          <Card className="shadow-sm">
+          <Card className="shadow-sm analisis-card">
             <Card.Body>
               <Outlet />
             </Card.Body>

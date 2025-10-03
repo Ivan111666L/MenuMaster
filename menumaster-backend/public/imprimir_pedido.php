@@ -6,7 +6,9 @@ $dotenv->load();
 require_once __DIR__ . '/../App/config/conexionDb.php';
 use app\config\ConexionDb;
 
-header('Content-Type: application/json');
+// Por defecto, JSON; si se solicita HTML explícito, devolver HTML
+$isHtml = (isset($_GET['format']) && strtolower($_GET['format']) === 'html');
+header('Content-Type: ' . ($isHtml ? 'text/html; charset=utf-8' : 'application/json; charset=utf-8'));
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
@@ -90,10 +92,14 @@ try {
         $totalCalculado = array_sum(array_column($items, 'subtotal'));
         $pedido['total_calculado'] = $totalCalculado;
         
-        echo json_encode([
-            'success' => true,
-            'data' => $pedido
-        ]);
+        if ($isHtml) {
+            echo generateTicketHTML($pedido, []);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'data' => $pedido
+            ]);
+        }
         
     } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Generate printable order
@@ -144,19 +150,24 @@ try {
         // Generate printable ticket
         $ticket = generateTicket($pedido, $items);
         
-        echo json_encode([
-            'success' => true,
-            'ticket' => $ticket,
-            'html' => generateTicketHTML($pedido, $items)
-        ]);
+        if ($isHtml) {
+            echo generateTicketHTML($pedido, $items);
+        } else {
+            echo json_encode([
+                'success' => true,
+                'ticket' => $ticket,
+                'html' => generateTicketHTML($pedido, $items)
+            ]);
+        }
     }
     
 } catch (Exception $e) {
     http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
         'success' => false,
         'error' => $e->getMessage()
-    ]);
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 
 function generateTicket($pedido, $items) {

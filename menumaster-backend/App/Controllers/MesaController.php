@@ -12,7 +12,7 @@ class MesaController
 {
     private $db;
     private $mesaModel;
-    private $estadoGeneralModel;
+    private $estadoGeneralModel; // Nota: usado para otras entidades; no para estados de mesa
 
     public function __construct(PDO $db)
     {
@@ -91,18 +91,22 @@ class MesaController
             throw new Exception("Mesa no encontrada.", 404);
         }
         
-        // Si se envía el nombre de un estado, lo convertimos a su ID
+        // Si se envía el nombre de un estado para mesas, usamos el método específico
         if (isset($data['estado_nombre'])) {
-            $estado = $this->estadoGeneralModel->findByName($data['estado_nombre']);
-            if (!$estado) {
-                throw new Exception("El estado '{$data['estado_nombre']}' no es válido.", 400);
+            $nuevoEstado = $data['estado_nombre'];
+            // Cambiamos el estado de la mesa con el nombre provisto (usa tabla 'estados_mesa')
+            $cambiado = $this->mesaModel->cambiarEstado($id, $nuevoEstado);
+            if (!$cambiado) {
+                throw new Exception("No se pudo cambiar el estado de la mesa a '{$nuevoEstado}'.", 400);
             }
-            $data['estado_id'] = $estado['id'];
-            unset($data['estado_nombre']); // Limpiamos para no confundir al modelo
+            unset($data['estado_nombre']);
         }
-        
-        if (!$this->mesaModel->update($id, $data)) {
-            throw new Exception("No se pudo actualizar la mesa.", 500);
+
+        // Si existen otros campos para actualizar (capacidad, ubicacion, etc.), aplicamos update
+        if (!empty($data)) {
+            if (!$this->mesaModel->update($id, $data)) {
+                throw new Exception("No se pudo actualizar la mesa.", 500);
+            }
         }
 
         $mesaActualizada = $this->mesaModel->find($id);

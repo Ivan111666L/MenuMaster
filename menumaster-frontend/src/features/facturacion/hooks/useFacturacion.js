@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode'; // Asegúrate de haber instalado: npm install qrcode
 import { useNotifications } from '@/hooks/useNotifications';
 import facturacionService from '@/features/facturacion/services/facturacionService';
@@ -14,6 +15,7 @@ const imprimirTicket = (contenido) => {
 export const useFacturacion = () => {
     // Hook de notificaciones
     const { showSuccess, showError } = useNotifications();
+    const navigate = useNavigate();
     
     // --- Estados del Hook ---
     const [pedidos, setPedidos] = useState([]);
@@ -40,6 +42,13 @@ export const useFacturacion = () => {
         cargarPedidos();
     }, [cargarPedidos]);
 
+    // Refrescar lista cuando se emita el evento global de pedidos
+    useEffect(() => {
+        const handler = () => cargarPedidos();
+        window.addEventListener('pedidos:update', handler);
+        return () => window.removeEventListener('pedidos:update', handler);
+    }, [cargarPedidos]);
+
     // --- Acciones del Usuario ---
     const seleccionarPedido = (pedido) => {
         setPedidoSeleccionado(pedido);
@@ -55,6 +64,8 @@ export const useFacturacion = () => {
             showSuccess(`Pedido #${pedidoId} facturado con ${metodoPago}.`);
             setPedidoSeleccionado(null);
             await cargarPedidos();
+            // Navegar a la pantalla de pagos según la ruta solicitada
+            navigate('/facturacion/pagos');
         } catch (err) {
             showError('Error al facturar el pedido.');
         }

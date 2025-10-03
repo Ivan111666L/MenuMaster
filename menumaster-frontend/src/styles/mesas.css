@@ -200,8 +200,8 @@
 
 /* === CONTENEDOR DE MESAS === */
 .mesa-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
     padding: 0.5rem;
 }
@@ -213,6 +213,7 @@
     padding: 1.75rem;
     box-shadow: var(--mesas-shadow);
     cursor: pointer;
+    width: 50%;
     border-left: 6px solid;
     transition: all 0.3s ease;
     position: relative;

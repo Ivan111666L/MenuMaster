@@ -1,13 +1,16 @@
 import React, { useEffect, useState, useCallback, useContext } from 'react';
 import mesaService from '@/features/mesas/services/mesaService';
+import api from '@/services/api';
+import { generarTicketHTML } from '@/features/pedidos/services/imprimirPedidoService';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
 import { AuthContext } from '@/context/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit, FaPrint, FaFilter, FaSearch } from 'react-icons/fa';
 import '@/styles/mesas.css';
 
 function Mesas() {
+    const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const [mesas, setMesas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -31,10 +34,18 @@ function Mesas() {
 
     useEffect(() => {
         cargarMesas(); // Carga inicial
-        // Polling: refrescar las mesas cada 10 segundos
-        const intervalId = setInterval(cargarMesas, 10000);
+        // Polling: refrescar las mesas cada 3 segundos para estado casi en tiempo real
+        const intervalId = setInterval(cargarMesas, 3000);
+
+        // Escuchar evento global para refrescar inmediatamente tras acciones (ej. crear pedido)
+        const handleMesasUpdate = () => cargarMesas();
+        window.addEventListener('mesas:update', handleMesasUpdate);
+
         // Limpieza al desmontar el componente
-        return () => clearInterval(intervalId);
+        return () => {
+            clearInterval(intervalId);
+            window.removeEventListener('mesas:update', handleMesasUpdate);
+        };
     }, [cargarMesas]);
 
     const cambiarEstado = async (id, estadoActual) => {
@@ -118,44 +129,40 @@ function Mesas() {
     };
     
     // Función para ver detalles del pedido
-    const verDetallePedido = (pedidoId) => {
+    const verDetallePedido = async (pedidoId) => {
         // Buscar el pedido en las mesas
         const mesa = mesas.find(m => m.pedido_id === pedidoId);
         if (mesa && mesa.pedido) {
             setPedidoSeleccionado(mesa.pedido);
             setMostrarDetallePedido(true);
-        } else {
-            // Cargar el pedido desde la API si no está en las mesas
-            fetch(`/api/pedidos/${pedidoId}`)
-                .then(response => response.json())
-                .then(data => {
-                    setPedidoSeleccionado(data);
-                    setMostrarDetallePedido(true);
-                })
-                .catch(error => {
-                    console.error('Error al cargar el pedido:', error);
-                    setError('No se pudo cargar el detalle del pedido');
-                });
+            return;
+        }
+
+        try {
+            const res = await api.get(`/pedidos/${pedidoId}`);
+            const pedido = res?.data?.data ?? res?.data;
+            setPedidoSeleccionado(pedido);
+            setMostrarDetallePedido(true);
+        } catch (error) {
+            console.error('Error al cargar el pedido:', error);
+            setError('No se pudo cargar el detalle del pedido');
         }
     };
     
     // Función para imprimir pedido
     const imprimirPedido = async (pedidoId) => {
         try {
-            const response = await fetch(`/api/pedidos/${pedidoId}/imprimir`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            
-            if (response.ok) {
-                alert('Pedido enviado a impresión');
-            } else {
-                const error = await response.json();
-                throw new Error(error.message || 'Error al imprimir');
+            if (pedidoId === undefined || pedidoId === null || pedidoId === '') {
+                setError('No se encontró el ID del pedido para imprimir.');
+                return;
             }
+            const html = await generarTicketHTML(pedidoId);
+            const win = window.open('', '_blank');
+            win.document.write(html);
+            win.document.close();
+            win.focus();
+            win.print();
+            win.close();
         } catch (error) {
             console.error('Error al imprimir:', error);
             setError('No se pudo imprimir el pedido. Verifique la configuración de la impresora.');
@@ -181,9 +188,14 @@ function Mesas() {
             <div className="mesas-controls">
                 <div className="search-bar">
                     <FaSearch />
+                    {/* Etiqueta accesible y atributos id/name para el campo de búsqueda */}
+                    <label htmlFor="busqueda" className="visually-hidden">Buscar</label>
                     <input 
+                        id="busqueda"
+                        name="busqueda"
                         type="text" 
                         placeholder="Buscar por número o cliente..." 
+                        aria-label="Buscar por número o cliente"
                         value={busqueda}
                         onChange={(e) => setBusqueda(e.target.value)}
                     />
@@ -226,6 +238,37 @@ function Mesas() {
                     >
                         <h2>Mesa {mesa.numero}</h2>
                         <p>Estado: {mesa.estado}</p>
+                        {/* Control para cambiar el estado de la mesa */}
+                        <div className="estado-actions">
+                            <Button 
+                                onClick={() => cambiarEstado(mesa.id, mesa.estado)}
+                                variant="secondary"
+                                title="Cambiar estado de la mesa"
+                            >
+                                Cambiar Estado
+                            </Button>
+                        </div>
+
+                        {/* Acción para crear pedido cuando la mesa está disponible */}
+                        {mesa.estado === 'disponible' && (
+                            <div className="mesa-actions">
+                                <div className="action-buttons">
+                                    <Button 
+                                        variant="primary"
+                                        title="Tomar pedido en esta mesa"
+                                        onClick={() => {
+                                            try {
+                                                navigate('/pedidos', { state: { mesaId: mesa.id } });
+                                            } catch (e) {
+                                                console.error('No se pudo navegar a Pedidos:', e);
+                                            }
+                                        }}
+                                    >
+                                        Crear Pedido
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
                         
                         {mesa.estado === 'ocupada' && (
                             <div className="mesa-actions">
@@ -247,6 +290,8 @@ function Mesas() {
                                     <Button 
                                         onClick={() => imprimirPedido(mesa.pedido_id)}
                                         variant="secondary"
+                                        disabled={!mesa.pedido_id}
+                                        title={!mesa.pedido_id ? 'Esta mesa no tiene pedido activo' : ''}
                                     >
                                         <FaPrint /> Imprimir
                                     </Button>
@@ -328,7 +373,7 @@ function Mesas() {
                                     <FaEdit /> Editar Pedido
                                 </Button>
                             </Link>
-                            <Button onClick={() => imprimirPedido(pedidoSeleccionado.id)} variant="primary">
+                            <Button onClick={() => imprimirPedido(pedidoSeleccionado?.id)} variant="primary" disabled={!pedidoSeleccionado?.id} title={!pedidoSeleccionado?.id ? 'Pedido sin ID válido' : ''}>
                                 <FaPrint /> Imprimir
                             </Button>
                         </div>

@@ -11,7 +11,12 @@ function ProveedorForm({ proveedorId, onSaved }) {
     if (proveedorId) {
       setLoading(true);
       proveedorService.getProveedorById(proveedorId)
-        .then(data => setForm(data))
+        .then(data => setForm({
+          nombre: data?.nombre || '',
+          contacto: data?.contacto || '',
+          telefono: data?.telefono || '',
+          email: data?.email || ''
+        }))
         .catch(() => setError('Error al cargar proveedor'))
         .finally(() => setLoading(false));
     }
@@ -26,10 +31,16 @@ function ProveedorForm({ proveedorId, onSaved }) {
     setLoading(true);
     setError('');
     try {
+      const payload = {
+        nombre: form.nombre,
+        contacto: form.contacto,
+        telefono: form.telefono,
+        email: form.email
+      };
       if (proveedorId) {
-        await proveedorService.updateProveedor(proveedorId, form);
+        await proveedorService.updateProveedor(proveedorId, payload);
       } else {
-        await proveedorService.createProveedor(form);
+        await proveedorService.createProveedor(payload);
       }
       onSaved();
     } catch {

@@ -164,11 +164,11 @@ try {
 } catch (Exception $e) {
     // Manejo de errores
     http_response_code($e->getCode() ?: 500);
-    header('Content-Type: application/json');
+    header('Content-Type: application/json; charset=utf-8');
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage(),
         'error_code' => $e->getCode() ?: 500
-    ]);
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 }
 ?>

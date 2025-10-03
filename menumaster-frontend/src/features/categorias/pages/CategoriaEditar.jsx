@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getCategoriaById, updateCategoria } from '../services/categoriaService';
+import { getCategoriaById, updateCategoria } from '@/features/categorias/services/categoriaService';
 import Button from '@/components/Button';
 
 function CategoriaEditar({ categoriaId, onSuccess }) {
@@ -34,7 +34,7 @@ function CategoriaEditar({ categoriaId, onSuccess }) {
   if (error) return <div>{error}</div>;
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="categoria-form">
       <h2>Editar Categoría</h2>
       <input
         type="text"
@@ -43,7 +43,7 @@ function CategoriaEditar({ categoriaId, onSuccess }) {
         required
       />
       <Button type="submit" disabled={loading}>Guardar</Button>
-      {error && <div style={{color:'red'}}>{error}</div>}
+      {error && <div className="error">{error}</div>}
     </form>
   );
 }

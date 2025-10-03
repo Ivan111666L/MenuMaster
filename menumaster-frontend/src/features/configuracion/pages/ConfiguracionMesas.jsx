@@ -49,6 +49,7 @@ function ConfiguracionMesas() {
       await mesaService.createMesa(nuevaMesa);
       setNuevaMesa(estadoInicialNuevaMesa);
       await cargarMesas(); // Recargar la lista
+      window.dispatchEvent(new Event('mesas:update'));
     } catch (err) {
       alert('Error al crear la mesa: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -63,6 +64,7 @@ function ConfiguracionMesas() {
     
     try {
       await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
+      window.dispatchEvent(new Event('mesas:update'));
     } catch (err) {
         alert('Error al cambiar el estado.');
         setMesas(mesasOriginales); // Revertir en caso de error
@@ -74,6 +76,7 @@ function ConfiguracionMesas() {
       try {
         await mesaService.deleteMesa(id);
         setMesas(prev => prev.filter(m => m.id !== id)); // Actualización optimista
+        window.dispatchEvent(new Event('mesas:update'));
       } catch (err) {
         alert('Error al eliminar la mesa.');
         cargarMesas(); // Recargar para re-sincronizar
@@ -104,6 +107,7 @@ function ConfiguracionMesas() {
 
       <Input
         id="busqueda"
+        name="busqueda"
         placeholder="Buscar por número o ubicación..."
         value={busqueda}
         onChange={(e) => setBusqueda(e.target.value)}

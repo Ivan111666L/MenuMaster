@@ -61,13 +61,19 @@ const Layout = () => {
             'administrador': {
                 dashboard: [{ accion: 'ver' }],
                 productos: [{ accion: 'ver' }],
+                productosCreados: [{ accion: 'ver' }],
+                productosNuevos: [{ accion: 'ver' }],
                 inventario: [{ accion: 'ver' }],
+                ingredientesCreados: [{ accion: 'ver' }],
+                ingredientesNuevos: [{ accion: 'ver' }],
                 facturacion: [{ accion: 'ver' }],
                 pedidos: [{ accion: 'ver' }],
                 mesas: [{ accion: 'ver' }],
                 cocina: [{ accion: 'ver' }],
                 reportes: [{ accion: 'ver' }],
                 configuracion: [{ accion: 'ver' }],
+                configUsuarios: [{ accion: 'ver' }],
+                configRoles: [{ accion: 'ver' }],
                 usuarios: [{ accion: 'ver' }]
             },
             'cajero': {
@@ -178,14 +184,6 @@ const Layout = () => {
                 roles: ["administrador", "mesero"]
             },
             { 
-                path: "/cocina", 
-                label: "Cocina", 
-                icon: <FaUtensils />, 
-                module: "cocina", 
-                action: "ver",
-                roles: ["administrador", "cocinero"]
-            },
-            { 
                 path: "/analisis", 
                 label: "Análisis Avanzado", 
                 icon: <FaChartBar />, 
@@ -198,14 +196,6 @@ const Layout = () => {
                 label: "Configuración", 
                 icon: <FaCog />, 
                 module: "configuracion", 
-                action: "ver",
-                roles: ["administrador"]
-            },
-            { 
-                path: "/configuracion/usuarios", 
-                label: "Usuarios", 
-                icon: <FaUsers />, 
-                module: "usuarios", 
                 action: "ver",
                 roles: ["administrador"]
             },
@@ -226,14 +216,6 @@ const Layout = () => {
                 roles: ["administrador"]
             },
             { 
-                path: "/pagos", 
-                label: "Pagos", 
-                icon: <FaCreditCard />, 
-                module: "pagos", 
-                action: "ver",
-                roles: ["administrador"]
-            },
-            { 
                 path: "/proveedores", 
                 label: "Proveedores", 
                 icon: <FaTruck />, 
@@ -241,24 +223,22 @@ const Layout = () => {
                 action: "ver",
                 roles: ["administrador"]
             },
-            { 
-                path: "/cocina/menudia", 
-                label: "Menú del Día", 
-                icon: <FaHome />, 
-                module: "cocina", 
-                action: "gestionar",
-                roles: ["cocinero"]
-            }
+            
         ];
 
         // Filtrar menús basado en rol y permisos
         return allMenuItems.filter(item => {
             // Administrador siempre ve todas las secciones
             const isAdmin = rol?.toLowerCase() === 'administrador';
+            const isWaiter = rol?.toLowerCase() === 'mesero';
+            const isCook = rol?.toLowerCase() === 'cocinero';
             if (!isAdmin && !item.roles.includes(rol?.toLowerCase())) return false;
             
             // Verificar permisos específicos del usuario
             return isAdmin ? true : hasModulePermission(item.module, item.action);
+            return isWaiter ? item.roles.includes('mesero') : true;
+            return isCook ? item.roles.includes('cocinero') : true;
+            return isCashier ? item.roles.includes('cajero') : true;
         });
     };
 

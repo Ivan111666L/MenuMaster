@@ -1,10 +1,11 @@
 
 import React, { useEffect, useState } from 'react';
-import { usePedido } from '@/features/pedidos/hooks/usePedido';
+import { useLocation } from 'react-router-dom';
+// Import explícito del hook que carga mesas disponibles y productos
+import { usePedido } from '@/features/pedidos/hooks/usePedido.js';
 import PedidoForm from '@/features/pedidos/components/PedidoForm';
 import PedidoResumen from '@/features/pedidos/components/PedidoResumen';
 import PedidoTicket from '@/features/pedidos/components/PedidoTicket';
-import ListaPedidos from '@/features/pedidos/components/ListaPedidos';
 import pedidoService from '@/features/pedidos/services/pedidoService';
 import Spinner from '@/components/Spinner';
 import '@/styles/pedidos.css';
@@ -12,6 +13,7 @@ import '@/styles/pedidos.css';
 
 
 function Pedidos() {
+  const location = useLocation();
   // Utilizamos el hook personalizado que creamos
   const { 
     pedido, 
@@ -30,23 +32,18 @@ function Pedidos() {
     setTicketOpen
   } = usePedido();
 
-  // Estado para la lista de pedidos creados
-  const [pedidosCreados, setPedidosCreados] = useState([]);
-  const [pedidoSeleccionado, setPedidoSeleccionado] = useState(null);
-  const [loadingPedidos, setLoadingPedidos] = useState(true);
+  // Eliminado flujo de lista de pedidos: impresión directa al enviar pedido
 
+  // Preseleccionar mesa si viene en el estado de navegación
   useEffect(() => {
-    const fetchPedidos = async () => {
-      setLoadingPedidos(true);
-      const pedidos = await pedidoService.getPedidos();
-      setPedidosCreados(pedidos);
-      setLoadingPedidos(false);
-    };
-    fetchPedidos();
-  }, []);
+    const mesaId = location?.state?.mesaId;
+    if (!loading && mesaId && (!pedido?.mesa_id || pedido?.mesa_id !== mesaId)) {
+      handleChangeMesa(mesaId);
+    }
+  }, [loading, location?.state, handleChangeMesa, pedido?.mesa_id]);
 
 
-  if (loading || loadingPedidos) return <Spinner />;
+  if (loading) return <Spinner />;
   if (error) return <div className="error-message">{error}</div>;
 
   return (
@@ -74,14 +71,6 @@ function Pedidos() {
           eliminarItem={removeProducto}
           limpiarPedido={() => {}}
           enviarPedido={savePedido}
-        />
-      </div>
-      {/* Mostrar la lista de pedidos creados */}
-      <div style={{marginTop: '2em'}}>
-        <ListaPedidos
-          pedidos={pedidosCreados}
-          pedidoSeleccionado={pedidoSeleccionado}
-          seleccionarPedido={setPedidoSeleccionado}
         />
       </div>
       {/* Mostrar el ticket en un modal si está disponible */}

@@ -333,8 +333,8 @@ class PedidoController
             $response['data'] = $data;
         }
         
-        header('Content-Type: application/json');
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
 }

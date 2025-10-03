@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '@/hooks/useNotifications';
 import pedidoService from '@/features/pedidos/services/pedidoService';
+import { generarTicketHTML } from '@/features/pedidos/services/imprimirPedidoService';
+import mesaService from '@/features/mesas/services/mesaService';
 
 // --- Funciones de Ayuda para la Impresión (se mantienen intactas) ---
 const generarTicketCocina = (pedidoCompleto) => {
@@ -37,6 +40,7 @@ const imprimirContenido = (contenido) => {
 export const usePedido = () => {
     // --- Hooks ---
     const { showWarning, showSuccess, showError } = useNotifications();
+    const navigate = useNavigate();
     
     // --- Estados ---
     const [productos, setProductos] = useState([]);
@@ -118,12 +122,34 @@ export const usePedido = () => {
         try {
             setLoading(true);
             const pedidoCreado = await pedidoService.createPedido(pedidoActual);
-            // Obtener el ticket HTML desde el backend
-            const ticketData = await pedidoService.getPedidoTicket(pedidoCreado.id);
-            setTicketHtml(ticketData.html);
-            setTicketOpen(true);
-            showSuccess('¡Pedido enviado a cocina exitosamente!');
+            // Al crear el pedido, marcar la mesa como ocupada en la base de datos
+            try {
+                await mesaService.updateMesa(pedidoCreado.mesa_id, { estado_nombre: 'ocupada' });
+            } catch (e) {
+                console.warn('No se pudo actualizar el estado de la mesa a ocupada:', e);
+            }
+            // Generar el ticket HTML e imprimir automáticamente
+            const html = await generarTicketHTML(pedidoCreado.id);
+            setTicketHtml(html);
+            setTicketOpen(false);
+            // Abrir ventana de impresión
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
+
+            showSuccess('Pedido enviado e impreso. Redirigiendo a Facturación...');
             setPedidoActual({ mesa_id: '', items: [], notas: '' });
+            // Notificar a la vista de Mesas para refrescar estado inmediatamente
+            try {
+                window.dispatchEvent(new CustomEvent('mesas:update', { detail: { source: 'pedido', pedidoId: pedidoCreado.id } }));
+                // Notificar a Facturación para que aparezca el pedido automáticamente
+                window.dispatchEvent(new CustomEvent('pedidos:update', { detail: { source: 'pedido', pedidoId: pedidoCreado.id } }));
+            } catch {}
+            // Redirigir a facturación
+            navigate('/facturacion');
         } catch (err) {
             showError(err.response?.data?.error || 'Error al enviar el pedido.');
         } finally {

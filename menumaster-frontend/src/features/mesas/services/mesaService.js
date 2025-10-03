@@ -25,9 +25,19 @@ const createMesa = async (mesaData) => {
  * @param {object} mesaData - Datos a actualizar (ej. { estado_nombre: 'ocupada' }).
  */
 const updateMesa = async (id, mesaData) => {
-    // Llama a: PUT /api/mesas/{id}
-    const response = await api.put(`/api/mesas/${id}`, mesaData);
+    // Llama a: PUT /mesas/{id}
+    const response = await api.put(`/mesas/${id}`, mesaData);
     return response.data.data;
+};
+
+/**
+ * Resetea una mesa individual a estado 'disponible'.
+ * @param {number} id - ID de la mesa a resetear.
+ */
+const resetMesa = async (id) => {
+    // Usamos el endpoint de actualización para establecer la mesa como disponible
+    const response = await api.put(`/mesas/${id}`, { estado_nombre: 'disponible' });
+    return response.data?.data ?? response.data;
 };
 
 /**
@@ -35,7 +45,7 @@ const updateMesa = async (id, mesaData) => {
  * @param {number} id - ID de la mesa a eliminar.
  */
 const deleteMesa = async (id) => {
-  await api.delete(`/api/mesas/${id}`);
+  await api.delete(`/mesas/${id}`);
 };
 
 /**
@@ -52,6 +62,7 @@ const mesaService = {
     getMesas,
     createMesa,
     updateMesa,
+    resetMesa,
     deleteMesa,
     resetAllMesas,
 };

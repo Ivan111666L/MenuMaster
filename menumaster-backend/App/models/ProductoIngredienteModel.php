@@ -16,7 +16,12 @@ class ProductoIngredienteModel {
      */
     public function getIngredientesByProductoId($productoId) {
         $query = "
-            SELECT pi.*, i.nombre as ingrediente_nombre, i.unidad_medida, i.stock_actual
+            SELECT 
+                pi.*, 
+                i.nombre as ingrediente_nombre, 
+                i.unidad_medida, 
+                i.stock_actual,
+                i.costo_unitario
             FROM producto_ingrediente pi
             JOIN ingredientes i ON pi.ingrediente_id = i.id
             WHERE pi.producto_id = :producto_id

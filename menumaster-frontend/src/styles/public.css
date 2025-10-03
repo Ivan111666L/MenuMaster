@@ -1,0 +1,112 @@
+/* ===== PÁGINAS PÚBLICAS (Marketing/Legal/Soporte) ===== */
+:root {
+  --public-primary: var(--primary-navy);
+  --public-accent: var(--primary-orange);
+  --public-muted: var(--text-secondary);
+  --public-bg: var(--bg-primary);
+  --public-bg-alt: var(--bg-secondary);
+  --public-card: var(--white);
+  --public-border: var(--border-light);
+  --public-shadow: var(--shadow-md);
+}
+
+.public-page {
+  background: var(--public-bg);
+  min-height: 100vh;
+}
+
+.public-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.public-header {
+  margin-bottom: 1.5rem;
+}
+
+.public-title {
+  margin: 0 0 0.5rem 0;
+  color: var(--public-primary);
+}
+
+.public-subtitle {
+  color: var(--public-muted);
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.card {
+  background: var(--public-card);
+  border: 1px solid var(--public-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--public-shadow);
+}
+
+.card h3 {
+  margin: 0 0 0.5rem 0;
+  color: var(--public-primary);
+}
+
+.card p {
+  color: var(--public-muted);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  border: 1px solid var(--public-border);
+}
+
+.badge.success { color: var(--success); border-color: var(--success); }
+.badge.warning { color: var(--warning); border-color: var(--warning); }
+.badge.info { color: var(--info); border-color: var(--info); }
+.badge.danger { color: var(--danger); border-color: var(--danger); }
+
+.cta {
+  display: inline-block;
+  margin-top: 0.75rem;
+  background: var(--public-accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+}
+
+.section {
+  margin-top: 2rem;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list li { margin-bottom: 0.5rem; }
+
+.form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.form input, .form textarea {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--public-border);
+  border-radius: 8px;
+}
+
+.form button { align-self: start; }
+
+@media (max-width: 600px) {
+  .public-container { padding: 1rem; }
+}

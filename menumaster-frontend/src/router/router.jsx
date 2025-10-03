@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+﻿import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 // --- Componentes de la Arquitectura ---
 import App from '@/App';
@@ -12,11 +12,28 @@ import ResetPassword from '@/features/auth/pages/ResetPassword';
 import Login from '@/features/auth/pages/Login';
 import Register from '@/features/auth/pages/Register';
 import Home from '@/features/home/pages/Home';
-import Dashboard from '@/features/dashboard/pages/Dashboard';
+import Features from '@/features/home/pages/Features.jsx';
+import Pricing from '@/features/home/pages/Pricing.jsx';
+import Demo from '@/features/home/pages/Demo.jsx';
+import Updates from '@/features/home/pages/Updates.jsx';
+import About from '@/features/home/pages/About.jsx';
+import Careers from '@/features/home/pages/Careers.jsx';
+import Press from '@/features/home/pages/Press.jsx';
+import Partners from '@/features/home/pages/Partners.jsx';
+import Help from '@/features/home/pages/Help.jsx';
+import Contact from '@/features/home/pages/Contact.jsx';
+import Status from '@/features/home/pages/Status.jsx';
+import Security from '@/features/home/pages/Security.jsx';
+import Privacy from '@/features/home/pages/Privacy.jsx';
+import Terms from '@/features/home/pages/Terms.jsx';
+import Cookies from '@/features/home/pages/Cookies.jsx';
+import Licenses from '@/features/home/pages/Licenses.jsx';
+import DashboardAdmin from '@/features/dashboard/pages/DashboardAdmin.jsx';
 
 import Facturacion from '@/features/facturacion/pages/Facturacion.jsx';
 import Mesas from '@/features/mesas/pages/Mesas.jsx';
 import Pedidos from '@/features/pedidos/pages/Pedidos.jsx';
+import PedidoEditar from '@/features/pedidos/pages/PedidoEditar.jsx';
 import Configuracion from '@/features/configuracion/pages/Configuracion.jsx';
 
 // Páginas anidadas de Inventario
@@ -24,7 +41,7 @@ import InventarioLayout from '@/features/inventario/pages/InventarioLayout.jsx';
 import InventarioMenu from '@/features/inventario/components/InventarioMenu.jsx';
 import IngredienteCreado from '@/features/inventario/pages/IngredienteCreado.jsx';
 import IngredienteNuevo from '@/features/inventario/pages/IngredienteNuevo.jsx';
-import Cocina from '@/features/cocina/pages/Cocina.jsx';
+// Cocina removida: se omite paso intermedio
 // Páginas anidadas de Productos
 import ProductosLayout from '@/features/productos/pages/ProductosLayout.jsx';
 import ProductosMenu from '@/features/productos/components/ProductosMenu.jsx';
@@ -40,7 +57,7 @@ import CategoriaModule from '@/features/categorias/CategoriaModule.jsx';
 import NotificacionesModule from '@/features/notificaciones/NotificacionesModule.jsx';
 import PagoModule from '@/features/pagos/PagoModule.jsx';
 import ProveedoresLista from '@/features/proveedores/pages/ProveedoresLista.jsx';
-import MenuDelDia from '@/features/cocina/pages/MenuDelDia.jsx';
+// MenuDelDia removido junto con módulo de cocina
 
 
 const router = createBrowserRouter([
@@ -78,6 +95,22 @@ const router = createBrowserRouter([
         path: '/home',
         element: <Home />,
       },
+      { path: '/features', element: <Features /> },
+      { path: '/pricing', element: <Pricing /> },
+      { path: '/demo', element: <Demo /> },
+      { path: '/updates', element: <Updates /> },
+      { path: '/about', element: <About /> },
+      { path: '/careers', element: <Careers /> },
+      { path: '/press', element: <Press /> },
+      { path: '/partners', element: <Partners /> },
+      { path: '/help', element: <Help /> },
+      { path: '/contact', element: <Contact /> },
+      { path: '/status', element: <Status /> },
+      { path: '/security', element: <Security /> },
+      { path: '/privacy', element: <Privacy /> },
+      { path: '/terms', element: <Terms /> },
+      { path: '/cookies', element: <Cookies /> },
+      { path: '/licenses', element: <Licenses /> },
 
       // --- Rutas Protegidas con Layout ---
       {
@@ -94,21 +127,23 @@ const router = createBrowserRouter([
           },
           {
             path: 'dashboard',
-            element: <Dashboard />,
+            element: <DashboardAdmin />,
           },
-          {
-            path: 'cocina',
-            element: (
-              <PrivateRoute roles={['administrador', 'cocinero']}>
-                <Cocina />
-              </PrivateRoute>
-            ),
-          },
+          // Ruta de cocina eliminada (flujo directo: Pedido -> Facturación)
           {
             path: 'facturacion',
             element: (
               <PrivateRoute roles={['administrador', 'cajero', 'mesero']}>
                 <Facturacion />
+              </PrivateRoute>
+            ),
+          },
+          // Ruta de pagos anidada bajo facturación
+          {
+            path: 'facturacion/pagos',
+            element: (
+              <PrivateRoute roles={['administrador', 'cajero']}>
+                <PagoModule />
               </PrivateRoute>
             ),
           },
@@ -138,6 +173,7 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <InventarioMenu /> },
               { path: 'creados', element: <IngredienteCreado /> },
+              { path: 'ver', element: <IngredienteCreado /> },
               { path: 'nuevo', element: <IngredienteNuevo /> },
             ],
           },
@@ -152,6 +188,7 @@ const router = createBrowserRouter([
               { index: true, element: <ProductosMenu /> },
               { path: 'creados', element: <ProductosCreados /> },
               { path: 'nuevo', element: <ProductoNuevo /> },
+              { path: 'nuevos', element: <ProductoNuevo /> },
             ],
           },
           {
@@ -206,7 +243,7 @@ const router = createBrowserRouter([
             ),
           },
           {
-            path: 'pagos/*',
+            path: 'pagos',
             element: (
               <PrivateRoute roles={['administrador']}>
                 <PagoModule />
@@ -220,15 +257,23 @@ const router = createBrowserRouter([
                 <ProveedoresLista />
               </PrivateRoute>
             ),
-          },
-          {
-            path: 'cocina/menudeldia',
+          },          {
+            path: 'pedidos/editar',
             element: (
-              <PrivateRoute roles={['administrador', 'cocinero']}>
-                <MenuDelDia />
+              <PrivateRoute roles={['administrador', 'mesero']}>
+                <PedidoEditar />
               </PrivateRoute>
             ),
           },
+          {
+            path: 'pedidos/editar/:pedidoId',
+            element: (
+              <PrivateRoute roles={['administrador', 'mesero']}>
+                <PedidoEditar />
+              </PrivateRoute>
+            ),
+          },
+// Subruta de cocina eliminada
         ],
       },
 
@@ -242,4 +287,5 @@ const router = createBrowserRouter([
 ]);
 
 export default router;
+
 

@@ -5,8 +5,13 @@ import React, { useState, useEffect } from 'react';
 // Then add bootstrap CSS in your app's entry point (e.g. index.js or App.js):
 // import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { Row, Col, Card, Form, Button, Table, Alert, Spinner, Modal } from 'react-bootstrap';
-import { getCuadresDiarios, crearOActualizarCuadreDiario } from '@/features/analisis/services/analisisService';
+import { Row, Col, Form, Button, Table, Alert, Spinner } from 'react-bootstrap';
+import { getCuadresDiarios, crearOActualizarCuadreDiario, getProductosMasVendidos } from '@/features/analisis/services/analisisService';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
+import { Bar } from 'react-chartjs-2';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 
 const CuadreDiario = () => {
   const [fechaInicio, setFechaInicio] = useState('');
@@ -21,6 +26,9 @@ const CuadreDiario = () => {
     notas: ''
   });
   const [successMessage, setSuccessMessage] = useState('');
+  const [topProductos, setTopProductos] = useState([]);
+  const [comparacion, setComparacion] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Establecer fechas predeterminadas (último mes)
@@ -37,11 +45,46 @@ const CuadreDiario = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await getCuadresDiarios(inicio, fin);
-      if (response.status === 'success') {
-        setCuadres(response.data);
+      const [cuadresResp, topResp] = await Promise.all([
+        getCuadresDiarios(inicio, fin),
+        getProductosMasVendidos(inicio, fin)
+      ]);
+
+      if (cuadresResp.status === 'success') {
+        const data = cuadresResp.data || [];
+        setCuadres(data);
+
+        // Preparar datos para gráfico de comparación Ventas vs Compras a Proveedores
+        const labels = data.map(item => new Date(item.fecha).toLocaleDateString());
+        const ventasData = data.map(item => parseFloat(item.total_ventas));
+        const comprasData = data.map(item => parseFloat(item.total_compras_proveedores));
+        setComparacion({
+          labels,
+          datasets: [
+            {
+              label: 'Ventas',
+              data: ventasData,
+              backgroundColor: 'rgba(54, 162, 235, 0.5)',
+              borderColor: 'rgba(54, 162, 235, 1)',
+              borderWidth: 1
+            },
+            {
+              label: 'Compras a Proveedores',
+              data: comprasData,
+              backgroundColor: 'rgba(255, 159, 64, 0.5)',
+              borderColor: 'rgba(255, 159, 64, 1)',
+              borderWidth: 1
+            }
+          ]
+        });
       } else {
-        setError(response.message || 'Error al cargar los datos');
+        setError(cuadresResp.message || 'Error al cargar los cuadres diarios');
+      }
+
+      // Procesar top productos (acepta formato {status:'success'} o {success:true})
+      if ((topResp && topResp.status === 'success') || (topResp && topResp.success === true)) {
+        const productos = topResp.data?.productos || topResp.data || [];
+        setTopProductos(productos);
       }
     } catch (err) {
       setError('Error de conexión al servidor');
@@ -104,12 +147,17 @@ const CuadreDiario = () => {
   };
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h3>Cuadre Diario</h3>
-        <Button variant="success" onClick={handleNuevoCuadre}>
-          Nuevo Cuadre
-        </Button>
+    <div className="analisis-section">
+      <div className="d-flex justify-content-between align-items-center mb-4 analisis-toolbar">
+        <h3 className="m-0">Cuadre Diario</h3>
+        <div className="d-flex gap-2">
+          <Button variant="outline-secondary" onClick={() => navigate('/analisis')}>
+            <FaArrowLeft className="me-2" /> Volver a Análisis
+          </Button>
+          <Button variant="success" onClick={handleNuevoCuadre}>
+            Nuevo Cuadre
+          </Button>
+        </div>
       </div>
       
       {successMessage && (
@@ -118,7 +166,7 @@ const CuadreDiario = () => {
         </Alert>
       )}
       
-      <Form onSubmit={handleSubmit} className="mb-4">
+      <Form onSubmit={handleSubmit} className="mb-4 analisis-filters">
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
@@ -160,24 +208,24 @@ const CuadreDiario = () => {
       )}
 
       {!loading && !error && (
-        <Card className="shadow-sm">
-          <Card.Body>
-            <div className="table-responsive">
-              <Table striped hover>
-                <thead>
-                  <tr>
-                    <th>Fecha</th>
-                    <th>Ventas</th>
-                    <th>Costos Productos</th>
-                    <th>Compras Proveedores</th>
-                    <th>Rentabilidad</th>
-                    <th>% Rentabilidad</th>
-                    <th>Notas</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {cuadres.length > 0 ? (
-                    cuadres.map((cuadre, index) => {
+        <div className="section-block">
+          <h5 className="mb-3">Resumen Diario</h5>
+          <div className="table-responsive analisis-table">
+            <Table striped hover className="mb-0">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Ventas</th>
+                  <th>Costos Productos</th>
+                  <th>Compras Proveedores</th>
+                  <th>Rentabilidad</th>
+                  <th>% Rentabilidad</th>
+                  <th>Notas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cuadres.length > 0 ? (
+                  cuadres.map((cuadre, index) => {
                       const rentabilidad = parseFloat(cuadre.total_ventas) - 
                                           parseFloat(cuadre.total_costos) - 
                                           parseFloat(cuadre.total_compras_proveedores);
@@ -202,19 +250,61 @@ const CuadreDiario = () => {
                       <td colSpan="7" className="text-center">No hay cuadres diarios para el período seleccionado</td>
                     </tr>
                   )}
-                </tbody>
-              </Table>
-            </div>
-          </Card.Body>
-        </Card>
+              </tbody>
+            </Table>
+          </div>
+        </div>
       )}
 
-      {/* Modal para nuevo cuadre */}
-      <Modal show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Nuevo Cuadre Diario</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
+      {!loading && !error && topProductos && topProductos.length > 0 && (
+        <div className="section-block">
+          <h5 className="mb-3">Productos más vendidos</h5>
+          <div className="table-responsive analisis-table">
+            <Table striped hover className="mb-0">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad Vendida</th>
+                  <th>Ventas</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topProductos.map((p, idx) => (
+                  <tr key={idx}>
+                    <td>{p.producto_nombre || p.nombre || 'Producto'}</td>
+                    <td>{p.cantidad_total || p.cantidad || 0}</td>
+                    <td>{formatearMoneda(p.ventas_totales || p.total || 0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && comparacion && (
+        <div className="section-block">
+          <h5 className="mb-3">Comparación: Ventas vs Compras a Proveedores</h5>
+          <Bar 
+            data={comparacion}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: 'top' },
+                title: { display: false }
+              },
+              scales: {
+                x: { ticks: { maxRotation: 45, minRotation: 45 } }
+              }
+            }}
+          />
+        </div>
+      )}
+
+      {/* Formulario inline para nuevo cuadre dentro del contenido principal */}
+      {showModal && (
+        <div className="section-block">
+          <h5 className="mb-3">Nuevo Cuadre Diario</h5>
           <Form onSubmit={handleGuardarCuadre}>
             <Form.Group className="mb-3">
               <Form.Label>Fecha</Form.Label>
@@ -260,8 +350,8 @@ const CuadreDiario = () => {
               </Button>
             </div>
           </Form>
-        </Modal.Body>
-      </Modal>
+        </div>
+      )}
     </div>
   );
 };

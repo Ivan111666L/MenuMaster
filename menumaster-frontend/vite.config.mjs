@@ -29,6 +29,7 @@ export default defineConfig({
 
   server: {
     middlewareMode: false,
+    open: '/home',
     proxy: {
       // Proxy para rutas de API que deben devolver JSON desde el backend PHP
       '/inventario': {

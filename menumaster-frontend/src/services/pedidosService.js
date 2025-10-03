@@ -21,7 +21,7 @@ export const getPedidos = async () => {
 
 export const getPedidoById = async (id) => {
   try {
-    const response = await api.get(`/api/pedidos/${id}`);
+    const response = await api.get(`/pedidos/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al obtener pedido ${id}:`, error);
@@ -41,7 +41,7 @@ export const createPedido = async (pedidoData) => {
 
 export const updatePedido = async (id, pedidoData) => {
   try {
-    const response = await api.put(`/api/pedidos/${id}`, pedidoData);
+    const response = await api.put(`/pedidos/${id}`, pedidoData);
     return response.data;
   } catch (error) {
     console.error(`Error al actualizar pedido ${id}:`, error);
@@ -51,7 +51,7 @@ export const updatePedido = async (id, pedidoData) => {
 
 export const deletePedido = async (id) => {
   try {
-    const response = await api.delete(`/api/pedidos/${id}`);
+    const response = await api.delete(`/pedidos/${id}`);
     return response.data;
   } catch (error) {
     console.error(`Error al eliminar pedido ${id}:`, error);

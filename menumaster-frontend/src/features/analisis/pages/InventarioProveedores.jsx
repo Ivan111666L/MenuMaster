@@ -69,12 +69,12 @@ const InventarioProveedores = () => {
   };
 
   return (
-    <div>
+    <div className="analisis-section">
       <h3 className="mb-4">Inventario y Proveedores</h3>
       
-      <Card className="mb-4 shadow-sm">
+      <Card className="mb-4 shadow-sm analisis-card">
         <Card.Body>
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3 analisis-filters">
             <InputGroup>
               <InputGroup.Text>
                 <i className="bi bi-search"></i>
@@ -106,7 +106,7 @@ const InventarioProveedores = () => {
           )}
 
           {!loading && !error && inventarioFiltrado.length > 0 && (
-            <div className="table-responsive">
+            <div className="table-responsive analisis-table">
               <Table striped hover>
                 <thead>
                   <tr>
@@ -163,12 +163,12 @@ const InventarioProveedores = () => {
         </Card.Body>
       </Card>
 
-      <Card className="shadow-sm">
+      <Card className="shadow-sm analisis-card">
         <Card.Body>
           <h5 className="mb-3">Resumen de Inventario</h5>
           <div className="row g-3">
             <div className="col-md-4">
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Total Ingredientes</h6>
                   <h3>{inventario.length}</h3>
@@ -176,7 +176,7 @@ const InventarioProveedores = () => {
               </Card>
             </div>
             <div className="col-md-4">
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Ingredientes Críticos</h6>
                   <h3>{inventario.filter(item => parseFloat(item.stock_actual) <= 10).length}</h3>
@@ -185,7 +185,7 @@ const InventarioProveedores = () => {
               </Card>
             </div>
             <div className="col-md-4">
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Valor Total Inventario</h6>
                   <h3>

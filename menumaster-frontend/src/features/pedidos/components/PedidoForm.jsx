@@ -62,9 +62,9 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
       </div>
 
       {/* Filtro por Categorías */}
-      <div className="form-group">
-        <label htmlFor="categoria">Filtrar por Categoría</label>
-        <div className="categoria-filtros">
+      <fieldset className="form-group" aria-labelledby="categoria-legend">
+        <legend id="categoria-legend">Filtrar por Categoría</legend>
+        <div className="categoria-filtros" role="group" aria-label="Opciones de categoría">
           <button 
             className={`categoria-btn ${categoriaSeleccionada === 'todas' || categoriaSeleccionada === '' ? 'active' : ''}`}
             onClick={() => setCategoriaSeleccionada('todas')}
@@ -81,7 +81,7 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
             </button>
           ))}
         </div>
-      </div>
+      </fieldset>
 
       {/* Lista de Productos por Categoría */}
       <div className="form-group">

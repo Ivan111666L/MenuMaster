@@ -69,10 +69,13 @@ export const useMesas = () => {
   const changeEstadoMesa = useCallback(async (id, nuevoEstado) => {
     try {
       setError(null);
-      const mesaActualizada = await mesaService.changeEstado(id, nuevoEstado);
+      const mesaActualizada = await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
+      // Actualizamos el campo 'estado' que es el que devuelve el backend en listados
       setMesas(prev => prev.map(mesa => 
-        mesa.id === id ? { ...mesa, estado_nombre: nuevoEstado } : mesa
+        mesa.id === id ? { ...mesa, estado: nuevoEstado } : mesa
       ));
+      // Disparamos evento global para refrescar otras vistas (Mesas.jsx)
+      window.dispatchEvent(new Event('mesas:update'));
       return mesaActualizada;
     } catch (err) {
       setError(err.message || 'Error al cambiar el estado de la mesa');
@@ -87,16 +90,16 @@ export const useMesas = () => {
 
   // Filtrar mesas por estado
   const getMesasByEstado = useCallback((estado) => {
-    return mesas.filter(mesa => mesa.estado_nombre === estado);
+    return mesas.filter(mesa => mesa.estado === estado);
   }, [mesas]);
 
   // Obtener estadísticas de mesas
   const getEstadisticasMesas = useCallback(() => {
     const total = mesas.length;
-    const disponibles = mesas.filter(m => m.estado_nombre === 'disponible').length;
-    const ocupadas = mesas.filter(m => m.estado_nombre === 'ocupada').length;
-    const reservadas = mesas.filter(m => m.estado_nombre === 'reservada').length;
-    const mantenimiento = mesas.filter(m => m.estado_nombre === 'mantenimiento').length;
+    const disponibles = mesas.filter(m => m.estado === 'disponible').length;
+    const ocupadas = mesas.filter(m => m.estado === 'ocupada').length;
+    const reservadas = mesas.filter(m => m.estado === 'reservada').length;
+    const mantenimiento = mesas.filter(m => m.estado === 'mantenimiento').length;
 
     return {
       total,

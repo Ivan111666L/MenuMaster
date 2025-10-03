@@ -92,10 +92,10 @@ const ResumenVentas = () => {
   };
 
   return (
-    <div>
+    <div className="analisis-section">
       <h3 className="mb-4">Resumen de Ventas</h3>
       
-      <Form onSubmit={handleSubmit} className="mb-4">
+      <Form onSubmit={handleSubmit} className="mb-4 analisis-filters">
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
@@ -138,9 +138,9 @@ const ResumenVentas = () => {
 
       {!loading && !error && resumen && (
         <>
-          <Row className="mb-4">
+          <Row className="mb-4 analisis-summary">
             <Col md={3}>
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Total Pedidos</h6>
                   <h3>{resumen.totales.total_pedidos}</h3>
@@ -148,7 +148,7 @@ const ResumenVentas = () => {
               </Card>
             </Col>
             <Col md={3}>
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Total Ventas</h6>
                   <h3>{formatearMoneda(resumen.totales.total_ventas)}</h3>
@@ -156,7 +156,7 @@ const ResumenVentas = () => {
               </Card>
             </Col>
             <Col md={3}>
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Total Costos</h6>
                   <h3>{formatearMoneda(resumen.totales.total_costos)}</h3>
@@ -164,7 +164,7 @@ const ResumenVentas = () => {
               </Card>
             </Col>
             <Col md={3}>
-              <Card className="text-center h-100 shadow-sm">
+              <Card className="text-center h-100 shadow-sm analisis-card">
                 <Card.Body>
                   <h6 className="text-muted">Rentabilidad</h6>
                   <h3>{formatearMoneda(resumen.totales.total_rentabilidad)}</h3>
@@ -176,7 +176,7 @@ const ResumenVentas = () => {
             </Col>
           </Row>
 
-          <Card className="mb-4 shadow-sm">
+          <Card className="mb-4 shadow-sm analisis-card">
             <Card.Body>
               <h5 className="mb-3">Evolución de Ventas y Costos</h5>
               {prepararDatosGrafico() && (
@@ -198,10 +198,10 @@ const ResumenVentas = () => {
             </Card.Body>
           </Card>
 
-          <Card className="shadow-sm">
+          <Card className="shadow-sm analisis-card">
             <Card.Body>
               <h5 className="mb-3">Detalle Diario</h5>
-              <div className="table-responsive">
+              <div className="table-responsive analisis-table">
                 <Table striped hover>
                   <thead>
                     <tr>

@@ -15,7 +15,7 @@ const getPedidosParaFacturar = async () => {
  */
 const facturarPedido = async (pedidoId, datosPago) => {
     // Usamos el endpoint que ya creamos en el backend para esto.
-    const response = await api.post(`/api/pedidos/${pedidoId}/facturar`, datosPago);
+    const response = await api.post(`/pedidos/${pedidoId}/facturar`, datosPago);
     return response.data;
 };
 

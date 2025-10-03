@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getNotificaciones, marcarLeida } from '../services/notificacionService';
 import Button from '@/components/Button';
+import '@/styles/notificaciones.css';
 
 function NotificacionesLista() {
   const [notificaciones, setNotificaciones] = useState([]);
@@ -25,11 +26,15 @@ function NotificacionesLista() {
   return (
     <div>
       <h2>Notificaciones</h2>
-      <ul>
+      <ul className="notifications-list">
         {notificaciones.map(n => (
-          <li key={n.id} style={{background:n.leida?'#eee':'#ffe'}}>
-            {n.mensaje}
-            {!n.leida && <Button onClick={() => handleLeida(n.id)} style={{marginLeft:8}}>Marcar como leída</Button>}
+          <li key={n.id} className={`notification-item ${n.leida ? 'leida' : ''}`}>
+            <span>{n.mensaje}</span>
+            {!n.leida && (
+              <Button onClick={() => handleLeida(n.id)} style={{marginLeft:8}}>
+                Marcar como leída
+              </Button>
+            )}
           </li>
         ))}
       </ul>

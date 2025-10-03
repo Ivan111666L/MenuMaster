@@ -23,7 +23,9 @@ const Productos = () => {
              Productos Creados
           </Link>
         </div>
-
+        <Button variant="outline-secondary" onClick={() => navigate('/categorias')}>
+            <FaArrowLeft className="me-2" /> Ver Categorías
+          </Button>
         {/* Puedes agregar más tarjetas aquí en el futuro */}
         
       </div>

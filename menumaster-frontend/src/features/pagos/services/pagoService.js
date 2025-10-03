@@ -2,7 +2,8 @@ import api from '@/services/api';
 
 export const getPagos = async () => {
   const res = await api.get('/pagos');
-  return res.data;
+  // El backend devuelve { success, data }
+  return res?.data?.data ?? [];
 };
 
 export const createPago = async (data) => {
@@ -12,7 +13,8 @@ export const createPago = async (data) => {
 
 export const getMetodosPago = async () => {
   const res = await api.get('/pagos/metodos');
-  return res.data;
+  // El backend devuelve { success, data }
+  return res?.data?.data ?? [];
 };
 
 export const createMetodoPago = async (data) => {

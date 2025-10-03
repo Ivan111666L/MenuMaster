@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Col, Card, Form, Button, Table, Alert, Spinner } from 'react-bootstrap';
+import { Row, Col, Form, Button, Table, Alert, Spinner } from 'react-bootstrap';
 import { getRentabilidadProductos } from '@/features/analisis/services/analisisService';
 import { Bar } from 'react-chartjs-2';
 import { Chart, registerables } from 'chart.js';
@@ -59,6 +59,11 @@ const RentabilidadProductos = () => {
     const rentabilidadData = topProductos.map(item => parseFloat(item.rentabilidad_total));
     const ventasData = topProductos.map(item => parseFloat(item.ventas_totales));
     const costosData = topProductos.map(item => parseFloat(item.costos_totales));
+    const gananciaUnitData = topProductos.map(item => {
+      const precio = parseFloat(item.precio_promedio || 0);
+      const costoUnit = parseFloat(item.costo_fabricacion || 0);
+      return precio - costoUnit;
+    });
 
     return {
       labels,
@@ -83,6 +88,13 @@ const RentabilidadProductos = () => {
           backgroundColor: 'rgba(75, 192, 192, 0.5)',
           borderColor: 'rgba(75, 192, 192, 1)',
           borderWidth: 1
+        },
+        {
+          label: 'Ganancia por Plato',
+          data: gananciaUnitData,
+          backgroundColor: 'rgba(255, 206, 86, 0.5)',
+          borderColor: 'rgba(255, 206, 86, 1)',
+          borderWidth: 1
         }
       ]
     };
@@ -96,11 +108,24 @@ const RentabilidadProductos = () => {
     });
   };
 
+  const calcularGananciaPorPlato = (producto) => {
+    const precio = parseFloat(producto?.precio_promedio || 0);
+    const costoUnit = parseFloat(producto?.costo_fabricacion || 0);
+    return precio - costoUnit;
+  };
+
+  const calcularMargenUnitario = (producto) => {
+    const precio = parseFloat(producto?.precio_promedio || 0);
+    const gananciaUnit = calcularGananciaPorPlato(producto);
+    if (precio <= 0) return 0;
+    return (gananciaUnit / precio) * 100;
+  };
+
   return (
-    <div>
+    <div className="analisis-section">
       <h3 className="mb-4">Rentabilidad de Productos</h3>
       
-      <Form onSubmit={handleSubmit} className="mb-4">
+      <Form onSubmit={handleSubmit} className="mb-4 analisis-filters">
         <Row>
           <Col md={4}>
             <Form.Group className="mb-3">
@@ -143,69 +168,106 @@ const RentabilidadProductos = () => {
 
       {!loading && !error && productos.length > 0 && (
         <>
-          <Card className="mb-4 shadow-sm">
-            <Card.Body>
-              <h5 className="mb-3">Top 10 Productos por Rentabilidad</h5>
-              {prepararDatosGrafico() && (
-                <Bar 
-                  data={prepararDatosGrafico()} 
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: 'top',
-                      },
-                      title: {
-                        display: false
-                      }
+          <div className="section-block">
+            <h5 className="mb-3">Top 10 Productos por Rentabilidad</h5>
+            {prepararDatosGrafico() && (
+              <Bar 
+                data={prepararDatosGrafico()} 
+                options={{
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      position: 'top',
                     },
-                    scales: {
-                      x: {
-                        ticks: {
-                          maxRotation: 45,
-                          minRotation: 45
-                        }
+                    title: {
+                      display: false
+                    }
+                  },
+                  scales: {
+                    x: {
+                      ticks: {
+                        maxRotation: 45,
+                        minRotation: 45
                       }
                     }
-                  }}
-                />
-              )}
-            </Card.Body>
-          </Card>
+                  }
+                }}
+              />
+            )}
+          </div>
 
-          <Card className="shadow-sm">
-            <Card.Body>
-              <h5 className="mb-3">Detalle de Rentabilidad por Producto</h5>
-              <div className="table-responsive">
-                <Table striped hover>
+          <div className="section-block">
+            <h5 className="mb-3">Detalle de Rentabilidad por Producto</h5>
+            <div className="table-responsive analisis-table">
+              <Table striped hover className="mb-0">
                   <thead>
                     <tr>
                       <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Precio Promedio</th>
-                      <th>Ventas</th>
-                      <th>Costos</th>
-                      <th>Rentabilidad</th>
+                      <th>Concurrencia</th>
+                      <th>Precio Venta Promedio</th>
+                      <th>Costo Unitario</th>
+                      <th>Ganancia por Plato</th>
+                      <th>Margen Unitario (%)</th>
+                      <th>Ventas Totales</th>
+                      <th>Costos Totales</th>
+                      <th>Rentabilidad Total</th>
                       <th>% Rentabilidad</th>
                     </tr>
                   </thead>
                   <tbody>
                     {productos.map((producto, index) => (
-                      <tr key={index}>
-                        <td>{producto.producto_nombre}</td>
-                        <td>{producto.cantidad_total}</td>
-                        <td>{formatearMoneda(producto.precio_promedio)}</td>
-                        <td>{formatearMoneda(producto.ventas_totales)}</td>
-                        <td>{formatearMoneda(producto.costos_totales)}</td>
-                        <td>{formatearMoneda(producto.rentabilidad_total)}</td>
-                        <td>{parseFloat(producto.porcentaje_rentabilidad).toFixed(2)}%</td>
-                      </tr>
+                      <>
+                        <tr key={`prod-${index}`}>
+                          <td>{producto.producto_nombre}</td>
+                          <td>{producto.cantidad_total}</td>
+                          <td>{formatearMoneda(producto.precio_promedio)}</td>
+                          <td>{formatearMoneda(producto.costo_fabricacion || 0)}</td>
+                          <td>{formatearMoneda(calcularGananciaPorPlato(producto))}</td>
+                          <td>{calcularMargenUnitario(producto).toFixed(2)}%</td>
+                          <td>{formatearMoneda(producto.ventas_totales)}</td>
+                          <td>{formatearMoneda(producto.costos_totales)}</td>
+                          <td>{formatearMoneda(producto.rentabilidad_total)}</td>
+                          <td>{parseFloat(producto.porcentaje_rentabilidad).toFixed(2)}%</td>
+                        </tr>
+                        <tr key={`ing-${index}`}>
+                          <td colSpan="10">
+                            {producto.ingredientes && producto.ingredientes.length > 0 ? (
+                              <div className="mt-2">
+                                <strong>Ingredientes:</strong>
+                                <Table size="sm" className="mt-2">
+                                  <thead>
+                                    <tr>
+                                      <th>Ingrediente</th>
+                                      <th>Cantidad</th>
+                                      <th>Unidad</th>
+                                      <th>Costo Unitario</th>
+                                      <th>Costo Subtotal</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {producto.ingredientes.map((ing, idx) => (
+                                      <tr key={idx}>
+                                        <td>{ing.ingrediente_nombre}</td>
+                                        <td>{ing.cantidad}</td>
+                                        <td>{ing.unidad_medida}</td>
+                                        <td>{formatearMoneda(ing.costo_unitario || 0)}</td>
+                                        <td>{formatearMoneda(ing.costo_subtotal || 0)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </Table>
+                              </div>
+                            ) : (
+                              <div className="text-muted">Sin ingredientes definidos para este producto.</div>
+                            )}
+                          </td>
+                        </tr>
+                      </>
                     ))}
                   </tbody>
                 </Table>
               </div>
-            </Card.Body>
-          </Card>
+          </div>
         </>
       )}
 

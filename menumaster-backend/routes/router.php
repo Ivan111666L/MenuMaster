@@ -122,6 +122,15 @@ try {
         case 'compras':
             require_once BASE_PATH . '/routes/compras_api.php';
             break;
+        case 'pagos':
+            require_once BASE_PATH . '/routes/pagos_api.php';
+            break;
+        case 'notificaciones':
+            require_once BASE_PATH . '/routes/notificaciones_api.php';
+            break;
+        case 'logs':
+            require_once BASE_PATH . '/routes/logs_api.php';
+            break;
 
         
         // ...otros recursos

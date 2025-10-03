@@ -2,7 +2,8 @@ import api from '@/services/api';
 
 export const getNotificaciones = async () => {
   const res = await api.get('/notificaciones');
-  return res.data;
+  // Backend responde { success, data }
+  return res?.data?.data ?? [];
 };
 
 export const marcarLeida = async (id) => {
@@ -12,5 +13,6 @@ export const marcarLeida = async (id) => {
 
 export const getLogs = async () => {
   const res = await api.get('/logs');
-  return res.data;
+  // Backend responde { success, data }
+  return res?.data?.data ?? [];
 };
