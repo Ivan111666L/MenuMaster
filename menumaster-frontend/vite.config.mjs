@@ -17,6 +17,26 @@ export default defineConfig({
           }
           next()
         })
+      },
+      // Forzar charset en dev server para HTML/JS/CSS por compatibilidad con herramientas
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          const url = req.url || ''
+          const accept = req.headers['accept'] || ''
+          // HTML
+          if (accept.includes('text/html') || url === '/' || url.startsWith('/dashboard')) {
+            res.setHeader('Content-Type', 'text/html; charset=utf-8')
+          }
+          // JavaScript (módulos y dependencias de Vite)
+          if (url.endsWith('.js') || url.includes('/node_modules/.vite/deps/')) {
+            res.setHeader('Content-Type', 'text/javascript; charset=utf-8')
+          }
+          // CSS
+          if (url.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8')
+          }
+          next()
+        })
       }
     }
   ],

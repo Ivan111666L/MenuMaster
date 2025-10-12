@@ -103,9 +103,13 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
       
       {/* Buscador */}
       <div className="ingredientes-busqueda">
+        <label htmlFor="ingredientes-busqueda" className="form-label">Buscar ingredientes</label>
         <input
+          id="ingredientes-busqueda"
+          name="ingredientes-busqueda"
           type="text"
           placeholder="Buscar ingredientes..."
+          aria-label="Buscar ingredientes"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           className="form-input"
@@ -151,8 +155,10 @@ function SelectorIngredientes({ onIngredientesChange, ingredientesSeleccionados 
               <div key={ingrediente.id} className="ingrediente-seleccionado">
                 <span className="ingrediente-nombre">{ingrediente.nombre}</span>
                 <div className="ingrediente-cantidad-control">
-                  <label>Cantidad:</label>
+                  <label htmlFor={`cantidad-${ingrediente.id}`}>Cantidad:</label>
                   <input
+                    id={`cantidad-${ingrediente.id}`}
+                    name="cantidad"
                     type="number"
                     min="0.1"
                     step="0.1"

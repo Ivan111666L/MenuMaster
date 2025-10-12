@@ -1,9 +1,10 @@
 <?php
+namespace App\Models;
 
-require_once __DIR__ . '/../config/conexionDb.php';
-use App\Config\ConexionDb;
+use PDO;
+use PDOException;
 
-class PagoModel {
+class PagosModel {
     // Conexión a la base de datos y nombre de la tabla
     private $conn;
     private $table_name = "pagos";
@@ -12,12 +13,12 @@ class PagoModel {
     public $id;
     public $pedido_id;
     public $monto;
-    public $metodo_pago;
+    public $metodo_pago_id;
     public $usuario_id;
     public $fecha_pago;
 
     // Constructor con la conexión a la base de datos
-    public function __construct($db) {
+    public function __construct(PDO $db) {
         $this->conn = $db;
     }
 
@@ -37,24 +38,20 @@ class PagoModel {
      */
     public function crear() {
         try {
-            $query = "INSERT INTO " . $this->table_name . "
-                      SET
-                        pedido_id = :pedido_id,
-                        monto = :monto,
-                        metodo_pago = :metodo_pago,
-                        usuario_id = :usuario_id";
+            $query = "INSERT INTO " . $this->table_name . " (pedido_id, monto, metodo_pago_id, usuario_id)
+                      VALUES (:pedido_id, :monto, :metodo_pago_id, :usuario_id)";
 
             $stmt = $this->conn->prepare($query);
 
             // Sanitizar y vincular los parámetros
             $this->pedido_id = htmlspecialchars(strip_tags($this->pedido_id));
             $this->monto = htmlspecialchars(strip_tags($this->monto));
-            $this->metodo_pago = htmlspecialchars(strip_tags($this->metodo_pago));
+            $this->metodo_pago_id = htmlspecialchars(strip_tags($this->metodo_pago_id));
             $this->usuario_id = htmlspecialchars(strip_tags($this->usuario_id));
 
             $stmt->bindParam(":pedido_id", $this->pedido_id, PDO::PARAM_INT);
             $stmt->bindParam(":monto", $this->monto);
-            $stmt->bindParam(":metodo_pago", $this->metodo_pago);
+            $stmt->bindParam(":metodo_pago_id", $this->metodo_pago_id, PDO::PARAM_INT);
             $stmt->bindParam(":usuario_id", $this->usuario_id, PDO::PARAM_INT);
 
             if ($stmt->execute()) {
@@ -74,7 +71,7 @@ class PagoModel {
      */
     public function leer() {
         try {
-            $query = "SELECT id, pedido_id, monto, metodo_pago, usuario_id, fecha_pago
+            $query = "SELECT id, pedido_id, monto, metodo_pago_id, usuario_id, fecha_pago
                       FROM " . $this->table_name . "
                       ORDER BY fecha_pago DESC";
             $stmt = $this->conn->prepare($query);
@@ -93,7 +90,7 @@ class PagoModel {
      */
     public function leerPorPedidoId($pedido_id) {
         try {
-            $query = "SELECT id, pedido_id, monto, metodo_pago, usuario_id, fecha_pago
+            $query = "SELECT id, pedido_id, monto, metodo_pago_id, usuario_id, fecha_pago
                       FROM " . $this->table_name . "
                       WHERE pedido_id = :pedido_id
                       ORDER BY fecha_pago DESC";

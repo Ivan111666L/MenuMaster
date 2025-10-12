@@ -3,6 +3,8 @@ namespace App\Controllers;
 
 use App\Models\PedidoModel;
 use App\Models\MesaModel;
+use App\Models\PagosModel;
+use App\Models\MetodoPagoModel;
 use App\EstadosMesa;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
@@ -31,6 +33,18 @@ class PedidoController
     {
         // Obtener parámetro 'estado' desde query string (forma segura)
         $estado = isset($_GET['estado']) ? trim($_GET['estado']) : null;
+
+        // Mapear sinónimos de estados enviados desde frontend a nombres internos
+        if ($estado) {
+            $synonyms = [
+                'listo para servir' => 'servido',
+            ];
+            $parts = array_map('trim', explode(',', strtolower($estado)));
+            $mapped = array_map(function ($p) use ($synonyms) {
+                return $synonyms[$p] ?? $p;
+            }, $parts);
+            $estado = implode(',', $mapped);
+        }
 
         try {
             if ($estado) {
@@ -159,28 +173,20 @@ class PedidoController
                 }
             } else {
                 Validator::validate($data, ['estado' => 'required']);
-                if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
+                // Normalizar nombre de estado para coincidir con la BD (espacios, guiones, mayúsculas)
+                $estadoNormalizado = $this->normalizarEstadoPedidoNombre((string)$data['estado']);
+                if ($estadoNormalizado === null) {
+                    $this->sendResponse(422, null, "Estado de pedido inválido");
+                    return;
+                }
+                if (!$this->pedidoModel->actualizarEstadoPedido($id, $estadoNormalizado)) {
                     $this->sendResponse(500, null, "Error al actualizar el estado del pedido");
                     return;
                 }
             }
             
-            // Si el pedido se marca como entregado o completado, liberar la mesa
-            $estadosQueLiberanMesaPorNombre = ['entregado', 'completado', 'finalizado'];
-            $liberarMesa = false;
-            if (isset($data['estado'])) {
-                $liberarMesa = in_array(strtolower($data['estado']), $estadosQueLiberanMesaPorNombre);
-            }
-            // Si envían estado_id, considerar liberar si corresponde (SERVIDO o PAGADO)
-            if (isset($data['estado_id'])) {
-                $liberarMesa = in_array((int)$data['estado_id'], [\App\EstadosPedido::SERVIDO, \App\EstadosPedido::PAGADO]);
-            }
-            if ($liberarMesa) {
-                $mesaId = $pedido['mesa_id'] ?? null;
-                if ($mesaId && !$this->mesaModel->cambiarEstadoPorId($mesaId, EstadosMesa::DISPONIBLE)) {
-                    error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
-                }
-            }
+            // Nota: Se desactiva la auto-liberación de mesa al cambiar estado del pedido.
+            // La liberación ahora se realiza explícitamente via endpoint de mesas.
             
             $this->sendResponse(200, "Estado del pedido actualizado correctamente");
             
@@ -188,6 +194,40 @@ class PedidoController
             error_log("Error en PedidoController::updateStatus: " . $e->getMessage());
             $this->sendResponse(500, null, $e->getMessage());
         }
+    }
+
+    /**
+     * Normaliza nombres de estado enviados por el frontend para que coincidan con la BD.
+     * Retorna el nombre exacto en la tabla `estados_pedido` o null si no se reconoce.
+     */
+    private function normalizarEstadoPedidoNombre(string $estado): ?string
+    {
+        $e = strtolower(trim($estado));
+        // Reemplazar guiones/underscores por espacio y colapsar dobles espacios
+        $e = preg_replace('/[-_]+/',' ', $e);
+        $e = preg_replace('/\s{2,}/',' ', $e);
+        // Mapeo de sinónimos conocidos
+        $map = [
+            'pendiente' => 'pendiente',
+            'en preparacion' => 'en preparacion',
+            'en preparación' => 'en preparacion',
+            'enpreparacion' => 'en preparacion',
+            'listo para servir' => 'servido',
+            'servido' => 'servido',
+            'entregado' => 'servido',
+            'completado' => 'servido',
+            'finalizado' => 'servido',
+            'pagado' => 'pagado',
+            'facturado' => 'pagado',
+            'cancelado' => 'cancelado'
+        ];
+        if (isset($map[$e])) {
+            return $map[$e];
+        }
+        // Si no coincide exactamente, devolver el valor normalizado como intento final
+        // para nombres ya correctos que vengan con variaciones.
+        $permitidos = ['pendiente','en preparacion','servido','pagado','cancelado'];
+        return in_array($e, $permitidos) ? $e : null;
     }
     
     /**
@@ -202,22 +242,136 @@ class PedidoController
                 $this->sendResponse(404, null, "Pedido no encontrado");
                 return;
             }
-            
-            // En una implementación real, aquí se validaría $data['metodo_pago'], etc.
+            // Validación de datos de pago
+            $metodoId = isset($data['metodo_id']) ? (int)$data['metodo_id'] : null;
+            $metodoPagoTexto = isset($data['metodo_pago']) ? trim($data['metodo_pago']) : null;
+            $dividir = !empty($data['dividir']);
+            $personas = isset($data['personas']) && (int)$data['personas'] > 0 ? (int)$data['personas'] : 1;
+
+            if (!$metodoId && !$metodoPagoTexto) {
+                $this->sendResponse(422, null, "Se requiere 'metodo_id' o 'metodo_pago'.");
+                return;
+            }
+
+            // Calcular total del pedido (a partir de los detalles)
+            $totalPedido = 0.0;
+            if (!empty($pedido['items'])) {
+                foreach ($pedido['items'] as $item) {
+                    $cantidad = isset($item['cantidad']) ? (int)$item['cantidad'] : 0;
+                    $precio = isset($item['precio_unitario']) ? (float)$item['precio_unitario'] : 0.0;
+                    $totalPedido += ($cantidad * $precio);
+                }
+            }
+
+            // Monto a registrar (por persona si se divide)
+            $monto = $dividir && $personas > 1 ? ($totalPedido / $personas) : $totalPedido;
+
+            // Resolver método de pago (id y nombre)
+            $metodoPagoNombre = $metodoPagoTexto;
+            // Mapeo de sinónimos de método de pago
+            $metodoPagoTextoNorm = $metodoPagoTexto ? mb_strtolower($metodoPagoTexto) : null;
+            $mapMetodos = [
+                'efectivo' => 1,
+                'cash' => 1,
+                'tarjeta' => 2, // por defecto crédito
+                'tarjeta de crédito' => 2,
+                'credito' => 2,
+                'crédito' => 2,
+                'tarjeta de débito' => 3,
+                'debito' => 3,
+                'débito' => 3,
+                'transferencia' => 4,
+                'transfer' => 4,
+            ];
+
+            if (!$metodoId && $metodoPagoTextoNorm && isset($mapMetodos[$metodoPagoTextoNorm])) {
+                $metodoId = $mapMetodos[$metodoPagoTextoNorm];
+            }
+
+            if ($metodoId) {
+                $stmtMetodo = $this->db->prepare('SELECT id, nombre FROM metodos_pago WHERE id = :id');
+                $stmtMetodo->bindParam(':id', $metodoId, PDO::PARAM_INT);
+                $stmtMetodo->execute();
+                $metodo = $stmtMetodo->fetch(PDO::FETCH_ASSOC);
+                if (!$metodo) {
+                    $this->sendResponse(404, null, 'Método de pago no encontrado.');
+                    return;
+                }
+                $metodoPagoNombre = $metodo['nombre'];
+                $metodoId = (int)$metodo['id'];
+            } else if ($metodoPagoTexto) {
+                // Buscar por nombre si no se envió id (case-insensitive)
+                $stmtMetodo = $this->db->prepare('SELECT id, nombre FROM metodos_pago WHERE LOWER(nombre) = LOWER(:nombre)');
+                $stmtMetodo->bindParam(':nombre', $metodoPagoTexto);
+                $stmtMetodo->execute();
+                $metodo = $stmtMetodo->fetch(PDO::FETCH_ASSOC);
+                if ($metodo) {
+                    $metodoPagoNombre = $metodo['nombre'];
+                    $metodoId = (int)$metodo['id'];
+                } else {
+                    $this->sendResponse(422, null, 'Método de pago inválido o no soportado.');
+                    return;
+                }
+            }
+
+            // Obtener usuario del token
+            $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+            $usuarioId = 0;
+            if ($token) {
+                $payload = AuthController::decodeTokenData($token);
+                if (isset($payload['data'])) {
+                    if (is_array($payload['data'])) {
+                        $usuarioId = $payload['data']['id'] ?? 0;
+                    } elseif (is_object($payload['data'])) {
+                        $usuarioId = $payload['data']->id ?? 0;
+                    }
+                }
+            }
+            // Fallback: usar usuario asociado al pedido si token no provee id válido
+            if (!$usuarioId) {
+                $usuarioId = isset($pedido['usuario_id']) ? (int)$pedido['usuario_id'] : 0;
+            }
+
+            // Registrar pago
+            $pagosModel = new PagosModel($this->db);
+            $pagosModel->pedido_id = $id;
+            $pagosModel->monto = $monto;
+            $pagosModel->metodo_pago_id = $metodoId;
+            $pagosModel->usuario_id = $usuarioId;
+
+            if (!$pagosModel->crear()) {
+                $this->sendResponse(500, null, 'No se pudo registrar el pago.');
+                return;
+            }
+
+            // Facturar pedido tras registrar el pago
             if (!$this->pedidoModel->facturarPedido($id)) {
                 $this->sendResponse(500, null, "No se pudo facturar el pedido. Verifique el ID");
                 return;
             }
-            
+
             // Cambiar el estado de la mesa a disponible (por ID) después de facturar el pedido
             $mesaId = $pedido['mesa_id'] ?? null;
             if ($mesaId && !$this->mesaModel->cambiarEstadoPorId($mesaId, EstadosMesa::DISPONIBLE)) {
                 error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
             }
-            
+
+            // Preparar datos de pago para impresión del recibo
+            $pedido['pago'] = [
+                'metodo' => $metodoPagoNombre ?? 'Desconocido',
+                'referencia' => 'PED-' . $id . '-' . date('YmdHis'),
+            ];
+
+            // Guardar en historial tras facturar
+            try {
+                $this->pedidoModel->guardarEnHistorial($id);
+            } catch (Exception $e) {
+                error_log('Advertencia: No se pudo guardar el pedido en historial: ' . $e->getMessage());
+            }
+
             // Imprimir recibo
             $this->imprimirRecibo($pedido);
-            
+
             $this->sendResponse(200, "Pedido facturado con éxito");
             
         } catch (Exception $e) {

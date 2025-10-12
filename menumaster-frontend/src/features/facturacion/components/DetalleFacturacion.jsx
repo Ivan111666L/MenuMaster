@@ -11,8 +11,19 @@ function DetalleFacturacion({ pedidoSeleccionado, numeroPersonas, setNumeroPerso
     );
   }
 
-  const totalPedido = pedidoSeleccionado.items.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
-  const totalPorPersona = (totalPedido / numeroPersonas).toFixed(2);
+  // Normalizamos la lista de items/detalles para evitar errores cuando 'items' sea undefined
+  const rawItems = Array.isArray(pedidoSeleccionado.items)
+    ? pedidoSeleccionado.items
+    : Array.isArray(pedidoSeleccionado.detalles)
+      ? pedidoSeleccionado.detalles
+      : [];
+
+  const getNombre = (item) => item?.nombre_producto ?? item?.producto_nombre ?? item?.nombre ?? 'Producto';
+  const getCantidad = (item) => Number(item?.cantidad ?? 1);
+  const getPrecioUnitario = (item) => Number(item?.precio_unitario ?? item?.precio ?? 0);
+
+  const totalPedido = rawItems.reduce((sum, item) => sum + (getCantidad(item) * getPrecioUnitario(item)), 0);
+  const totalPorPersona = (totalPedido / Math.max(1, Number(numeroPersonas) || 1)).toFixed(2);
 
   return (
     <div className="detalle-facturacion">
@@ -20,10 +31,10 @@ function DetalleFacturacion({ pedidoSeleccionado, numeroPersonas, setNumeroPerso
       <p><strong>Mesa:</strong> {pedidoSeleccionado.mesa_numero}</p>
       
       <ul className="detalle-items">
-        {pedidoSeleccionado.items.map(item => (
-          <li key={item.producto_id}>
-            <span>{item.cantidad} x {item.nombre_producto}</span>
-            <span>${(item.cantidad * item.precio_unitario).toFixed(2)}</span>
+        {rawItems.map((item, idx) => (
+          <li key={item?.producto_id ?? item?.id ?? idx}>
+            <span>{getCantidad(item)} x {getNombre(item)}</span>
+            <span>${(getCantidad(item) * getPrecioUnitario(item)).toFixed(2)}</span>
           </li>
         ))}
       </ul>
@@ -40,8 +51,9 @@ function DetalleFacturacion({ pedidoSeleccionado, numeroPersonas, setNumeroPerso
         {numeroPersonas > 1 && (<h4 className="total-dividido">Total por persona: ${totalPorPersona}</h4>)}
         
         <div className="botones-accion">
-          <Button onClick={() => facturar(pedidoSeleccionado.id, 'Efectivo')} variant="primary">Facturar (Efectivo)</Button>
-          <Button onClick={() => facturar(pedidoSeleccionado.id, 'Tarjeta')} variant="secondary">Facturar (Tarjeta)</Button>
+          {/* Enviamos metodo_id explícito para evitar errores en backend */}
+          <Button onClick={() => facturar(pedidoSeleccionado.id, 'Efectivo', 1)} variant="primary">Facturar (Efectivo)</Button>
+          <Button onClick={() => facturar(pedidoSeleccionado.id, 'Tarjeta de Crédito', 2)} variant="secondary">Facturar (Tarjeta)</Button>
           <Button onClick={generarFacturaParaImprimir}>Imprimir</Button>
           <Button onClick={generarPagoQR}>Generar QR</Button>
         </div>

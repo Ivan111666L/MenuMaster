@@ -139,9 +139,10 @@ export const usePedido = () => {
             }
             // Intentar marcar el pedido como en preparación en backend
             try {
-                await api.put(`/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
+                // Enviar estado_id para evitar problemas de normalización
+                await api.put(`/pedidos/${pedidoId}/estado`, { estado_id: 2 });
             } catch (e) {
-                console.warn('No se pudo asignar estado en_preparacion al pedido:', e);
+                console.warn('No se pudo asignar estado EN_PREPARACION al pedido:', e);
             }
             // No actualizar estado de mesa aquí: el backend ya marca la mesa como 'ocupada'
             // al crear el pedido y la libera en los estados correspondientes.

@@ -66,7 +66,15 @@ function DashboardAdmin() {
           <div className="chart-container">
             <h3>Reportes</h3>
             <div className="form-row" style={{display:'flex',gap:'0.5rem',alignItems:'center'}}>
-              <select value={reportType} onChange={e => setReportType(e.target.value)}>
+              <label htmlFor="report-type" className="visually-hidden">Tipo de reporte</label>
+              <select
+                id="report-type"
+                name="reportType"
+                aria-label="Tipo de reporte"
+                title="Tipo de reporte"
+                value={reportType}
+                onChange={e => setReportType(e.target.value)}
+              >
                 <option value="ventas">Ventas</option>
                 <option value="pedidos">Pedidos</option>
                 <option value="productos">Productos</option>

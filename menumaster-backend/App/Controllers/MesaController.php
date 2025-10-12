@@ -158,6 +158,25 @@ class MesaController
         $this->sendResponse(200, ['success' => true, 'message' => 'Todas las mesas han sido reseteadas a disponible.']);
     }
 
+    /**
+     * Libera una mesa específica, estableciéndola en estado 'DISPONIBLE'.
+     * Corresponde a: PUT /api/mesas/{id}/liberar
+     */
+    public function liberar(int $id): void
+    {
+        if (!$this->mesaModel->find($id)) {
+            throw new Exception("Mesa no encontrada.", 404);
+        }
+
+        $cambiado = $this->mesaModel->cambiarEstadoPorId($id, EstadosMesa::DISPONIBLE);
+        if (!$cambiado) {
+            throw new Exception("No se pudo liberar la mesa.", 400);
+        }
+
+        $mesaActualizada = $this->mesaModel->find($id);
+        $this->sendResponse(200, ['success' => true, 'data' => $mesaActualizada]);
+    }
+
     // --- Métodos de Ayuda ---
     private function validarCampos(array $data, array $camposRequeridos): void
     {

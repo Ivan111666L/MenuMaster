@@ -169,19 +169,28 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
 
       <h4 style={{ marginTop: '16px' }}>Todos los ingredientes disponibles</h4>
       <div style={{ marginBottom: '8px' }}>
+        <label htmlFor="proveedor-buscar-ingredientes" style={{ display: 'block', marginBottom: '4px' }}>Buscar ingredientes</label>
         <input
+          id="proveedor-buscar-ingredientes"
+          name="proveedor-buscar-ingredientes"
           type="text"
           placeholder="Buscar ingredientes..."
+          aria-label="Buscar ingredientes"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
           style={{ width: '100%', padding: '6px' }}
         />
       </div>
       <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+        <label htmlFor="proveedor-nuevo-ingrediente" style={{ fontSize: '0.9em' }}>Agregar ingrediente</label>
         <select
+          id="proveedor-nuevo-ingrediente"
+          name="proveedor-nuevo-ingrediente"
           value={nuevoIngredienteId}
           onChange={(e) => setNuevoIngredienteId(e.target.value)}
           style={{ flex: 1, padding: '6px' }}
+          aria-label="Seleccionar ingrediente para agregar"
+          title="Seleccionar ingrediente para agregar"
         >
           <option value="">Selecciona un ingrediente para agregar</option>
           {Array.isArray(allIngredientes) && allIngredientes

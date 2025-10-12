@@ -3,9 +3,9 @@ import React from 'react';
 function ListaPedidos({ pedidos, pedidoSeleccionado, seleccionarPedido }) {
   return (
     <div className="facturacion-lista-pedidos">
-      <h2>Pedidos Listos</h2>
+      <h2>Pedidos para Facturar</h2>
       {pedidos.length === 0 ? (
-        <p>No hay pedidos listos para servir.</p>
+        <p>No hay pedidos disponibles para facturar.</p>
       ) : (
         <ul>
           {pedidos.map(pedido => (

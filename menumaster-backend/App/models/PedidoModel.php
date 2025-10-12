@@ -63,7 +63,7 @@ class PedidoModel
     public function getPedidoWithDetails(int $id): array|false
     {
         // 1. Obtenemos los datos básicos del pedido.
-        $sql = "SELECT p.id, p.mesa_id, p.notas, p.fecha_creacion, m.numero AS mesa_numero, 
+        $sql = "SELECT p.id, p.mesa_id, p.usuario_id, p.notas, p.fecha_creacion, m.numero AS mesa_numero, 
                        u.nombre AS mesero_nombre, ep.nombre AS estado
                 FROM {$this->table} p
                 LEFT JOIN mesas m ON p.mesa_id = m.id
@@ -295,12 +295,17 @@ class PedidoModel
                     // Calcular y guardar el costo del producto
                     $costo = $productoIngredienteModel->calcularCostoProducto($detalle['producto_id']) * $detalle['cantidad'];
                     
-                    // Guardar el costo en el detalle del pedido para uso posterior
-                    $updateCostoQuery = "UPDATE detalles_pedido SET costo_total = :costo WHERE id = :detalle_id";
-                    $updateCostoStmt = $this->db->prepare($updateCostoQuery);
-                    $updateCostoStmt->bindParam(':costo', $costo, PDO::PARAM_STR);
-                    $updateCostoStmt->bindParam(':detalle_id', $detalle['id'], PDO::PARAM_INT);
-                    $updateCostoStmt->execute();
+                    // Guardar el costo en el detalle del pedido si la columna existe
+                    try {
+                        $updateCostoQuery = "UPDATE detalles_pedido SET costo_total = :costo WHERE id = :detalle_id";
+                        $updateCostoStmt = $this->db->prepare($updateCostoQuery);
+                        $updateCostoStmt->bindParam(':costo', $costo, PDO::PARAM_STR);
+                        $updateCostoStmt->bindParam(':detalle_id', $detalle['id'], PDO::PARAM_INT);
+                        $updateCostoStmt->execute();
+                    } catch (Exception $e) {
+                        // Continuar si la columna no existe en algunas instalaciones
+                        error_log('Aviso: No se pudo actualizar costo_total en detalles_pedido: ' . $e->getMessage());
+                    }
                 } catch (Exception $e) {
                     // Si hay error en el descuento, revertir transacción
                     if ($this->db->inTransaction()) {
@@ -311,8 +316,11 @@ class PedidoModel
                 }
             }
             
-            // Cambiar estado del pedido a 'facturado'
+            // Cambiar estado del pedido a 'facturado' si existe, en caso contrario 'pagado'
             $result = $this->actualizarEstadoPedido($id, 'facturado');
+            if (!$result) {
+                $result = $this->actualizarEstadoPedido($id, 'pagado');
+            }
             
             // Confirmar transacción
             $this->db->commit();

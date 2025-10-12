@@ -47,8 +47,8 @@ try {
 
     // Instanciar modelos
     $metodosModel = new \App\Models\MetodoPagoModel($db);
-    $pagosModelClassExists = class_exists('PagoModel');
-    $pagosModel = $pagosModelClassExists ? new PagoModel($db) : null;
+    // CORRECCIÓN: Usar la clase correcta del modelo de pagos
+    $pagosModel = new \App\Models\PagosModel($db);
 
     if ($method === 'GET') {
         if ($action === 'metodos') {
@@ -61,15 +61,11 @@ try {
             return;
         }
 
-        // Listar pagos (si el modelo existe)
-        if ($pagosModel) {
-            requireAdmin();
-            $data = $pagosModel->leer();
-            echo json_encode(['success' => true, 'data' => $data]);
-            return;
-        }
-
-        throw new Exception('Recurso no disponible.', 404);
+        // Listar pagos
+        requireAdmin();
+        $data = $pagosModel->leer();
+        echo json_encode(['success' => true, 'data' => $data]);
+        return;
     }
 
     if ($method === 'POST') {
@@ -91,56 +87,52 @@ try {
             return;
         }
 
-        // Crear pago general (si el modelo existe)
-        if ($pagosModel) {
-            requireAdmin();
-            $input = json_decode(file_get_contents('php://input'), true) ?? [];
-            $monto = $input['monto'] ?? null;
-            $metodo_id = $input['metodo_id'] ?? null;
-            $pedido_id = $input['pedido_id'] ?? null; // opcional
+        // Crear pago general
+        requireAdmin();
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $monto = $input['monto'] ?? null;
+        $metodo_id = $input['metodo_id'] ?? null;
+        $pedido_id = $input['pedido_id'] ?? null; // opcional
 
-            if ($monto === null || $metodo_id === null) {
-                throw new Exception('Campos requeridos: monto, metodo_id.', 422);
-            }
-
-            // Resolver nombre del método
-            $stmtMetodo = $db->prepare('SELECT nombre FROM metodos_pago WHERE id = :id');
-            $stmtMetodo->bindParam(':id', $metodo_id, PDO::PARAM_INT);
-            $stmtMetodo->execute();
-            $metodo = $stmtMetodo->fetch(PDO::FETCH_ASSOC);
-            if (!$metodo) {
-                throw new Exception('Método de pago no encontrado.', 404);
-            }
-
-            // Rellenar modelo
-            $pagosModel->monto = $monto;
-            $pagosModel->metodo_pago = $metodo['nombre'];
-            $pagosModel->pedido_id = $pedido_id ?? 0; // permitir 0 si no hay pedido
-
-            // Tomar usuario del token (id dentro de 'data')
-            $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-            $usuarioId = null;
-            if ($token) {
-                $payload = AuthController::decodeTokenData($token);
-                if (isset($payload['data'])) {
-                    if (is_array($payload['data'])) {
-                        $usuarioId = $payload['data']['id'] ?? null;
-                    } elseif (is_object($payload['data'])) {
-                        $usuarioId = $payload['data']->id ?? null;
-                    }
-                }
-            }
-            $pagosModel->usuario_id = $usuarioId ?? 0;
-
-            if ($pagosModel->crear()) {
-                echo json_encode(['success' => true]);
-            } else {
-                throw new Exception('No se pudo crear el pago.', 500);
-            }
-            return;
+        if ($monto === null || $metodo_id === null) {
+            throw new Exception('Campos requeridos: monto, metodo_id.', 422);
         }
 
-        throw new Exception('Recurso no disponible.', 404);
+        // Verificar método de pago existente
+        $stmtMetodo = $db->prepare('SELECT id FROM metodos_pago WHERE id = :id');
+        $stmtMetodo->bindParam(':id', $metodo_id, PDO::PARAM_INT);
+        $stmtMetodo->execute();
+        $metodo = $stmtMetodo->fetch(PDO::FETCH_ASSOC);
+        if (!$metodo) {
+            throw new Exception('Método de pago no encontrado.', 404);
+        }
+
+        // Rellenar modelo
+        $pagosModel->monto = $monto;
+        $pagosModel->metodo_pago_id = (int)$metodo_id;
+        $pagosModel->pedido_id = $pedido_id ? (int)$pedido_id : 0; // permitir 0 si no hay pedido
+
+        // Tomar usuario del token (id dentro de 'data')
+        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
+        $usuarioId = null;
+        if ($token) {
+            $payload = AuthController::decodeTokenData($token);
+            if (isset($payload['data'])) {
+                if (is_array($payload['data'])) {
+                    $usuarioId = $payload['data']['id'] ?? null;
+                } elseif (is_object($payload['data'])) {
+                    $usuarioId = $payload['data']->id ?? null;
+                }
+            }
+        }
+        $pagosModel->usuario_id = $usuarioId ?? 0;
+
+        if ($pagosModel->crear()) {
+            echo json_encode(['success' => true]);
+        } else {
+            throw new Exception('No se pudo crear el pago.', 500);
+        }
+        return;
     }
 
     throw new Exception('Método HTTP no permitido.', 405);

@@ -86,7 +86,12 @@ function ConfiguracionMesas() {
     setMesas(prev => prev.map(m => m.id === id ? { ...m, estado: nuevoEstado } : m));
     
     try {
-      await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
+      // Si se selecciona 'disponible' desde una mesa ocupada, usar liberar
+      if (nuevoEstado === ESTADOS_MESA.DISPONIBLE) {
+        await mesaService.liberarMesa(id);
+      } else {
+        await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
+      }
       window.dispatchEvent(new Event('mesas:update'));
     } catch (err) {
         alert('Error al cambiar el estado.');
@@ -177,6 +182,11 @@ function ConfiguracionMesas() {
                   <Button variant="danger" onClick={() => eliminarMesa(m.id)}>
                     Eliminar
                   </Button>
+                  {m.estado === ESTADOS_MESA.OCUPADA && (
+                    <Button style={{ marginLeft: 8 }} variant="secondary" onClick={() => cambiarEstado(m.id, ESTADOS_MESA.DISPONIBLE)}>
+                      Liberar
+                    </Button>
+                  )}
                 </td>
               </tr>
             ))}

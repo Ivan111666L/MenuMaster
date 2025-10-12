@@ -46,8 +46,17 @@ const updateMesa = async (id, mesaData) => {
  * @param {number} id - ID de la mesa a resetear.
  */
 const resetMesa = async (id) => {
-    // Usamos el endpoint de actualización para establecer la mesa como disponible
-    const response = await api.put(`/mesas/${id}`, { estado_nombre: ESTADOS_MESA.DISPONIBLE });
+    // Usamos el endpoint dedicado para liberar mesas
+    const response = await api.put(`/mesas/${id}/liberar`);
+    return response.data?.data ?? response.data;
+};
+
+/**
+ * Libera una mesa usando el nuevo endpoint.
+ * @param {number} id - ID de la mesa a liberar.
+ */
+const liberarMesa = async (id) => {
+    const response = await api.put(`/mesas/${id}/liberar`);
     return response.data?.data ?? response.data;
 };
 
@@ -75,6 +84,7 @@ const mesaService = {
     createMesa,
     updateMesa,
     resetMesa,
+    liberarMesa,
     deleteMesa,
     resetAllMesas,
 };
@@ -82,4 +92,4 @@ const mesaService = {
 export default mesaService;
 
 // También exportamos funciones nombradas para compatibilidad con imports antiguos
-export { getMesas, getMesa, createMesa, updateMesa, resetMesa, deleteMesa, resetAllMesas };
+export { getMesas, getMesa, createMesa, updateMesa, resetMesa, liberarMesa, deleteMesa, resetAllMesas };

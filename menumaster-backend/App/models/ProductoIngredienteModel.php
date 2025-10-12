@@ -21,8 +21,8 @@ class ProductoIngredienteModel {
                 i.nombre as ingrediente_nombre, 
                 i.unidad_medida, 
                 i.stock_actual,
-                i.costo_unitario
-            FROM producto_ingrediente pi
+                i.precio_compra AS costo_unitario
+            FROM productos_ingredientes pi
             JOIN ingredientes i ON pi.ingrediente_id = i.id
             WHERE pi.producto_id = :producto_id
         ";
@@ -40,7 +40,7 @@ class ProductoIngredienteModel {
     public function agregarIngrediente($productoId, $ingredienteId, $cantidad) {
         try {
             $query = "
-                INSERT INTO producto_ingrediente (producto_id, ingrediente_id, cantidad)
+                INSERT INTO productos_ingredientes (producto_id, ingrediente_id, cantidad)
                 VALUES (:producto_id, :ingrediente_id, :cantidad)
                 ON DUPLICATE KEY UPDATE cantidad = :cantidad
             ";
@@ -62,7 +62,7 @@ class ProductoIngredienteModel {
     public function eliminarIngrediente($productoId, $ingredienteId) {
         try {
             $query = "
-                DELETE FROM producto_ingrediente 
+                DELETE FROM productos_ingredientes 
                 WHERE producto_id = :producto_id AND ingrediente_id = :ingrediente_id
             ";
             
@@ -81,8 +81,8 @@ class ProductoIngredienteModel {
      */
     public function calcularCostoProducto($productoId) {
         $query = "
-            SELECT SUM(pi.cantidad * IFNULL(i.costo_unitario, 0)) as costo_total
-            FROM producto_ingrediente pi
+            SELECT SUM(pi.cantidad * i.precio_compra) as costo_total
+            FROM productos_ingredientes pi
             JOIN ingredientes i ON pi.ingrediente_id = i.id
             WHERE pi.producto_id = :producto_id
         ";
@@ -100,49 +100,38 @@ class ProductoIngredienteModel {
      */
     public function descontarInventario($productoId, $cantidad) {
         try {
-            // Iniciar transacción
-            $this->db->beginTransaction();
-            
             // Obtener ingredientes del producto
             $ingredientes = $this->getIngredientesByProductoId($productoId);
-            
-            // Descontar cada ingrediente del inventario
+
+            // Descontar cada ingrediente del inventario (sin manejar transacción aquí)
             foreach ($ingredientes as $ingrediente) {
                 $cantidadTotal = $ingrediente['cantidad'] * $cantidad;
-                
+
+                // Actualizar stock
                 $query = "
                     UPDATE ingredientes
                     SET stock_actual = stock_actual - :cantidad_total
                     WHERE id = :ingrediente_id
                 ";
-                
                 $stmt = $this->db->prepare($query);
                 $stmt->bindParam(':cantidad_total', $cantidadTotal, PDO::PARAM_STR);
                 $stmt->bindParam(':ingrediente_id', $ingrediente['ingrediente_id'], PDO::PARAM_INT);
                 $stmt->execute();
-                
+
                 // Verificar si el stock quedó negativo
                 $checkQuery = "SELECT stock_actual FROM ingredientes WHERE id = :ingrediente_id";
                 $checkStmt = $this->db->prepare($checkQuery);
                 $checkStmt->bindParam(':ingrediente_id', $ingrediente['ingrediente_id'], PDO::PARAM_INT);
                 $checkStmt->execute();
                 $stockActual = $checkStmt->fetchColumn();
-                
+
                 if ($stockActual < 0) {
-                    // Si el stock es negativo, revertir la transacción
-                    $this->db->rollBack();
-                    throw new Exception("Stock insuficiente para el ingrediente: " . $ingrediente['ingrediente_nombre']);
+                    throw new Exception("Stock insuficiente para el ingrediente: " . ($ingrediente['ingrediente_nombre'] ?? $ingrediente['ingrediente_id']));
                 }
             }
-            
-            // Confirmar transacción
-            $this->db->commit();
+
             return true;
         } catch (Exception $e) {
-            // Revertir transacción en caso de error
-            if ($this->db->inTransaction()) {
-                $this->db->rollBack();
-            }
             throw new Exception("Error al descontar inventario: " . $e->getMessage());
         }
     }

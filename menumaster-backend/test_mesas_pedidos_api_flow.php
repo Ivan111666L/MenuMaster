@@ -309,11 +309,25 @@ if (!$updateResp['success']) {
 }
 echo "   Order status updated to SERVIDO\n";
 
-// Step 6: Verify mesa state returned to DISPONIBLE
-echo "6) Verifying mesa state is DISPONIBLE...\n";
+// Step 6: Bill the order explicitly (facturar) to release the mesa
+echo "6) Billing the order to release mesa...\n";
+$facturarPayload = [
+    'metodo_pago' => 'efectivo',
+    // Opcionales: dividir/personas si se desea probar pago dividido
+];
+$facturarResp = makeHttpRequest("$baseUrl/api/pedidos/" . (int)$pedidoCreado['id'] . "/facturar", 'POST', $facturarPayload, $authHeader);
+if (!$facturarResp['success']) {
+    echo "❌ Failed to bill order (HTTP {$facturarResp['code']})\n";
+    echo substr($facturarResp['body'], 0, 300) . "\n";
+    exit(1);
+}
+echo "   Order billed successfully. Verifying mesa release...\n";
+
+// Step 7: Verify mesa state returned to DISPONIBLE after billing
+echo "7) Verifying mesa state is DISPONIBLE after billing...\n";
 $mesaShowResp2 = makeHttpRequest("$baseUrl/api/mesas/" . (int)$mesaSeleccionada['id'], 'GET', null, $authHeader);
 if (!$mesaShowResp2['success']) {
-    echo "❌ Failed to fetch mesa after status update\n";
+    echo "❌ Failed to fetch mesa after billing\n";
     exit(1);
 }
 $mesaDet2 = $mesaShowResp2['data']['data'] ?? [];
@@ -321,7 +335,7 @@ $estadoId2 = $mesaDet2['estado_id'] ?? null;
 if ((int)$estadoId2 === \App\EstadosMesa::DISPONIBLE) {
     echo "✅ Mesa state returned to DISPONIBLE (estado_id={$estadoId2})\n";
 } else {
-    echo "❌ Mesa state not DISPONIBLE, got estado_id=" . var_export($estadoId2, true) . "\n";
+    echo "❌ Mesa state not DISPONIBLE after billing, got estado_id=" . var_export($estadoId2, true) . "\n";
     exit(1);
 }
 

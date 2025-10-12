@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import QRCode from 'qrcode'; // Asegúrate de haber instalado: npm install qrcode
 import { useNotifications } from '@/hooks/useNotifications';
 import facturacionService from '@/features/facturacion/services/facturacionService';
+import api from '@/services/api';
 
 // --- Función de ayuda para la impresión ---
 const imprimirTicket = (contenido) => {
@@ -50,33 +51,55 @@ export const useFacturacion = () => {
     }, [cargarPedidos]);
 
     // --- Acciones del Usuario ---
-    const seleccionarPedido = (pedido) => {
+    const seleccionarPedido = async (pedido) => {
+        // Establecemos el pedido seleccionado inicialmente (resumen)
         setPedidoSeleccionado(pedido);
         setNumeroPersonas(1);
         setQrCodeDataUrl('');
+
+        // Intentamos cargar detalles completos del pedido desde el backend
+        try {
+            const res = await api.get(`/pedidos/${pedido.id}`);
+            const detalles = res?.data?.data ?? res?.data ?? null;
+            if (detalles) {
+                setPedidoSeleccionado(detalles);
+            }
+        } catch (e) {
+            // Si falla, mantenemos el resumen ya seleccionado
+            console.warn('No se pudieron cargar los detalles completos del pedido:', e?.message || e);
+        }
     };
 
     // Función unificada para facturar y recargar la lista
-    const facturarYRecargar = async (pedidoId, metodoPago) => {
+    const facturarYRecargar = async (pedidoId, metodoPago, metodoId = null) => {
         try {
             const datosPago = { metodo_pago: metodoPago, dividir: numeroPersonas > 1, personas: numeroPersonas };
+            if (metodoId) datosPago.metodo_id = metodoId;
             await facturacionService.facturarPedido(pedidoId, datosPago);
             showSuccess(`Pedido #${pedidoId} facturado con ${metodoPago}.`);
             setPedidoSeleccionado(null);
             await cargarPedidos();
-            // Navegar a la pantalla de pagos según la ruta solicitada
-            navigate('/facturacion/pagos');
+            // Permanecer en la misma página para continuar facturando
         } catch (err) {
             showError('Error al facturar el pedido.');
         }
     };
 
     // Función para generar la factura para imprimir
-    const generarFacturaParaImprimir = () => {
-        if (!pedidoSeleccionado) return;
+  const generarFacturaParaImprimir = () => {
+      if (!pedidoSeleccionado) return;
+        // Normalizamos items/detalles para evitar errores
+        const rawItems = Array.isArray(pedidoSeleccionado.items)
+            ? pedidoSeleccionado.items
+            : Array.isArray(pedidoSeleccionado.detalles)
+                ? pedidoSeleccionado.detalles
+                : [];
+        const getNombre = (item) => item?.nombre_producto ?? item?.producto_nombre ?? item?.nombre ?? 'Producto';
+        const getCantidad = (item) => Number(item?.cantidad ?? 1);
+        const getPrecioUnitario = (item) => Number(item?.precio_unitario ?? item?.precio ?? 0);
 
-        const totalPedido = pedidoSeleccionado.items.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
-        const totalPorPersona = totalPedido / numeroPersonas;
+        const totalPedido = rawItems.reduce((sum, item) => sum + (getCantidad(item) * getPrecioUnitario(item)), 0);
+        const totalPorPersona = totalPedido / Math.max(1, Number(numeroPersonas) || 1);
 
         let facturaTexto = "========================================\n";
         facturaTexto += "            FACTURA CLIENTE\n";
@@ -88,10 +111,10 @@ export const useFacturacion = () => {
         facturaTexto += "Cant.  Producto              Subtotal\n";
         facturaTexto += "----------------------------------------\n";
 
-        pedidoSeleccionado.items.forEach(item => {
-            const nombre = item.nombre_producto.padEnd(20, ' ').substring(0, 20);
-            const cantidad = item.cantidad.toString().padStart(3, ' ');
-            const subtotal = (item.precio_unitario * item.cantidad).toFixed(2).padStart(8, ' ');
+        rawItems.forEach(item => {
+            const nombre = getNombre(item).toString().padEnd(20, ' ').substring(0, 20);
+            const cantidad = getCantidad(item).toString().padStart(3, ' ');
+            const subtotal = (getPrecioUnitario(item) * getCantidad(item)).toFixed(2).padStart(8, ' ');
             facturaTexto += `${cantidad}    ${nombre}  $${subtotal}\n`;
         });
 
@@ -106,16 +129,22 @@ export const useFacturacion = () => {
         }
 
         imprimirTicket(facturaTexto);
-        // Marcamos el pedido como facturado en el backend después de imprimir
-        facturarYRecargar(pedidoSeleccionado.id, 'Impreso');
+        // La impresión de factura no debe disparar facturación automática en backend
     };
 
     // Función para generar el código QR
-    const generarPagoQR = async () => {
-        if (!pedidoSeleccionado) return;
-    
-        const totalPedido = pedidoSeleccionado.items.reduce((sum, item) => sum + (item.cantidad * item.precio_unitario), 0);
-        const totalPorPersona = totalPedido / numeroPersonas;
+  const generarPagoQR = async () => {
+      if (!pedidoSeleccionado) return;
+        
+        const rawItems = Array.isArray(pedidoSeleccionado.items)
+            ? pedidoSeleccionado.items
+            : Array.isArray(pedidoSeleccionado.detalles)
+                ? pedidoSeleccionado.detalles
+                : [];
+        const getCantidad = (item) => Number(item?.cantidad ?? 1);
+        const getPrecioUnitario = (item) => Number(item?.precio_unitario ?? item?.precio ?? 0);
+        const totalPedido = rawItems.reduce((sum, item) => sum + (getCantidad(item) * getPrecioUnitario(item)), 0);
+        const totalPorPersona = totalPedido / Math.max(1, Number(numeroPersonas) || 1);
         
         const textoQR = `https://tu-pasarela-de-pago.com/pagar?monto=${totalPorPersona.toFixed(2)}&ref=PED-${pedidoSeleccionado.id}`;
     
