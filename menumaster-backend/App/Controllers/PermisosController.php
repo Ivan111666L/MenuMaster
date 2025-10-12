@@ -3,7 +3,7 @@ namespace App\Controllers;
 
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RolMiddleware;
-use App\Config\conexionDb;
+use App\Config\ConexionDb;
 use PDO;
 use Exception;
 
@@ -14,7 +14,7 @@ class PermisosController extends Controller
 
     public function __construct()
     {
-        $db = conexionDb::getConnection();
+        $db = ConexionDb::getConnection();
         parent::__construct($db);
         $this->authMiddleware = new AuthMiddleware();
         $this->rolMiddleware = new RolMiddleware();

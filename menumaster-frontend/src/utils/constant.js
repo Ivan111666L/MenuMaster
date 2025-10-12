@@ -8,3 +8,19 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localho
 // Aquí podrías agregar otras constantes que uses en tu app
 // export const APP_NAME = 'Menu Master';
 // export const DEFAULT_THEME = 'light';
+
+// Estados centralizados de Mesas y Pedidos
+export const ESTADOS_MESA = {
+  DISPONIBLE: 'disponible',
+  OCUPADA: 'ocupada',
+  RESERVADA: 'reservada',
+};
+
+export const ESTADOS_PEDIDO = {
+  PENDIENTE: 'pendiente',
+  EN_PREPARACION: 'en_preparacion',
+  SERVIDO: 'servido',
+  PAGADO: 'pagado',
+  CANCELADO: 'cancelado',
+  FACTURADO: 'facturado',
+};

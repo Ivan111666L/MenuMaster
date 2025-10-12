@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getMesa, updateMesa } from '../services/mesaService';
+import { ESTADOS_MESA } from '@/utils/constant';
 import Button from '@/components/Button';
 
 function MesaEditar({ mesaId, onSuccess }) {
   const [nombre, setNombre] = useState('');
-  const [estado, setEstado] = useState('libre');
+  const [estado, setEstado] = useState(ESTADOS_MESA.DISPONIBLE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -25,7 +26,8 @@ function MesaEditar({ mesaId, onSuccess }) {
     setLoading(true);
     setError('');
     try {
-      await updateMesa(mesaId, { nombre, estado });
+      // Enviar estado como estado_nombre para que el backend mapee correctamente
+      await updateMesa(mesaId, { nombre, estado_nombre: estado });
       if (onSuccess) onSuccess();
     } catch {
       setError('Error al actualizar la mesa');
@@ -47,9 +49,9 @@ function MesaEditar({ mesaId, onSuccess }) {
         required
       />
       <select value={estado} onChange={e => setEstado(e.target.value)}>
-        <option value="libre">Libre</option>
-        <option value="ocupada">Ocupada</option>
-        <option value="reservada">Reservada</option>
+        <option value={ESTADOS_MESA.DISPONIBLE}>Disponible</option>
+        <option value={ESTADOS_MESA.OCUPADA}>Ocupada</option>
+        <option value={ESTADOS_MESA.RESERVADA}>Reservada</option>
       </select>
       <Button type="submit" disabled={loading}>Guardar</Button>
       {error && <div style={{color:'red'}}>{error}</div>}

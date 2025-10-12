@@ -1,8 +1,8 @@
 <?php
-// API simple para obtener productos para el sistema de pedidos
+// API simple para obtener mesas disponibles para el sistema de pedidos
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -17,29 +17,23 @@ require_once __DIR__ . '/../App/config/Constantes.php';
 require_once __DIR__ . '/../App/config/conexionDb.php';
 
 use App\Config\ConexionDb;
-use App\Models\ProductoModel;
-use App\Models\ProductoIngredientesModel;
+use App\Models\MesaModel;
 
 try {
     $db = ConexionDb::getConnection();
-    $productoModel = new ProductoModel($db);
-    $prodIngredientesModel = new ProductoIngredientesModel($db);
+    $mesaModel = new MesaModel($db);
     
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-        // Get all available products
-        $productos = $productoModel->findAll(false); // Solo productos disponibles
-        
-        // Add ingredients to each product
-        foreach ($productos as &$producto) {
-            $ingredientes = $prodIngredientesModel->getByProducto($producto['id']);
-            $producto['ingredientes'] = $ingredientes;
-        }
-        
+        // Obtener todas las mesas disponibles
+        $mesas = $mesaModel->findDisponibles();
+
+        // Normalizar estructura de salida
+        $mesas = $mesas ?: [];
         echo json_encode([
             'success' => true,
-            'data' => $productos,
-            'total' => count($productos)
-        ]);
+            'data' => $mesas,
+            'total' => count($mesas)
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     } else {
         echo json_encode([
             'success' => false,

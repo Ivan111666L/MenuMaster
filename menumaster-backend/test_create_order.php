@@ -1,5 +1,7 @@
 <?php
 require_once 'vendor/autoload.php';
+// Asegurar carga de clases de constantes (EstadosMesa, EstadosPedido, etc.)
+require_once 'App/config/Constantes.php';
 require_once 'App/config/conexionDb.php';
 require_once 'App/Controllers/PedidoController.php';
 require_once 'App/Controllers/AuthController.php';

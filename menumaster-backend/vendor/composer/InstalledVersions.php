@@ -123,12 +123,12 @@ class InstalledVersions
      *
      *   Composer\InstalledVersions::satisfies(new VersionParser, 'foo/bar', '^2.3')
      *
-     * @param  mixed         $parser      Install composer/semver to have access to this class and functionality
+     * @param  VersionParser $parser      Install composer/semver to have access to this class and functionality
      * @param  string        $packageName
      * @param  string|null   $constraint  A version constraint to check for, if you pass one you have to make sure composer/semver is required by your package
      * @return bool
      */
-    public static function satisfies($parser, $packageName, $constraint)
+    public static function satisfies(VersionParser $parser, $packageName, $constraint)
     {
         $constraint = $parser->parseConstraints((string) $constraint);
         $provided = $parser->parseConstraints(self::getVersionRanges($packageName));

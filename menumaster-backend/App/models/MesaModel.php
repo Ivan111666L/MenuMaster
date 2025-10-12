@@ -99,12 +99,15 @@ class MesaModel
                 LEFT JOIN 
                     estados_mesa em ON m.estado_id = em.id
                 WHERE 
-                    em.nombre = 'disponible'
+                    m.estado_id = :estado_disponible_id
                 ORDER BY 
                     m.numero ASC";
         
         try {
             $stmt = $this->db->prepare($sql);
+            // Usar constante centralizada
+            $estadoDisponibleId = \App\EstadosMesa::DISPONIBLE;
+            $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -162,11 +165,12 @@ class MesaModel
      */
     public function resetAll(): bool
     {
-        // Asumimos que el ID del estado 'disponible' es 1.
-        $sql = "UPDATE {$this->table} SET estado_id = 1";
+        $sql = "UPDATE {$this->table} SET estado_id = :estado_disponible_id";
 
         try {
             $stmt = $this->db->prepare($sql);
+            $estadoDisponibleId = \App\EstadosMesa::DISPONIBLE;
+            $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log('Error en MesaModel::resetAll: ' . $e->getMessage());
@@ -193,4 +197,24 @@ class MesaModel
             return false;
         }
     }
+
+    /**
+     * Cambia el estado de una mesa específica por ID del estado.
+     */
+    public function cambiarEstadoPorId(int $mesaId, int $estadoId): bool
+    {
+        $sql = "UPDATE {$this->table} SET estado_id = :estado_id WHERE id = :mesa_id";
+
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':mesa_id', $mesaId, PDO::PARAM_INT);
+            $stmt->bindParam(':estado_id', $estadoId, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en MesaModel::cambiarEstadoPorId: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    
 }

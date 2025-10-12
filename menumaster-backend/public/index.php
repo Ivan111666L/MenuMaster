@@ -40,6 +40,9 @@ define('BASE_PATH', dirname(__DIR__));
 // Se carga el autoloader de Composer, que es esencial para todo lo demás.
 require_once BASE_PATH . '/vendor/autoload.php';
 
+// Asegurar carga de clases de constantes (IDs de estados, roles)
+require_once BASE_PATH . '/App/config/Constantes.php';
+
 // Se cargan las variables de entorno desde el archivo .env ubicado en la raíz.
 $dotenv = Dotenv\Dotenv::createImmutable(BASE_PATH);
 $dotenv->load();

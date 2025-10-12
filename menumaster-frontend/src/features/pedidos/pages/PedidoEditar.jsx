@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Spinner from '@/components/Spinner';
 import Button from '@/components/Button';
@@ -11,6 +11,7 @@ import '@/styles/pedidos.css';
 
 function PedidoEditar() {
   const { pedidoId } = useParams();
+  const pedidoIdNum = Number(pedidoId);
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -29,8 +30,8 @@ function PedidoEditar() {
       setMesas(Array.isArray(mesasData) ? mesasData : []);
       setProductos(Array.isArray(productosData) ? productosData : []);
 
-      if (pedidoId) {
-        const pedidoData = await getPedidoById(pedidoId);
+      if (pedidoId && !Number.isNaN(pedidoIdNum)) {
+        const pedidoData = await getPedidoById(pedidoIdNum);
         const detalles = pedidoData?.detalles || [];
         const items = detalles.map(d => ({
           producto_id: d.producto_id,
@@ -44,6 +45,8 @@ function PedidoEditar() {
           items,
           notas: '',
         });
+      } else if (pedidoId) {
+        setError('Ruta inválida: el ID de pedido no es numérico.');
       }
       setLoading(false);
     } catch (err) {
@@ -96,6 +99,10 @@ function PedidoEditar() {
         setError('Ruta inválida: falta ID de pedido.');
         return;
       }
+      if (Number.isNaN(pedidoIdNum)) {
+        setError('Ruta inválida: el ID de pedido debe ser numérico.');
+        return;
+      }
       if (!pedido.mesa_id) {
         setError('Selecciona una mesa.');
         return;
@@ -112,7 +119,7 @@ function PedidoEditar() {
         items: pedido.items.map(it => ({ producto_id: it.producto_id, cantidad: it.cantidad })),
         notas: pedido.notas,
       };
-      await updatePedido(pedidoId, payload);
+      await updatePedido(pedidoIdNum, payload);
       setLoading(false);
       navigate('/mesas');
     } catch (err) {

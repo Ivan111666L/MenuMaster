@@ -3,6 +3,7 @@ namespace App\Models;
 
 use PDO;
 use PDOException;
+use App\EstadosProducto;
 
 class ProductoModel
 {
@@ -37,14 +38,18 @@ class ProductoModel
                 LEFT JOIN estados_producto ep ON p.estado_id = ep.id";
                 
         if (!$todos) {
-            // Si no se solicitan todos, filtramos por productos activos/disponibles
-            $sql .= " WHERE ep.nombre = 'disponible'";
+            // Filtrar por estado disponible usando ID
+            $sql .= " WHERE p.estado_id = :estado_disponible_id";
         }
         
         $sql .= " ORDER BY p.nombre ASC";
         
         try {
             $stmt = $this->conn->prepare($sql);
+            if (!$todos) {
+                $estadoDisponibleId = EstadosProducto::DISPONIBLE;
+                $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
+            }
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -195,11 +200,13 @@ class ProductoModel
                     {$this->table} p
                 LEFT JOIN categorias c ON p.categoria_id = c.id
                 LEFT JOIN estados_producto ep ON p.estado_id = ep.id
-                WHERE ep.nombre = 'disponible'
+                WHERE p.estado_id = :estado_disponible_id
                 ORDER BY c.nombre ASC, p.nombre ASC";
         
         try {
             $stmt = $this->conn->prepare($sql);
+            $estadoDisponibleId = EstadosProducto::DISPONIBLE;
+            $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
             $stmt->execute();
             $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
@@ -238,7 +245,7 @@ class ProductoModel
                     {$this->table} p
                 LEFT JOIN categorias c ON p.categoria_id = c.id
                 LEFT JOIN estados_producto ep ON p.estado_id = ep.id
-                WHERE ep.nombre = 'disponible' 
+                WHERE p.estado_id = :estado_disponible_id 
                 AND (p.nombre LIKE :search OR p.descripcion LIKE :search)
                 ORDER BY 
                     CASE WHEN p.nombre LIKE :exact_search THEN 1 ELSE 2 END,
@@ -252,6 +259,8 @@ class ProductoModel
             $stmt->bindParam(':search', $searchTerm, PDO::PARAM_STR);
             $stmt->bindParam(':exact_search', $exactSearch, PDO::PARAM_STR);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $estadoDisponibleId = EstadosProducto::DISPONIBLE;
+            $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -278,7 +287,7 @@ class ProductoModel
                     {$this->table} p
                 LEFT JOIN categorias c ON p.categoria_id = c.id
                 LEFT JOIN estados_producto ep ON p.estado_id = ep.id
-                WHERE ep.nombre = 'disponible' 
+                WHERE p.estado_id = :estado_disponible_id 
                 AND p.destacado = 1
                 ORDER BY p.nombre ASC
                 LIMIT :limit";
@@ -286,6 +295,8 @@ class ProductoModel
         try {
             $stmt = $this->conn->prepare($sql);
             $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
+            $estadoDisponibleId = EstadosProducto::DISPONIBLE;
+            $stmt->bindParam(':estado_disponible_id', $estadoDisponibleId, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -313,6 +324,26 @@ class ProductoModel
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log('Error en ProductoModel::updateStatus: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza el estado de un producto por ID de estado.
+     * @param int $id ID del producto
+     * @param int $estadoId ID del estado (EstadosProducto::DISPONIBLE, etc.)
+     * @return bool
+     */
+    public function updateStatusPorId(int $id, int $estadoId): bool
+    {
+        $sql = "UPDATE {$this->table} SET estado_id = :estado_id WHERE id = :id";
+        try {
+            $stmt = $this->conn->prepare($sql);
+            $stmt->bindParam(':estado_id', $estadoId, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en ProductoModel::updateStatusPorId: ' . $e->getMessage());
             return false;
         }
     }

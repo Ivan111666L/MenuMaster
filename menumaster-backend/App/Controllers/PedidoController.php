@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use App\Models\PedidoModel;
 use App\Models\MesaModel;
+use App\EstadosMesa;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
 use App\Utils\Validator;
@@ -107,8 +108,8 @@ class PedidoController
                 return;
             }
             
-            // Cambiar el estado de la mesa a 'ocupada' después de crear el pedido
-            if (!$this->mesaModel->cambiarEstado($data['mesa_id'], 'ocupada')) {
+            // Cambiar el estado de la mesa a ocupada (por ID) después de crear el pedido
+            if (!$this->mesaModel->cambiarEstadoPorId($data['mesa_id'], EstadosMesa::OCUPADA)) {
                 error_log("Advertencia: No se pudo cambiar el estado de la mesa {$data['mesa_id']} a ocupada");
             }
             
@@ -142,7 +143,7 @@ class PedidoController
     public function updateStatus(int $id, array $data): void
     {
         try {
-            Validator::validate($data, ['estado' => 'required']);
+            // Permitir estado_id directamente; mantener compatibilidad con 'estado' por nombre
             
             // Obtener información del pedido antes de actualizar el estado
             $pedido = $this->pedidoModel->getPedidoWithDetails($id);
@@ -151,16 +152,32 @@ class PedidoController
                 return;
             }
             
-            if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
-                $this->sendResponse(500, null, "Error al actualizar el estado del pedido");
-                return;
+            if (isset($data['estado_id'])) {
+                if (!$this->pedidoModel->actualizarEstadoPedidoPorId($id, (int)$data['estado_id'])) {
+                    $this->sendResponse(500, null, "Error al actualizar el estado del pedido");
+                    return;
+                }
+            } else {
+                Validator::validate($data, ['estado' => 'required']);
+                if (!$this->pedidoModel->actualizarEstadoPedido($id, $data['estado'])) {
+                    $this->sendResponse(500, null, "Error al actualizar el estado del pedido");
+                    return;
+                }
             }
             
             // Si el pedido se marca como entregado o completado, liberar la mesa
-            $estadosQueLiberanMesa = ['entregado', 'completado', 'finalizado'];
-            if (in_array(strtolower($data['estado']), $estadosQueLiberanMesa)) {
+            $estadosQueLiberanMesaPorNombre = ['entregado', 'completado', 'finalizado'];
+            $liberarMesa = false;
+            if (isset($data['estado'])) {
+                $liberarMesa = in_array(strtolower($data['estado']), $estadosQueLiberanMesaPorNombre);
+            }
+            // Si envían estado_id, considerar liberar si corresponde (SERVIDO o PAGADO)
+            if (isset($data['estado_id'])) {
+                $liberarMesa = in_array((int)$data['estado_id'], [\App\EstadosPedido::SERVIDO, \App\EstadosPedido::PAGADO]);
+            }
+            if ($liberarMesa) {
                 $mesaId = $pedido['mesa_id'] ?? null;
-                if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+                if ($mesaId && !$this->mesaModel->cambiarEstadoPorId($mesaId, EstadosMesa::DISPONIBLE)) {
                     error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
                 }
             }
@@ -192,9 +209,9 @@ class PedidoController
                 return;
             }
             
-            // Cambiar el estado de la mesa a 'disponible' después de facturar el pedido
+            // Cambiar el estado de la mesa a disponible (por ID) después de facturar el pedido
             $mesaId = $pedido['mesa_id'] ?? null;
-            if ($mesaId && !$this->mesaModel->cambiarEstado($mesaId, 'disponible')) {
+            if ($mesaId && !$this->mesaModel->cambiarEstadoPorId($mesaId, EstadosMesa::DISPONIBLE)) {
                 error_log("Advertencia: No se pudo cambiar el estado de la mesa {$mesaId} a disponible");
             }
             
@@ -235,8 +252,19 @@ class PedidoController
             // Cargar el gestor de impresión
             $printerManager = new \App\Utils\PrinterManager();
             
-            // Imprimir pedido en cocina
-            $resultado = $printerManager->printOrder($pedido);
+            // Imprimir pedido en cocina sin contaminar la salida JSON
+            // Se suprimen temporalmente los warnings/notices y se usa un buffer de salida
+            $prevDisplayErrors = ini_get('display_errors');
+            $prevErrorReporting = error_reporting();
+            ini_set('display_errors', '0');
+            error_reporting(0);
+            ob_start();
+            $resultado = @$printerManager->printOrder($pedido);
+            // Limpiar cualquier salida generada durante la impresión
+            ob_end_clean();
+            // Restaurar configuración previa
+            error_reporting($prevErrorReporting);
+            ini_set('display_errors', $prevDisplayErrors);
             
             if ($resultado) {
                 error_log("Pedido ID {$pedido['id']} enviado automáticamente a impresión en cocina");

@@ -1,4 +1,4 @@
-﻿import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
 // --- Componentes de la Arquitectura ---
 import App from '@/App';
@@ -34,6 +34,7 @@ import Facturacion from '@/features/facturacion/pages/Facturacion.jsx';
 import Mesas from '@/features/mesas/pages/Mesas.jsx';
 import Pedidos from '@/features/pedidos/pages/Pedidos.jsx';
 import PedidoEditar from '@/features/pedidos/pages/PedidoEditar.jsx';
+import TestPedidos from '@/features/pedidos/pages/TestPedidos.jsx';
 import Configuracion from '@/features/configuracion/pages/Configuracion.jsx';
 
 // Páginas anidadas de Inventario
@@ -160,6 +161,14 @@ const router = createBrowserRouter([
             element: (
               <PrivateRoute roles={['administrador', 'mesero']}>
                 <Pedidos />
+              </PrivateRoute>
+            ),
+          },
+          {
+            path: 'pedidos/test',
+            element: (
+              <PrivateRoute roles={['administrador', 'mesero']}>
+                <TestPedidos />
               </PrivateRoute>
             ),
           },

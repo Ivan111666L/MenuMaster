@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { ESTADOS_MESA } from '@/utils/constant';
 
 /**
  * Hook personalizado para gestionar configuraciones del sistema
@@ -32,17 +33,17 @@ export const useConfiguraciones = () => {
       alertas_inventario_bajo: true,
       reportes_automaticos: false
     },
-    mesas: {
-      tiempo_limite_ocupacion: 120, // minutos
-      auto_liberar_mesas: false,
-      mostrar_plano_mesas: true,
+      mesas: {
+        tiempo_limite_ocupacion: 120, // minutos
+        auto_liberar_mesas: false,
+        mostrar_plano_mesas: true,
       colores_estado: {
-        disponible: '#28a745',
-        ocupada: '#dc3545',
-        reservada: '#ffc107',
+        [ESTADOS_MESA.DISPONIBLE]: '#28a745',
+        [ESTADOS_MESA.OCUPADA]: '#dc3545',
+        [ESTADOS_MESA.RESERVADA]: '#ffc107',
         mantenimiento: '#6c757d'
       }
-    }
+      }
   });
   
   const [loading, setLoading] = useState(false);
@@ -154,9 +155,9 @@ export const useConfiguraciones = () => {
         auto_liberar_mesas: false,
         mostrar_plano_mesas: true,
         colores_estado: {
-          disponible: '#28a745',
-          ocupada: '#dc3545',
-          reservada: '#ffc107',
+          [ESTADOS_MESA.DISPONIBLE]: '#28a745',
+          [ESTADOS_MESA.OCUPADA]: '#dc3545',
+          [ESTADOS_MESA.RESERVADA]: '#ffc107',
           mantenimiento: '#6c757d'
         }
       }

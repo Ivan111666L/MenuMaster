@@ -10,7 +10,7 @@
  * ✅ ESA INFORMACIÓN PERTENECE A TU ARCHIVO .env Y SE ACCEDE A TRAVÉS DE Config.php
  */
 
-namespace app;
+namespace App;
 
 /**
  * Define los IDs de los roles de usuario.
@@ -56,6 +56,16 @@ class EstadosMesa
     const DISPONIBLE = 1;
     const OCUPADA    = 2;
     const RESERVADA  = 3;
+}
+
+/**
+ * Define los IDs para los estados específicos de un producto.
+ * Uso: \App\EstadosProducto::DISPONIBLE
+ */
+class EstadosProducto
+{
+    const DISPONIBLE    = 1;
+    const NO_DISPONIBLE = 2;
 }
 
 

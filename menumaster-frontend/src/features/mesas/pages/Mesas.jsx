@@ -8,10 +8,13 @@ import { AuthContext } from '@/context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaEdit, FaPrint, FaFilter, FaSearch } from 'react-icons/fa';
 import '@/styles/mesas.css';
+import { useNotifications } from '@/hooks/useNotifications';
+import { ESTADOS_MESA } from '@/utils/constant';
 
 function Mesas() {
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+    const { showError, notifications } = useNotifications();
     const [mesas, setMesas] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -50,11 +53,14 @@ function Mesas() {
 
     const cambiarEstado = async (id, estadoActual) => {
         const estadosCiclo = {
-            'disponible': 'ocupada',
-            'ocupada': 'reservada',
-            'reservada': 'disponible'
+            [ESTADOS_MESA.DISPONIBLE]: ESTADOS_MESA.OCUPADA,
+            [ESTADOS_MESA.OCUPADA]: ESTADOS_MESA.RESERVADA,
+            [ESTADOS_MESA.RESERVADA]: ESTADOS_MESA.DISPONIBLE,
         };
         const nuevoEstado = estadosCiclo[estadoActual];
+
+        const mesaTarget = mesas.find(m => m.id === id);
+        const numeroMesa = mesaTarget?.numero ?? id;
 
         // Actualización optimista: cambiamos el estado en la UI al instante
         const mesasOriginales = [...mesas];
@@ -62,8 +68,16 @@ function Mesas() {
 
         try {
             await mesaService.updateMesa(id, { estado_nombre: nuevoEstado });
+            // Notificaciones de éxito específicas
+            if (nuevoEstado === ESTADOS_MESA.OCUPADA && notifications?.mesaOcupada) {
+                notifications.mesaOcupada(numeroMesa);
+            } else if (nuevoEstado === ESTADOS_MESA.DISPONIBLE && notifications?.mesaLiberada) {
+                notifications.mesaLiberada(numeroMesa);
+            } else if (notifications?.mesaActualizada) {
+                notifications.mesaActualizada(numeroMesa);
+            }
         } catch (err) {
-            alert('Error al actualizar la mesa. Revirtiendo cambio.');
+            showError('Error al actualizar la mesa. Revirtiendo cambio.');
             setMesas(mesasOriginales); // Si falla, revertimos al estado anterior
         }
     };
@@ -80,17 +94,24 @@ function Mesas() {
     };
     
     const resetMesa = async (mesaId) => {
+        const mesaTarget = mesas.find(m => m.id === mesaId);
+        const numeroMesa = mesaTarget?.numero ?? mesaId;
         try {
             await mesaService.resetMesa(mesaId);
             // Actualización optimista de la UI
             setMesas(prevMesas => 
                 prevMesas.map(mesa => 
-                    mesa.id === mesaId ? { ...mesa, estado: 'disponible', pedido_id: null } : mesa
+                    mesa.id === mesaId ? { ...mesa, estado: ESTADOS_MESA.DISPONIBLE, pedido_id: null } : mesa
                 )
             );
+            // Notificación informativa de mesa liberada
+            if (notifications?.mesaLiberada) {
+                notifications.mesaLiberada(numeroMesa);
+            }
         } catch (error) {
             console.error('Error al resetear la mesa:', error);
             setError('No se pudo resetear la mesa. Intente de nuevo.');
+            showError('No se pudo resetear la mesa. Intente de nuevo.');
         }
     };
     
@@ -105,10 +126,10 @@ function Mesas() {
                     mesa.pedido && mesa.pedido.usuario_id === user.id);
                 break;
             case 'ocupadas':
-                mesasFiltradas = mesasFiltradas.filter(mesa => mesa.estado === 'ocupada');
+                mesasFiltradas = mesasFiltradas.filter(mesa => mesa.estado === ESTADOS_MESA.OCUPADA);
                 break;
             case 'disponibles':
-                mesasFiltradas = mesasFiltradas.filter(mesa => mesa.estado === 'disponible');
+                mesasFiltradas = mesasFiltradas.filter(mesa => mesa.estado === ESTADOS_MESA.DISPONIBLE);
                 break;
             default:
                 // Mostrar todas las mesas
@@ -250,7 +271,7 @@ function Mesas() {
                         </div>
 
                         {/* Acción para crear pedido cuando la mesa está disponible */}
-                        {mesa.estado === 'disponible' && (
+                        {mesa.estado === ESTADOS_MESA.DISPONIBLE && (
                             <div className="mesa-actions">
                                 <div className="action-buttons">
                                     <Button 
@@ -270,12 +291,12 @@ function Mesas() {
                             </div>
                         )}
                         
-                        {mesa.estado === 'ocupada' && (
+                        {mesa.estado === ESTADOS_MESA.OCUPADA && (
                             <div className="mesa-actions">
                                 {/* Botones para mesas ocupadas */}
                                 <div className="action-buttons">
-                                    <Link to={`/pedidos/editar/${mesa.pedido_id}`}>
-                                        <Button variant="warning">
+                                    <Link to={mesa.pedido_id ? `/pedidos/editar/${mesa.pedido_id}` : '#'}>
+                                        <Button variant="warning" disabled={!mesa.pedido_id} title={!mesa.pedido_id ? 'Esta mesa no tiene pedido activo' : ''}>
                                             <FaEdit /> Editar
                                         </Button>
                                     </Link>
@@ -368,8 +389,8 @@ function Mesas() {
                             <Button onClick={() => setMostrarDetallePedido(false)} variant="secondary">
                                 Cerrar
                             </Button>
-                            <Link to={`/pedidos/editar/${pedidoSeleccionado.id}`}>
-                                <Button variant="warning">
+                            <Link to={pedidoSeleccionado?.id ? `/pedidos/editar/${pedidoSeleccionado.id}` : '#'}>
+                                <Button variant="warning" disabled={!pedidoSeleccionado?.id} title={!pedidoSeleccionado?.id ? 'Pedido sin ID válido' : ''}>
                                     <FaEdit /> Editar Pedido
                                 </Button>
                             </Link>

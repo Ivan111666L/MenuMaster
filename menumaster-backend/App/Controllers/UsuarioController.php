@@ -4,7 +4,7 @@ namespace App\Controllers;
 // --- Dependencias ---
 use App\Models\UsuarioModel;
 use App\Models\RolModel;
-use App\Models\EstadoGeneralModel;
+use App\EstadosGenerales;
 use App\Utils\Validator;
 use App\Middleware\AuthMiddleware;
 use App\Controllers\AuthController;
@@ -16,7 +16,7 @@ class UsuarioController
     // --- Propiedades para los modelos ---
     private $usuarioModel;
     private $rolModel;
-    private $estadoGeneralModel;
+    
 
     /**
      * El constructor recibe la conexión a la DB e instancia todos los modelos necesarios.
@@ -25,7 +25,7 @@ class UsuarioController
     {
         $this->usuarioModel = new UsuarioModel($db);
         $this->rolModel = new RolModel($db);
-        $this->estadoGeneralModel = new EstadoGeneralModel($db);
+        
     }
 
     /**
@@ -95,8 +95,7 @@ class UsuarioController
         Validator::validate($data, [
             'nombre' => 'required',
             'email' => 'required|email',
-            'rol' => 'required',
-            'estado' => 'required'
+            'rol' => 'required'
         ]);
         
         if (!$this->usuarioModel->find($id)) {
@@ -104,12 +103,26 @@ class UsuarioController
         }
 
         $rol = $this->rolModel->findByName($data['rol']);
-        $estado = $this->estadoGeneralModel->findByName($data['estado']);
-        if (!$rol || !$estado) {
-            throw new Exception("El rol o estado especificado no es válido.", 400);
+        if (!$rol) {
+            throw new Exception("El rol especificado no es válido.", 400);
+        }
+        // Estado: preferir 'estado_id' en payload; si no, intentar mapear 'estado' textual
+        $estadoId = $data['estado_id'] ?? null;
+        if (!$estadoId && isset($data['estado'])) {
+            $nombre = strtolower(trim($data['estado']));
+            if ($nombre === 'activo') {
+                $estadoId = EstadosGenerales::ACTIVO;
+            } elseif ($nombre === 'inactivo') {
+                $estadoId = EstadosGenerales::INACTIVO;
+            } else {
+                throw new Exception("Estado especificado no es válido.", 400);
+            }
+        }
+        if (!$estadoId) {
+            throw new Exception("Debe especificarse el estado_id o un estado válido.", 400);
         }
 
-        if (!$this->usuarioModel->update($id, $data['nombre'], $data['email'], $rol['id'], $estado['id'])) {
+        if (!$this->usuarioModel->update($id, $data['nombre'], $data['email'], $rol['id'], (int)$estadoId)) {
             throw new Exception("No se pudo actualizar el usuario.", 500);
         }
 
@@ -162,12 +175,7 @@ class UsuarioController
      */
     public function deactivate(int $id): void
     {
-        $estadoInactivo = $this->estadoGeneralModel->findByName('inactivo');
-        if (!$estadoInactivo) {
-            throw new Exception("El estado 'inactivo' no está configurado en la base de datos.", 500);
-        }
-
-        if (!$this->usuarioModel->updateStatus($id, $estadoInactivo['id'])) {
+        if (!$this->usuarioModel->updateStatus($id, EstadosGenerales::INACTIVO)) {
             throw new Exception("No se pudo desactivar el usuario.", 500);
         }
 

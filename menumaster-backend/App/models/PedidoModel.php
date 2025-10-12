@@ -63,7 +63,7 @@ class PedidoModel
     public function getPedidoWithDetails(int $id): array|false
     {
         // 1. Obtenemos los datos básicos del pedido.
-        $sql = "SELECT p.id, p.notas, p.fecha_creacion, m.numero AS mesa_numero, 
+        $sql = "SELECT p.id, p.mesa_id, p.notas, p.fecha_creacion, m.numero AS mesa_numero, 
                        u.nombre AS mesero_nombre, ep.nombre AS estado
                 FROM {$this->table} p
                 LEFT JOIN mesas m ON p.mesa_id = m.id
@@ -245,6 +245,25 @@ class PedidoModel
             return $stmt->execute();
         } catch (PDOException $e) {
             error_log('Error en PedidoModel::actualizarEstadoPedido: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Actualiza el estado de un pedido por ID de estado.
+     * @param int $id ID del pedido
+     * @param int $estadoId ID del estado (EstadosPedido::...)
+     */
+    public function actualizarEstadoPedidoPorId(int $id, int $estadoId): bool
+    {
+        $sql = "UPDATE {$this->table} SET estado_id = :estado_id WHERE id = :id";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindParam(':estado_id', $estadoId, PDO::PARAM_INT);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log('Error en PedidoModel::actualizarEstadoPedidoPorId: ' . $e->getMessage());
             return false;
         }
     }

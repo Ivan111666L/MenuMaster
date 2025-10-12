@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import mesaService from '@/features/mesas/services/mesaService';
+import { ESTADOS_MESA } from '@/utils/constant';
 import Input from '@/components/Input';
 import Button from '@/components/Button';
 import Spinner from '@/components/Spinner';
@@ -9,7 +10,7 @@ const estadoInicialNuevaMesa = {
   numero: '',
   capacidad: '',
   ubicacion: '',
-  estado_nombre: 'disponible',
+  estado_nombre: ESTADOS_MESA.DISPONIBLE,
 };
 
 function ConfiguracionMesas() {
@@ -46,10 +47,32 @@ function ConfiguracionMesas() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await mesaService.createMesa(nuevaMesa);
+      // Crear mesa (el backend establece estado 'disponible' por defecto)
+      const creada = await mesaService.createMesa({
+        numero: nuevaMesa.numero,
+        capacidad: nuevaMesa.capacidad,
+        ubicacion: nuevaMesa.ubicacion,
+      });
+
+      let mesaFinal = creada;
+      // Si el usuario seleccionó un estado distinto al disponible, actualizamos inmediatamente
+      if (nuevaMesa.estado_nombre !== ESTADOS_MESA.DISPONIBLE && creada?.id) {
+        try {
+          mesaFinal = await mesaService.updateMesa(creada.id, { estado_nombre: nuevaMesa.estado_nombre });
+        } catch (updateErr) {
+          console.warn('No se pudo establecer el estado inicial seleccionado. Usando disponible.', updateErr);
+        }
+      }
+
+      // Actualización optimista: agregamos la mesa a la lista local sin bloquear el handler
+      setMesas(prev => Array.isArray(prev) ? [...prev, mesaFinal] : [mesaFinal]);
       setNuevaMesa(estadoInicialNuevaMesa);
-      await cargarMesas(); // Recargar la lista
+
+      // Refresco en segundo plano para sincronizar con backend y otras vistas
       window.dispatchEvent(new Event('mesas:update'));
+      setTimeout(() => {
+        cargarMesas();
+      }, 0);
     } catch (err) {
       alert('Error al crear la mesa: ' + (err.response?.data?.error || err.message));
     } finally {
@@ -100,6 +123,18 @@ function ConfiguracionMesas() {
         <Input id="numero" name="numero" placeholder="Número (ej: M5)" value={nuevaMesa.numero} onChange={handleInputChange} required />
         <Input id="capacidad" name="capacidad" type="number" placeholder="Capacidad" value={nuevaMesa.capacidad} onChange={handleInputChange} required />
         <Input id="ubicacion" name="ubicacion" placeholder="Ubicación" value={nuevaMesa.ubicacion} onChange={handleInputChange} />
+        {/* Selector de estado inicial usando constantes centralizadas */}
+        <select
+          id="estado_nombre"
+          name="estado_nombre"
+          className="form-input"
+          value={nuevaMesa.estado_nombre}
+          onChange={handleInputChange}
+        >
+          <option value={ESTADOS_MESA.DISPONIBLE}>Disponible</option>
+          <option value={ESTADOS_MESA.OCUPADA}>Ocupada</option>
+          <option value={ESTADOS_MESA.RESERVADA}>Reservada</option>
+        </select>
         <Button type="submit" variant="primary" disabled={isSubmitting}>
           {isSubmitting ? <Spinner /> : 'Crear Mesa'}
         </Button>
@@ -133,9 +168,9 @@ function ConfiguracionMesas() {
                 <td>{m.ubicacion}</td>
                 <td>
                   <select className="form-input" value={m.estado} onChange={(e) => cambiarEstado(m.id, e.target.value)}>
-                    <option value="disponible">Disponible</option>
-                    <option value="ocupada">Ocupada</option>
-                    <option value="reservada">Reservada</option>
+                    <option value={ESTADOS_MESA.DISPONIBLE}>Disponible</option>
+                    <option value={ESTADOS_MESA.OCUPADA}>Ocupada</option>
+                    <option value={ESTADOS_MESA.RESERVADA}>Reservada</option>
                   </select>
                 </td>
                 <td>

@@ -61,7 +61,7 @@ export const deletePedido = async (id) => {
 
 export const cambiarEstadoPedido = async (id, nuevoEstado) => {
   try {
-    const response = await api.put(`/api/pedidos/${id}/estado`, { estado: nuevoEstado });
+    const response = await api.put(`/pedidos/${id}/estado`, { estado: nuevoEstado });
     return response.data;
   } catch (error) {
     console.error(`Error al cambiar estado del pedido ${id}:`, error);

@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '@/hooks/useNotifications';
 import pedidoService from '@/features/pedidos/services/pedidoService';
-import { generarTicketHTML } from '@/features/pedidos/services/imprimirPedidoService';
-import mesaService from '@/features/mesas/services/mesaService';
+import { generarTicketHTMLMinimo } from '@/features/pedidos/services/imprimirPedidoService';
+import api from '@/services/api';
 
 // --- Funciones de Ayuda para la Impresión (se mantienen intactas) ---
 const generarTicketCocina = (pedidoCompleto) => {
@@ -121,15 +121,33 @@ export const usePedido = () => {
         }
         try {
             setLoading(true);
-            const pedidoCreado = await pedidoService.createPedido(pedidoActual);
-            // Al crear el pedido, marcar la mesa como ocupada en la base de datos
-            try {
-                await mesaService.updateMesa(pedidoCreado.mesa_id, { estado_nombre: 'ocupada' });
-            } catch (e) {
-                console.warn('No se pudo actualizar el estado de la mesa a ocupada:', e);
+            // Asegurar que el payload contenga solo los campos esperados por backend
+            const payload = {
+                mesa_id: pedidoActual.mesa_id,
+                notas: pedidoActual.notas || undefined,
+                items: (pedidoActual.items || []).map(item => ({
+                    producto_id: item.producto_id ?? item.id,
+                    cantidad: item.cantidad ?? 1,
+                    notas: item.notas || undefined
+                }))
+            };
+            const pedidoCreado = await pedidoService.createPedido(payload);
+            // Validar ID del pedido creado para evitar errores de acceso
+            const pedidoId = pedidoCreado?.id ?? pedidoCreado?.pedido_id ?? pedidoCreado?.data?.id;
+            if (!pedidoId) {
+                throw new Error('Pedido creado sin ID. Respuesta inválida del backend.');
             }
+            // Intentar marcar el pedido como en preparación en backend
+            try {
+                await api.put(`/pedidos/${pedidoId}/estado`, { estado: 'en_preparacion' });
+            } catch (e) {
+                console.warn('No se pudo asignar estado en_preparacion al pedido:', e);
+            }
+            // No actualizar estado de mesa aquí: el backend ya marca la mesa como 'ocupada'
+            // al crear el pedido y la libera en los estados correspondientes.
             // Generar el ticket HTML e imprimir automáticamente
-            const html = await generarTicketHTML(pedidoCreado.id);
+            // Generar ticket mínimo para cocina
+            const html = await generarTicketHTMLMinimo(pedidoId);
             setTicketHtml(html);
             setTicketOpen(false);
             // Abrir ventana de impresión
@@ -144,9 +162,9 @@ export const usePedido = () => {
             setPedidoActual({ mesa_id: '', items: [], notas: '' });
             // Notificar a la vista de Mesas para refrescar estado inmediatamente
             try {
-                window.dispatchEvent(new CustomEvent('mesas:update', { detail: { source: 'pedido', pedidoId: pedidoCreado.id } }));
+                window.dispatchEvent(new CustomEvent('mesas:update', { detail: { source: 'pedido', pedidoId } }));
                 // Notificar a Facturación para que aparezca el pedido automáticamente
-                window.dispatchEvent(new CustomEvent('pedidos:update', { detail: { source: 'pedido', pedidoId: pedidoCreado.id } }));
+                window.dispatchEvent(new CustomEvent('pedidos:update', { detail: { source: 'pedido', pedidoId } }));
             } catch {}
             // Redirigir a facturación
             navigate('/facturacion');

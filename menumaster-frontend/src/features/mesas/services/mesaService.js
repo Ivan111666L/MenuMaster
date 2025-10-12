@@ -1,4 +1,5 @@
 import api from '@/services/api'; // Tu instancia central de Axios
+import { ESTADOS_MESA } from '@/utils/constant';
 
 /**
  * Obtiene todas las mesas desde el backend.
@@ -6,6 +7,16 @@ import api from '@/services/api'; // Tu instancia central de Axios
 const getMesas = async () => {
     // Llama a: GET /api/mesas
     const response = await api.get('/mesas');
+    return response.data.data;
+};
+
+/**
+ * Obtiene una mesa por ID.
+ * @param {number} id - ID de la mesa.
+ */
+const getMesa = async (id) => {
+    const response = await api.get(`/mesas/${id}`);
+    // La API responde { success, data }, devolvemos data
     return response.data.data;
 };
 
@@ -36,7 +47,7 @@ const updateMesa = async (id, mesaData) => {
  */
 const resetMesa = async (id) => {
     // Usamos el endpoint de actualización para establecer la mesa como disponible
-    const response = await api.put(`/mesas/${id}`, { estado_nombre: 'disponible' });
+    const response = await api.put(`/mesas/${id}`, { estado_nombre: ESTADOS_MESA.DISPONIBLE });
     return response.data?.data ?? response.data;
 };
 
@@ -60,6 +71,7 @@ const resetAllMesas = async () => {
 
 const mesaService = {
     getMesas,
+    getMesa,
     createMesa,
     updateMesa,
     resetMesa,
@@ -68,3 +80,6 @@ const mesaService = {
 };
 
 export default mesaService;
+
+// También exportamos funciones nombradas para compatibilidad con imports antiguos
+export { getMesas, getMesa, createMesa, updateMesa, resetMesa, deleteMesa, resetAllMesas };

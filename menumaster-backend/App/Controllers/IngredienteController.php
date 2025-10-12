@@ -6,7 +6,7 @@ namespace App\Controllers;
 // Importamos los modelos que vamos a necesitar
 use App\Models\IngredienteModel;
 use App\Models\ProveedorModel;
-use App\Models\EstadoGeneralModel;
+use App\EstadosGenerales;
 use PDO;
 use Exception;
 
@@ -16,7 +16,7 @@ class IngredienteController
     private $db;
     private $ingredienteModel;
     private $proveedorModel;
-    private $estadoGeneralModel;
+    
 
     // --- Constructor ---
     // Inicializa los modelos y la conexión a la base de datos.
@@ -25,7 +25,7 @@ class IngredienteController
         $this->db = $db;
         $this->ingredienteModel = new IngredienteModel($this->db);
         $this->proveedorModel = new ProveedorModel($this->db); // Suponiendo que tienes un ProveedorModel
-        $this->estadoGeneralModel = new EstadoGeneralModel($this->db);
+        
     }
 
     /**
@@ -86,11 +86,10 @@ class IngredienteController
             $datosParaCrear['proveedor_id'] = null;
         }
 
-        $estadoActivo = $this->estadoGeneralModel->findByName('activo');
-        if (!$estadoActivo) throw new Exception("El estado 'activo' no está configurado.", 500);
-        
-        $estadoResult = $estadoActivo->fetch(PDO::FETCH_ASSOC);
-        $datosParaCrear['estado_id'] = $estadoResult['id'];
+        // Estado por defecto: ACTIVO, permitir override con 'estado_id'
+        $datosParaCrear['estado_id'] = isset($data['estado_id']) 
+            ? (int)$data['estado_id'] 
+            : EstadosGenerales::ACTIVO;
 
         try {
             $nuevoId = $this->ingredienteModel->create($datosParaCrear);
@@ -133,10 +132,18 @@ class IngredienteController
             $data['proveedor_id'] = $proveedor['id'];
             unset($data['proveedor_nombre']);
         }
-        if (isset($data['estado_nombre'])) {
-            $estado = $this->estadoGeneralModel->findByName($data['estado_nombre']);
-            if (!$estado) throw new Exception("Estado no válido.", 400);
-            $data['estado_id'] = $estado['id'];
+        // Estado: preferir 'estado_id'; opcionalmente mapear 'estado_nombre' conocido
+        if (isset($data['estado_id'])) {
+            $data['estado_id'] = (int)$data['estado_id'];
+        } elseif (isset($data['estado_nombre'])) {
+            $nombre = strtolower(trim($data['estado_nombre']));
+            if ($nombre === 'activo') {
+                $data['estado_id'] = EstadosGenerales::ACTIVO;
+            } elseif ($nombre === 'inactivo') {
+                $data['estado_id'] = EstadosGenerales::INACTIVO;
+            } else {
+                throw new Exception("Estado no válido.", 400);
+            }
             unset($data['estado_nombre']);
         }
 

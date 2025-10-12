@@ -4,7 +4,7 @@ namespace App\Controllers;
 // CORRECCIÓN: Se usan los nombres de clase correctos para los modelos.
 // Asumimos que el modelo para los estados se llama 'EstadoGeneral'.
 use App\Models\MesaModel;
-use App\Models\EstadoGeneralModel; // Se usa un modelo de estado genérico
+use App\EstadosMesa;
 use PDO;
 use Exception;
 
@@ -12,14 +12,14 @@ class MesaController
 {
     private $db;
     private $mesaModel;
-    private $estadoGeneralModel; // Nota: usado para otras entidades; no para estados de mesa
+    // Estados de mesa centralizados via constantes
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
         // CORRECCIÓN: Se instancian los modelos con el nombre de clase correcto.
         $this->mesaModel = new MesaModel($this->db);
-        $this->estadoGeneralModel = new EstadoGeneralModel($this->db);
+        // Estados de mesa manejados por MesaModel y constantes (sin modelo genérico)
     }
 
     /**
@@ -56,17 +56,14 @@ class MesaController
     {
         $this->validarCampos($data, ['numero', 'capacidad']);
 
-        // Por defecto, una nueva mesa siempre está 'disponible'
-        $estadoDisponible = $this->estadoGeneralModel->findByName('disponible');
-        if (!$estadoDisponible) {
-            throw new Exception("El estado 'disponible' no está configurado en la base de datos.", 500);
-        }
+        // Por defecto, una nueva mesa siempre está disponible (ID constante)
+        $estadoDisponibleId = EstadosMesa::DISPONIBLE;
 
         $datosParaCrear = [
             'numero' => $data['numero'],
             'capacidad' => $data['capacidad'],
             'ubicacion' => $data['ubicacion'] ?? null,
-            'estado_id' => $estadoDisponible['id']
+            'estado_id' => $estadoDisponibleId
         ];
         
         $nuevoId = $this->mesaModel->create($datosParaCrear);
@@ -91,10 +88,16 @@ class MesaController
             throw new Exception("Mesa no encontrada.", 404);
         }
         
-        // Si se envía el nombre de un estado para mesas, usamos el método específico
-        if (isset($data['estado_nombre'])) {
+        // Actualización de estado de la mesa: aceptar estado_id directo o estado_nombre
+        if (isset($data['estado_id'])) {
+            $estadoId = (int)$data['estado_id'];
+            $cambiado = $this->mesaModel->cambiarEstadoPorId($id, $estadoId);
+            if (!$cambiado) {
+                throw new Exception("No se pudo cambiar el estado de la mesa.", 400);
+            }
+            unset($data['estado_id']);
+        } elseif (isset($data['estado_nombre'])) {
             $nuevoEstado = $data['estado_nombre'];
-            // Cambiamos el estado de la mesa con el nombre provisto (usa tabla 'estados_mesa')
             $cambiado = $this->mesaModel->cambiarEstado($id, $nuevoEstado);
             if (!$cambiado) {
                 throw new Exception("No se pudo cambiar el estado de la mesa a '{$nuevoEstado}'.", 400);
@@ -152,8 +155,7 @@ class MesaController
         if (!$this->mesaModel->resetAll()) {
             throw new Exception("No se pudieron resetear las mesas.", 500);
         }
-        
-        $this->sendResponse(200, ['success' => true, 'message' => 'Todas las mesas han sido reseteadas a "disponible".']);
+        $this->sendResponse(200, ['success' => true, 'message' => 'Todas las mesas han sido reseteadas a disponible.']);
     }
 
     // --- Métodos de Ayuda ---

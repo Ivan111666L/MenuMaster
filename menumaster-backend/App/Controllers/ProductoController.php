@@ -8,6 +8,7 @@ use App\Models\ProductoModel;
 use App\Models\ProductoIngredientesModel;
 use App\Models\CategoriaModel;
 use App\Models\EstadoProductoModel;
+use App\EstadosProducto;
 use App\Utils\Validator;
 use PDO;
 use Exception;
@@ -120,16 +121,8 @@ class ProductoController {
                 'destacado' => isset($data['destacado']) ? (int)(bool)$data['destacado'] : 0
             ];
 
-            // Buscar estado 'disponible' por nombre
-            $stmt = $this->db->prepare("SELECT id FROM estados_producto WHERE nombre = 'disponible' LIMIT 1");
-            $stmt->execute();
-            $estadoDisponible = $stmt->fetch(PDO::FETCH_ASSOC);
-            
-            if ($estadoDisponible) {
-                $productoData['estado_id'] = $estadoDisponible['id'];
-            } else {
-                $productoData['estado_id'] = 1; // Default
-            }
+            // Asignar estado disponible por ID constante
+            $productoData['estado_id'] = EstadosProducto::DISPONIBLE;
 
             // Crear el producto
             $productoCreado = $this->productoModel->create($productoData);
@@ -327,10 +320,16 @@ class ProductoController {
     public function updateProductStatus(int $id, array $data): void
     {
         try {
-            Validator::validate($data, ['estado' => 'required']);
-            
-            if (!$this->productoModel->updateStatus($id, $data['estado'])) {
-                throw new Exception("No se pudo actualizar el estado del producto.", 500);
+            // Permitir enviar 'estado_id' directamente; mantener compatibilidad con 'estado' por nombre
+            if (isset($data['estado_id'])) {
+                if (!$this->productoModel->updateStatusPorId($id, (int)$data['estado_id'])) {
+                    throw new Exception("No se pudo actualizar el estado del producto.", 500);
+                }
+            } else {
+                Validator::validate($data, ['estado' => 'required']);
+                if (!$this->productoModel->updateStatus($id, $data['estado'])) {
+                    throw new Exception("No se pudo actualizar el estado del producto.", 500);
+                }
             }
             
             $this->sendResponse(200, ["mensaje" => "Estado del producto actualizado correctamente."]);

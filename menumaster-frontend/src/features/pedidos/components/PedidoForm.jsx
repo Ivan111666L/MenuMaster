@@ -85,12 +85,12 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
 
       {/* Lista de Productos por Categoría */}
       <div className="form-group">
-        <label>
+        <h3 className="section-title">
           {categoriaSeleccionada && categoriaSeleccionada !== 'todas' 
             ? `Productos - ${categoriaSeleccionada}` 
             : 'Productos Disponibles'
           }
-        </label>
+        </h3>
         
         {categoriaSeleccionada === '' || categoriaSeleccionada === 'todas' ? (
           // Mostrar productos agrupados por categoría

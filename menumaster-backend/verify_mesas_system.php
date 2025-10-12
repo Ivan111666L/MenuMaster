@@ -2,7 +2,7 @@
 require_once 'vendor/autoload.php';
 require_once 'App/config/conexionDb.php';
 
-use app\config\ConexionDb;
+use App\Config\ConexionDb;
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -55,7 +55,7 @@ try {
     echo "\n3. Probando MesaController...\n";
     require_once 'App/Controllers/MesaController.php';
     
-    $controller = new \app\Controllers\MesaController($db);
+    $controller = new \App\Controllers\MesaController($db);
     echo "✅ MesaController instanciado correctamente\n";
     
     // 4. Verificar rutas de mesas

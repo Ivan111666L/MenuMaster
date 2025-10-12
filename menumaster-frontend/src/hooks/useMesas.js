@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import mesaService from '@/features/mesas/services/mesaService';
+import { ESTADOS_MESA } from '@/utils/constant';
 
 /**
  * Hook personalizado para gestionar el estado y operaciones de mesas
@@ -96,9 +97,9 @@ export const useMesas = () => {
   // Obtener estadísticas de mesas
   const getEstadisticasMesas = useCallback(() => {
     const total = mesas.length;
-    const disponibles = mesas.filter(m => m.estado === 'disponible').length;
-    const ocupadas = mesas.filter(m => m.estado === 'ocupada').length;
-    const reservadas = mesas.filter(m => m.estado === 'reservada').length;
+    const disponibles = mesas.filter(m => m.estado === ESTADOS_MESA.DISPONIBLE).length;
+    const ocupadas = mesas.filter(m => m.estado === ESTADOS_MESA.OCUPADA).length;
+    const reservadas = mesas.filter(m => m.estado === ESTADOS_MESA.RESERVADA).length;
     const mantenimiento = mesas.filter(m => m.estado === 'mantenimiento').length;
 
     return {
