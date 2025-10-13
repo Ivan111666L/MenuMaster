@@ -84,3 +84,53 @@ export const getProductosMasVendidos = async (fechaInicio, fechaFin) => {
     throw error;
   }
 };
+
+// Listado de pagos (para análisis). Devuelve { success, data }
+export const getPagosListado = async () => {
+  try {
+    const response = await api.get('/pagos');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener pagos:', error);
+    throw error;
+  }
+};
+
+// Listado de métodos de pago. Devuelve { success, data }
+export const getMetodosPagoListado = async () => {
+  try {
+    const response = await api.get('/pagos/metodos');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener métodos de pago:', error);
+    throw error;
+  }
+};
+
+// Listado de usuarios/meseros para filtros
+export const getUsuariosListado = async () => {
+  try {
+    const response = await api.get('/usuarios');
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    throw error;
+  }
+};
+
+// Ventas por día filtradas por usuario/mesero
+export const getVentasPorDiaPorUsuario = async (fechaInicio, fechaFin, usuarioIds) => {
+  try {
+    const response = await api.get('/historial/ventas-por-dia-usuario', {
+      params: {
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        usuario_id: Array.isArray(usuarioIds) ? usuarioIds.join(',') : usuarioIds
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error al obtener ventas por día por usuario:', error);
+    throw error;
+  }
+};

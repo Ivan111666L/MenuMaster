@@ -3,6 +3,8 @@ import { Outlet, NavLink } from 'react-router-dom';
 import { Container, Row, Col, Nav, Card } from 'react-bootstrap';
 import { FaChartLine, FaBalanceScale, FaBoxes, FaCalendarAlt } from 'react-icons/fa';
 import '@/styles/analisis.css';
+import PaymentSummary from '@/features/analisis/components/PaymentSummary.jsx';
+import AIInsights from '@/features/analisis/components/AIInsights.jsx';
 
 const AnalisisLayout = () => {
   return (
@@ -32,6 +34,10 @@ const AnalisisLayout = () => {
         </Col>
         
         <Col md={9} lg={10}>
+          {/* Resumen de pagos para empezar a usar los datos guardados */}
+          <PaymentSummary />
+          {/* Inteligencia Artificial: insights y recomendaciones */}
+          <AIInsights />
           <Card className="shadow-sm analisis-card">
             <Card.Body>
               <Outlet />

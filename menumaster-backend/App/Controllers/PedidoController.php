@@ -492,31 +492,47 @@ class PedidoController
     // --- Helper para enviar respuestas ---
     private function sendResponse(int $statusCode, $message = null, $error = null, $data = null): void
     {
-        http_response_code($statusCode);
-        
+        $isCli = (php_sapi_name() === 'cli');
+
+        if (!$isCli) {
+            http_response_code($statusCode);
+        }
+
         if ($statusCode === 204) {
+            if ($isCli) {
+                return;
+            }
             exit;
         }
-        
+
         $response = [
             'success' => $statusCode < 400,
             'timestamp' => date('Y-m-d H:i:s')
         ];
-        
+
         if ($message) {
             $response['message'] = $message;
         }
-        
+
         if ($error) {
             $response['error'] = $error;
         }
-        
+
         if ($data !== null) {
             $response['data'] = $data;
         }
-        
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // Evitar warnings de headers ya enviados; en CLI no enviar headers
+        if (!$isCli && !headers_sent()) {
+            header('Content-Type: application/json; charset=utf-8');
+        }
+
+        $json = json_encode($response, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        echo $json;
+
+        if ($isCli) {
+            return;
+        }
         exit;
     }
 }

@@ -3,6 +3,15 @@
 # Enable URL Rewriting
 RewriteEngine On
 
+# Forward Authorization header to PHP so JWT can be read
+<IfModule mod_rewrite.c>
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule ^(.*)$ - [E=HTTP_AUTHORIZATION:%1]
+</IfModule>
+
+# Fallback for environments where Rewrite does not expose Authorization
+SetEnvIfNoCase Authorization ".+" HTTP_AUTHORIZATION=$0
+
 # Handle API Routes - but allow direct PHP file access
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

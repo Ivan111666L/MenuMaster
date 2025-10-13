@@ -9,8 +9,9 @@ use App\Controllers\PermisosController;
 use App\Middleware\AuthMiddleware;
 
 try {
-    // Instanciar el controlador
+    // Instanciar dependencias
     $controller = new PermisosController();
+    $auth = new AuthMiddleware();
     
     // Analizar la petición
     $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
@@ -24,18 +25,24 @@ try {
             switch ($action) {
                 case null:
                 case 'list':
+                    // Requiere autenticación básica; el controlador validará permisos específicos
+                    $auth->requireAuth();
                     $controller->getPermisos();
                     break;
                     
                 case 'by-role':
+                    $auth->requireAuth();
                     $controller->getPermisosByRol();
                     break;
                     
                 case 'current-user':
+                    // Debe requerir autenticación para obtener permisos del usuario actual
+                    $auth->requireAuth();
                     $controller->getCurrentUserPermisos();
                     break;
                     
                 case 'check':
+                    $auth->requireAuth();
                     $controller->checkPermiso();
                     break;
                     
@@ -49,18 +56,22 @@ try {
         case 'POST':
             switch ($action) {
                 case 'assign':
+                    $auth->requireAuth();
                     $controller->asignarPermisos();
                     break;
                     
                 case 'create':
+                    $auth->requireAuth();
                     $controller->crearPermiso();
                     break;
                     
                 case 'by-role':
+                    $auth->requireAuth();
                     $controller->getPermisosByRol();
                     break;
                     
                 case 'check':
+                    $auth->requireAuth();
                     $controller->checkPermiso();
                     break;
                     

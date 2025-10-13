@@ -33,14 +33,15 @@
 }
 
 .analisis-nav .nav-link.active {
-  background: #eef2ff;
+  background: var(--secondary-color);
   border-left: 3px solid var(--analisis-primary);
-  color: #111827;
+  color: #fff;
 }
 
 .analisis-card {
   border: 1px solid var(--analisis-border);
   border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
 .analisis-section {

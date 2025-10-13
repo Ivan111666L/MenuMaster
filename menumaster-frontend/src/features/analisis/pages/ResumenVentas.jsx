@@ -23,6 +23,28 @@ const ResumenVentas = () => {
     cargarResumen(inicioMes.toISOString().split('T')[0], hoy.toISOString().split('T')[0]);
   }, []);
 
+  // Refresco silencioso para mantener los datos en tiempo real sin mostrar spinner
+  const refrescarResumen = async (inicio, fin) => {
+    try {
+      const response = await getResumenVentas(inicio, fin);
+      if (response?.status === 'success') {
+        setResumen(response.data);
+      }
+    } catch (err) {
+      // Evitar romper la UI en refrescos periódicos; solo registrar de forma no intrusiva
+      console.debug('Fallo refresco de resumen de ventas:', err?.message || err);
+    }
+  };
+
+  // Configurar polling para actualización en vivo cada 10 segundos
+  useEffect(() => {
+    if (!fechaInicio || !fechaFin) return;
+    const interval = setInterval(() => {
+      refrescarResumen(fechaInicio, fechaFin);
+    }, 10000); // 10s
+    return () => clearInterval(interval);
+  }, [fechaInicio, fechaFin]);
+
   const cargarResumen = async (inicio, fin) => {
     try {
       setLoading(true);

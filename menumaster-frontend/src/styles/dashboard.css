@@ -81,6 +81,37 @@
     to { transform: rotate(360deg); }
 }
 
+/* === Comparación semanal simple (ventas vs costos vs compras) === */
+.comparacion-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+.comparacion-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 120px;
+    padding: 6px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+.bar {
+    width: 10px;
+    border-radius: 3px;
+}
+.bar.ventas { background-color: rgba(54, 162, 235, 0.7); }
+.bar.costos { background-color: rgba(255, 99, 132, 0.7); }
+.bar.compras { background-color: rgba(255, 159, 64, 0.7); }
+
+.widget-insight {
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 0.25rem;
+}
+
 .error-banner {
     background-color: #fed7d7;
     color: #c53030;

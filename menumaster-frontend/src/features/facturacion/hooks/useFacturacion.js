@@ -31,7 +31,12 @@ export const useFacturacion = () => {
         try {
             setLoading(true);
             const data = await facturacionService.getPedidosParaFacturar();
-            setPedidos(data);
+            if (!Array.isArray(data)) {
+                console.warn('useFacturacion: getPedidosParaFacturar no devolvió un arreglo. Valor recibido:', data);
+                setPedidos([]);
+            } else {
+                setPedidos(data);
+            }
         } catch (err) {
             setError('No se pudieron cargar los pedidos listos para facturar.');
         } finally {
@@ -41,6 +46,14 @@ export const useFacturacion = () => {
 
     useEffect(() => {
         cargarPedidos();
+    }, [cargarPedidos]);
+
+    // Auto-refresco por polling para datos en tiempo real
+    useEffect(() => {
+        const interval = setInterval(() => {
+            cargarPedidos();
+        }, 10000); // cada 10 segundos
+        return () => clearInterval(interval);
     }, [cargarPedidos]);
 
     // Refrescar lista cuando se emita el evento global de pedidos

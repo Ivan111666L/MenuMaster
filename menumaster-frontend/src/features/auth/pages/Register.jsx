@@ -105,12 +105,12 @@ function Register() {
 
     return (
         <div className='auth-container'>
-            <div className="auth-form-container">
+        <div className="auth-form-container form-container">
                 <div className="auth-logo-container">
                     <img src={MenuMasterLogo} alt="MenuMaster" className="auth-logo" />
                 </div>
                 <h1 className='auth-title'>Crear una Cuenta</h1>
-                <form onSubmit={handleRegister} noValidate>
+                <form onSubmit={handleRegister} noValidate className="form-grid cols-2">
                     
                     <Input
                         id="nombre"
@@ -205,9 +205,11 @@ function Register() {
                     
                     {apiError && <div className="auth-error-message">{apiError}</div>}
 
-                    <Button type='submit' variant="primary" className="w-full" disabled={isLoading}>
-                        {isLoading ? <Spinner /> : 'Crear Cuenta'}
-                    </Button>
+                    <div className="form-actions" style={{gridColumn: '1 / -1'}}>
+                        <Button type='submit' variant="primary" className="w-full" disabled={isLoading}>
+                            {isLoading ? <Spinner /> : 'Crear Cuenta'}
+                        </Button>
+                    </div>
                 </form>
 
                 <p className="auth-switch">

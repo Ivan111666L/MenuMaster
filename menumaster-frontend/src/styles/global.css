@@ -161,6 +161,74 @@ html {
   color: var(--gray);
 }
 
+/* Contenedor de formularios y layout responsivo */
+.form-container {
+  background: var(--white);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .form-grid.cols-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+  .form-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Select y textarea coherentes */
+textarea.form-input {
+  min-height: 120px;
+  resize: vertical;
+}
+
+select.form-input {
+  cursor: pointer;
+}
+
+/* Utilidades de accesibilidad */
+.visually-hidden,
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
 /* Select inputs */
 .form-select {
   width: 100%;
@@ -724,10 +792,10 @@ body {
     transition: all 0.3s ease;
 }
 
-.sidebar-menu li:hover {
+/* .sidebar-menu li:hover {
     background-color: #F57C00;
     color: white;
-}
+} */
 
 .sidebar-icon {
     font-size: 1.2rem;

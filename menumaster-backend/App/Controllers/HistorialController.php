@@ -242,6 +242,32 @@ class HistorialController extends Controller
     }
 
     /**
+     * Obtener ventas por día filtradas por usuario_id (uno o varios)
+     * GET /api/historial/ventas-por-dia-usuario?fecha_inicio=YYYY-MM-DD&fecha_fin=YYYY-MM-DD&usuario_id=1,2,3
+     */
+    public function getVentasPorDiaPorUsuario()
+    {
+        try {
+            $fechaInicio = $_GET['fecha_inicio'] ?? null;
+            $fechaFin = $_GET['fecha_fin'] ?? null;
+            $usuarioParam = $_GET['usuario_id'] ?? '';
+            $usuarioIds = array_filter(array_map('intval', explode(',', $usuarioParam)));
+
+            $ventas = $this->historialPedidosModel->getVentasPorDiaPorUsuario($fechaInicio, $fechaFin, $usuarioIds);
+
+            $this->jsonResponse([
+                'success' => true,
+                'data' => $ventas
+            ]);
+        } catch (Exception $e) {
+            $this->jsonResponse([
+                'success' => false,
+                'message' => 'Error al obtener ventas por día por usuario: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Obtener ventas por mes
      */
     public function getVentasPorMes()

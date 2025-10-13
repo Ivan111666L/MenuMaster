@@ -40,8 +40,9 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
   };
   
   return (
-    <div className="pedido-form">
+    <div className="form-container pedido-form">
       <h2>1. Selecciona Mesa y Productos</h2>
+      <div className="form-grid">
       
       {/* Selección de Mesa */}
       <div className="form-group">
@@ -140,6 +141,7 @@ function PedidoForm({ productos, mesas, seleccionarMesa, agregarItem, pedidoActu
             ))}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

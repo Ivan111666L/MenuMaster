@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import configService from '@/services/configService';
 import { ESTADOS_MESA } from '@/utils/constant';
 
 /**
@@ -63,9 +64,16 @@ export const useConfiguraciones = () => {
         setConfiguraciones(prev => ({ ...prev, ...parsedConfig }));
       }
       
-      // Aquí se podría hacer una llamada a la API para sincronizar
-      // const apiConfig = await configService.getConfiguraciones();
-      // setConfiguraciones(apiConfig);
+      // Intentar sincronizar con el backend
+      try {
+        const apiConfig = await configService.getConfiguraciones();
+        if (apiConfig && typeof apiConfig === 'object') {
+          setConfiguraciones(prev => ({ ...prev, ...apiConfig }));
+          localStorage.setItem('menumaster_configuraciones', JSON.stringify(apiConfig));
+        }
+      } catch (syncErr) {
+        console.warn('No se pudo sincronizar configuraciones con backend, usando localStorage.', syncErr?.message);
+      }
       
     } catch (err) {
       setError(err.message || 'Error al cargar las configuraciones');
@@ -104,12 +112,17 @@ export const useConfiguraciones = () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Guardar en localStorage
-      localStorage.setItem('menumaster_configuraciones', JSON.stringify(configuraciones));
-      
-      // Aquí se podría hacer una llamada a la API para guardar
-      // await configService.saveConfiguraciones(configuraciones);
+
+      // Guardar en backend primero
+      try {
+        const saved = await configService.saveConfiguraciones(configuraciones);
+        if (saved && typeof saved === 'object') {
+          localStorage.setItem('menumaster_configuraciones', JSON.stringify(saved));
+        }
+      } catch (saveErr) {
+        console.warn('Fallo al guardar en backend; persistiendo en localStorage.', saveErr?.message);
+        localStorage.setItem('menumaster_configuraciones', JSON.stringify(configuraciones));
+      }
       
       setHasChanges(false);
       return true;

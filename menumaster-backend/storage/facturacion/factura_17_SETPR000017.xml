@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Invoice xmlns="urn:oasis:names:specification:ubl:schema:xsd:Invoice-2"
+         xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+         xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2">
+  <cbc:ID>SETPR000017</cbc:ID>
+  <cbc:IssueDate>2025-10-12 23:34:26</cbc:IssueDate>
+  <cbc:UUID>b3101d4b6a08ca8d2b5234763bf6d286cb1c12914c884e2cc7a10366b7a3f9ca</cbc:UUID>
+  <cac:AccountingSupplierParty>
+    <cac:Party>
+      <cac:PartyIdentification><cbc:ID>900000000</cbc:ID></cac:PartyIdentification>
+    </cac:Party>
+  </cac:AccountingSupplierParty>
+  <cac:AccountingCustomerParty>
+    <cac:Party>
+      <cac:PartyIdentification><cbc:ID>00000000</cbc:PartyIdentification>
+      <cac:PartyName><cbc:Name>Cliente</cbc:Name></cac:PartyName>
+    </cac:Party>
+  </cac:AccountingCustomerParty>
+  <cac:LegalMonetaryTotal>
+    <cbc:PayableAmount currencyID="COP">17.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
+</Invoice>

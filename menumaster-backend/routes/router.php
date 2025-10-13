@@ -125,11 +125,17 @@ try {
         case 'pagos':
             require_once BASE_PATH . '/routes/pagos_api.php';
             break;
+        case 'facturacion-electronica':
+            require_once BASE_PATH . '/routes/facturacion_electronica_api.php';
+            break;
         case 'notificaciones':
             require_once BASE_PATH . '/routes/notificaciones_api.php';
             break;
         case 'logs':
             require_once BASE_PATH . '/routes/logs_api.php';
+            break;
+        case 'configuracion':
+            require_once BASE_PATH . '/routes/configuracion_api.php';
             break;
 
         

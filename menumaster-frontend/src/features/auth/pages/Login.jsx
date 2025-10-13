@@ -50,14 +50,14 @@ function Login() {
 
   return (
     <div className='auth-container'>
-      <div className="auth-form-container">
+      <div className="auth-form-container form-container">
         <div className="auth-logo-container">
           <img src={MenuMasterLogo} alt="MenuMaster" className="auth-logo" />
         </div>
         <h1 className='auth-title'>Iniciar Sesión</h1>
         <p className="auth-subtitle">Bienvenido de nuevo a MenuMaster</p>
 
-        <form onSubmit={handleSubmit} noValidate>
+        <form onSubmit={handleSubmit} noValidate className="form-grid">
           <label htmlFor="email" className="sr-only">Correo electrónico</label>
             <Input 
               id="email"
@@ -90,9 +90,11 @@ function Login() {
             </span>
           </div>
           {error && <div className="auth-error-message">{error}</div>}
-          <Button type='submit' variant="primary" disabled={isLoading} className="w-full">
-            {isLoading ? <Spinner /> : 'Ingresar'}
-          </Button>
+          <div className="form-actions">
+            <Button type='submit' variant="primary" disabled={isLoading} className="w-full">
+              {isLoading ? <Spinner /> : 'Ingresar'}
+            </Button>
+          </div>
         </form>
         <div className="auth-links-container">
           <Link to="/forgot-password">¿Olvidaste tu contraseña?</Link>

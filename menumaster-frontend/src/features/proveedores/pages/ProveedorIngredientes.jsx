@@ -122,7 +122,7 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
   if (error) return <div>{error}</div>;
 
   return (
-    <div>
+    <div className="form-container">
       <h3>Ingredientes del Proveedor</h3>
       <div style={{ marginBottom: '8px', fontSize: '0.9em', color: '#555' }}>
         Selecciona ingredientes y cantidades para preparar el pedido por WhatsApp.
@@ -147,7 +147,7 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
                   {unidad && (<div style={{ fontSize: '0.85em', color: '#666' }}>Unidad: {unidad}</div>)}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <label style={{ fontSize: '0.85em' }}>Cant:</label>
+                  <label style={{ fontSize: '0.85em' }} className="form-label">Cant:</label>
                   <input
                     type="number"
                     min="0"
@@ -156,6 +156,7 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
                     onChange={(e) => cambiarCantidad(id, e.target.value)}
                     disabled={!seleccionado}
                     style={{ width: '80px' }}
+                    className="form-input"
                   />
                 </div>
                 <Button variant="danger" onClick={() => quitarIngrediente(ing)}>Quitar</Button>
@@ -168,8 +169,8 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
       </div>
 
       <h4 style={{ marginTop: '16px' }}>Todos los ingredientes disponibles</h4>
-      <div style={{ marginBottom: '8px' }}>
-        <label htmlFor="proveedor-buscar-ingredientes" style={{ display: 'block', marginBottom: '4px' }}>Buscar ingredientes</label>
+      <div className="form-group" style={{ marginBottom: '8px' }}>
+        <label htmlFor="proveedor-buscar-ingredientes" className="form-label" style={{ display: 'block', marginBottom: '4px' }}>Buscar ingredientes</label>
         <input
           id="proveedor-buscar-ingredientes"
           name="proveedor-buscar-ingredientes"
@@ -178,17 +179,19 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
           aria-label="Buscar ingredientes"
           value={busqueda}
           onChange={(e) => setBusqueda(e.target.value)}
-          style={{ width: '100%', padding: '6px' }}
+          className="form-input"
+          style={{ width: '100%' }}
         />
       </div>
-      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
-        <label htmlFor="proveedor-nuevo-ingrediente" style={{ fontSize: '0.9em' }}>Agregar ingrediente</label>
+      <div className="form-row" style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '8px' }}>
+        <label htmlFor="proveedor-nuevo-ingrediente" className="form-label" style={{ fontSize: '0.9em' }}>Agregar ingrediente</label>
         <select
           id="proveedor-nuevo-ingrediente"
           name="proveedor-nuevo-ingrediente"
           value={nuevoIngredienteId}
           onChange={(e) => setNuevoIngredienteId(e.target.value)}
-          style={{ flex: 1, padding: '6px' }}
+          className="form-input"
+          style={{ flex: 1 }}
           aria-label="Seleccionar ingrediente para agregar"
           title="Seleccionar ingrediente para agregar"
         >
@@ -200,7 +203,9 @@ function ProveedorIngredientes({ proveedorId, modoPedido = false }) {
               <option key={ing.id} value={ing.id}>{ing.nombre}</option>
             ))}
         </select>
-        <Button variant="primary" onClick={agregarIngrediente} disabled={!nuevoIngredienteId}>Agregar</Button>
+        <div className="form-actions" style={{ margin: 0 }}>
+          <Button variant="primary" onClick={agregarIngrediente} disabled={!nuevoIngredienteId}>Agregar</Button>
+        </div>
       </div>
       <ul style={{ maxHeight: '200px', overflowY: 'auto' }}>
         {Array.isArray(allIngredientes) && allIngredientes

@@ -7,7 +7,8 @@ const getPedidosParaFacturar = async () => {
     // Incluir pedidos en estados relevantes para facturación: servido, pendiente y en preparación
     const estados = encodeURIComponent('servido,pendiente,en preparacion');
     const response = await api.get(`/pedidos?estado=${estados}`);
-    return response.data.data;
+    const data = response?.data?.data ?? response?.data ?? [];
+    return Array.isArray(data) ? data : [];
 };
 
 /**

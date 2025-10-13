@@ -203,22 +203,55 @@ class HistorialPedidosModel extends Model
     { 
         try {
             $sql = "SELECT 
-                        DATE(fecha_finalizacion) as fecha,
+                        DATE(hp.fecha_finalizacion) as fecha,
                         COUNT(*) as total_pedidos,
-                        SUM(total) as total_ventas,
-                        AVG(total) as promedio_pedido,
+                        SUM(hp.total) as total_ventas,
+                        AVG(hp.total) as promedio_pedido,
                         SUM(hdp.rentabilidad) as rentabilidad_total
                     FROM {$this->table} hp
                     LEFT JOIN historial_detalles_pedido hdp ON hp.id = hdp.historial_pedido_id
-                    WHERE DATE(hp.fecha_finalizacion) = ?
-                    GROUP BY DATE(fecha_finalizacion)
-                    ORDER BY fecha DESC";
+                    WHERE DATE(hp.fecha_finalizacion) BETWEEN ? AND ?
+                    GROUP BY DATE(hp.fecha_finalizacion)
+                    ORDER BY fecha ASC";
 
             $stmt = $this->db->prepare($sql);
             $stmt->execute([$fechaInicio, $fechaFin]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             error_log("Error al obtener ventas por día: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
+     * Obtener ventas por día filtradas por uno o varios usuario_id
+     */
+    public function getVentasPorDiaPorUsuario($fechaInicio, $fechaFin, $usuarioIds = [])
+    {
+        try {
+            if (empty($usuarioIds)) {
+                return [];
+            }
+            $placeholders = implode(',', array_fill(0, count($usuarioIds), '?'));
+            $sql = "SELECT 
+                        DATE(hp.fecha_finalizacion) as fecha,
+                        COUNT(*) as total_pedidos,
+                        SUM(hp.total) as total_ventas,
+                        AVG(hp.total) as promedio_pedido,
+                        SUM(hdp.rentabilidad) as rentabilidad_total
+                    FROM {$this->table} hp
+                    LEFT JOIN historial_detalles_pedido hdp ON hp.id = hdp.historial_pedido_id
+                    WHERE DATE(hp.fecha_finalizacion) BETWEEN ? AND ?
+                      AND hp.usuario_id IN ($placeholders)
+                    GROUP BY DATE(hp.fecha_finalizacion)
+                    ORDER BY fecha ASC";
+
+            $params = array_merge([$fechaInicio, $fechaFin], array_map('intval', $usuarioIds));
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            error_log("Error al obtener ventas por día por usuario: " . $e->getMessage());
             return [];
         }
     }

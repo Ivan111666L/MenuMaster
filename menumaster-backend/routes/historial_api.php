@@ -64,6 +64,10 @@ try {
                 $controller->getVentasPorDia();
                 break;
 
+            case 'ventas-por-dia-usuario':
+                $controller->getVentasPorDiaPorUsuario();
+                break;
+
             case 'ventas-por-mes':
                 $controller->getVentasPorMes();
                 break;

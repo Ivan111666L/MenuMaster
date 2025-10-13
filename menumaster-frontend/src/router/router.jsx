@@ -203,7 +203,7 @@ const router = createBrowserRouter([
           {
             path: 'configuracion',
             element: (
-              <PrivateRoute roles={['administrador']}>
+              <PrivateRoute>
                 <Configuracion />
               </PrivateRoute>
             ),

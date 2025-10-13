@@ -41,7 +41,7 @@ try {
     
     // Las acciones de escritura y ver la lista completa de usuarios requieren ser administrador.
     if (in_array($method, ['POST', 'PUT', 'DELETE']) || ($method === 'GET' && $id === null)) {
-        requireAdmin();
+        \App\Utils\AuthHelpers::requireAdmin();
     }
 
     // 4. Dirigimos la petición al método correcto
@@ -92,18 +92,5 @@ try {
 }
 
 
-/**
- * Función de Ayuda para la AUTORIZACIÓN
- */
-if (!function_exists('requireAdmin')) {
-    function requireAdmin(): void {
-        $token = (new AuthMiddleware())->getBearerTokenForInternalUse();
-        if (!$token) {
-            throw new Exception("Token no encontrado para verificación de rol.", 401);
-        }
-        $payload = AuthController::decodeTokenData($token);
-        if (($payload['rol_id'] ?? null) !== 1) { // 1 = administrador
-            throw new Exception("No tienes permisos para realizar esta acción.", 403);
-        }
-    }
-}
+// Helper de autorización: usar la implementación centralizada
+// La verificación de admin se delega a AuthHelpers::requireAdmin() para evitar problemas de alcance

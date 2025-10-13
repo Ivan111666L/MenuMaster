@@ -263,6 +263,20 @@ class RolMiddleware
     }
 
     /**
+     * Middleware para rutas que requieren permiso por módulo y acción
+     */
+    public function requireModulePermission(string $modulo, string $accion): void
+    {
+        // Primero verificar autenticación
+        $this->authMiddleware->requireAuth();
+
+        if (!$this->checkModulePermission($modulo, $accion)) {
+            $this->sendForbiddenResponse("No tienes permisos para el módulo '{$modulo}' y acción '{$accion}'");
+            exit;
+        }
+    }
+
+    /**
      * Verificar si el usuario es administrador
      */
     public function isAdmin(): bool

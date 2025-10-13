@@ -51,14 +51,30 @@ function ProveedorForm({ proveedorId, onSaved }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="form-container">
       <h2>{proveedorId ? 'Editar Proveedor' : 'Nuevo Proveedor'}</h2>
-      <label>Nombre:<input name="nombre" value={form.nombre} onChange={handleChange} required /></label>
-      <label>Contacto:<input name="contacto" value={form.contacto} onChange={handleChange} /></label>
-      <label>Teléfono:<input name="telefono" value={form.telefono} onChange={handleChange} /></label>
-      <label>Email:<input name="email" value={form.email} onChange={handleChange} /></label>
-      {error && <div>{error}</div>}
-      <Button type="submit" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</Button>
+      <div className="form-grid">
+        <div className="form-group">
+          <label htmlFor="nombre" className="form-label">Nombre</label>
+          <input id="nombre" name="nombre" value={form.nombre} onChange={handleChange} required className="form-input" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="contacto" className="form-label">Contacto</label>
+          <input id="contacto" name="contacto" value={form.contacto} onChange={handleChange} className="form-input" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="telefono" className="form-label">Teléfono</label>
+          <input id="telefono" name="telefono" value={form.telefono} onChange={handleChange} className="form-input" />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email" className="form-label">Email</label>
+          <input id="email" name="email" value={form.email} onChange={handleChange} className="form-input" />
+        </div>
+      </div>
+      {error && <div className="form-input-error">{error}</div>}
+      <div className="form-actions">
+        <Button type="submit" disabled={loading}>{loading ? 'Guardando...' : 'Guardar'}</Button>
+      </div>
     </form>
   );
 }
